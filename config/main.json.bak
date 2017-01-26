@@ -1,0 +1,14 @@
+{
+	"db": {
+		"database": "abe",
+		"username": "root",
+		"password": ""
+	},
+	"blockchain": {
+		"host": "localhost",
+		"port": 8332,
+		"user": "user",
+		"pass": "123456",
+		"timeout": 30000
+	}
+}
