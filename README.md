@@ -55,3 +55,20 @@ response
 }]
 ```
 
+## Get news
+`GET`
+
+/news/{lang}
+
+response
+```
+[{
+	"id": 287,
+	"date": "2017-01-15T10:45:51",
+	"link": "https://qtum.org/qa-about-qtum-project/",
+	"title": "Q&#038;A About Qtum Project",
+	"body": "These questions were asked in Slack Channel...",
+	"short": "These questions were asked in Qtum...",
+	"image": "https://qtum.org/wp-content/uploads/2017/01/Telephone-Game.png"
+}]
+```
