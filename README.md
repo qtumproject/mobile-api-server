@@ -79,8 +79,10 @@ response
 	"short": "These questions were asked in Qtum...",
 	"image": "https://qtum.org/wp-content/uploads/2017/01/Telephone-Game.png"
 }]
+```
 
 ## Get blockchain info
+
 `GET`
 
 /blockchain/info
