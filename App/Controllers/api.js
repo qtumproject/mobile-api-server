@@ -37,6 +37,7 @@ let APIController = {
 		APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory);
 		APIController.addHandler('post', '/send-raw-transaction', Controllers.blockchain.sendRawTransaction);
 		APIController.addHandler('get', '/news/:lang', Controllers.news.getNews);
+		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
 	},
 	server: null,
 	getServer: function() {

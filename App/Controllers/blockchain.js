@@ -18,6 +18,7 @@ class BlockchainController {
 		});
 		
 		this.sendRawTransaction = this.sendRawTransaction.bind(this);
+		this.getInfo = this.getInfo.bind(this);
 	}
 	
 	run() {
@@ -33,6 +34,10 @@ class BlockchainController {
 			}
 			cb(null, result);
 		});
+	}
+	
+	getInfo(cb) {
+		this.client.getInfo(cb);
 	}
 }
 

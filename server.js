@@ -9,11 +9,11 @@ let async = require('async'),
 	dir = require('node-dir'),
 	moment = require('moment');
 
-// let Raven = null;
-// if(!config.disableRaven) {
-// 	Raven = require('raven');
-// 	Raven.config('https://35b2581219364a37aa0261cc100cf13a:255b6373e8d34aebbc0cacdc5a43c415@sentry.io/123730').install();
-// }
+let Raven = null;
+if(!config.disableRaven) {
+	Raven = require('raven');
+	Raven.config('https://5e107da476d548918506f173c1aeaf93:d15d9ecd7c53466fb1e7d80f257f2a4a@sentry.io/133897').install();
+}
 
 let Server = {
 	models: {},
@@ -66,14 +66,18 @@ global.getControllers = () => Server.controllers;
 
 global.RootDir = __dirname;
 
-global.GlobalError = (key, err, cb) => {
+global.GlobalError = (key, err, cb = () => {}) => {
 	logger.error(key, err);
+	Raven.captureException(err, {
+		key: key
+	});
 	cb('Unknown error');
 };
 
 try {
 	Server.init();
 } catch(e) {
-	// if(!config.disableRaven)
-	// 	Raven.captureException(e);
+	logger.error(e);
+	if(!config.disableRaven)
+		Raven.captureException(e);
 }
