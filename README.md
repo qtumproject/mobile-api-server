@@ -4,7 +4,7 @@
 
 /send-raw-transaction
 
-[http://139.162.119.184/send-raw-transaction](http://139.162.119.184/send-raw-transaction)
+[http://139.162.178.174/send-raw-transaction](http://139.162.178.174/send-raw-transaction)
 
 request parameters
 
@@ -20,7 +20,7 @@ request parameters
 
 /history/{address}/{limit}/{offset}
 
-[http://139.162.119.184/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0](http://139.162.119.184/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0)
+[http://139.162.178.174/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0](http://139.162.178.174/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0)
 
 response
 
@@ -42,7 +42,7 @@ response
 
 /outputs/unspent/{address}
 
-[http://139.162.119.184/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.119.184/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+[http://139.162.178.174/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.178.174/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
 
 response
 
@@ -66,7 +66,7 @@ response
 
 /outputs/unspent?addresses[]={:address}&addresses[]={:address2}
 
-[http://139.162.119.184/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.119.184/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+[http://139.162.178.174/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.178.174/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
 
 response
 
@@ -90,7 +90,7 @@ response
 
 /news/{lang}
 
-[http://139.162.119.184/news/en](http://139.162.119.184/news/en)
+[http://139.162.178.174/news/en](http://139.162.178.174/news/en)
 
 response
 ```
@@ -111,7 +111,7 @@ response
 
 /blockchain/info
 
-[http://139.162.119.184/blockchain/info](http://139.162.119.184/blockchain/info)
+[http://139.162.178.174/blockchain/info](http://139.162.178.174/blockchain/info)
 
 response
 ```
