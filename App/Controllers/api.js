@@ -34,6 +34,7 @@ let APIController = {
 		APIController.app.options('*', cors());
 		
 		APIController.addHandler('get', '/outputs/unspent/:address', Controllers.outputs.getUnspent);
+		APIController.addHandler('get', '/outputs/unspent', Controllers.outputs.getUnspentForList);
 		APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory);
 		APIController.addHandler('post', '/send-raw-transaction', Controllers.blockchain.sendRawTransaction);
 		APIController.addHandler('get', '/news/:lang', Controllers.news.getNews);

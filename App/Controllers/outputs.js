@@ -9,16 +9,28 @@ class OutputsControllers {
 	
 	getUnspent(cb, data) {
 		let address = data._get.address;
-		let addressBytes;
-		try {
-			addressBytes = Controllers.utils.decodeAddress(address);
-		} catch(e) {
-			return cb(e.message);
-		}
+		return this.getList([address], cb);
+	}
+	
+	getUnspentForList(cb, data) {
+		let addresses = data._get.addresses;
+		return this.getList(addresses, cb);
+	}
+	
+	getList(addresses, cb) {
+		let addressesBytes = [];
+		
+		addresses.forEach(address => {
+			try {
+				addressesBytes.push(Controllers.utils.decodeAddress(address));
+			} catch(e) {}
+		});
 		
 		Models.unspent_txout_detail.findAll({
 			where: {
-				pubkey_hash: addressBytes
+				pubkey_hash: {
+					$in: addressesBytes
+				}
 			}
 		}).then(list => {
 			list = list.map(row => {

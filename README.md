@@ -61,6 +61,30 @@ response
 }]
 ```
 
+## Get unspent outputs for several addresses
+`GET`
+
+/outputs/unspent?addresses[]={:address}&addresses[]={:address2}
+
+[http://139.162.119.184/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.119.184/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+
+response
+
+```
+[{
+	"amount": 99989999995420,
+	"vout": 0,
+	"tx_id": 18398,
+	"block_id": 15305,
+	"block_height": 14111,
+	"txout_id": 36775,
+	"txout_scriptPubKey": "76a914ca9466c29560b9fdfa1deb95c95af9ddfb40c79d88ac",
+	"tx_hash": "85c71cc1a065e8607821df764891397cf5d5a8a4af3126987ab4632de5b2eb68",
+	"block_hash": "85aebc2ea4488e0d68cda6fd53b37e0589b2c3c38538d3040d34090ea7a9de5f",
+	"pubkey_hash": "ca9466c29560b9fdfa1deb95c95af9ddfb40c79d"
+}]
+```
+
 ## Get news
 `GET`
 
