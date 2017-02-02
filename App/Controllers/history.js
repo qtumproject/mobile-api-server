@@ -9,8 +9,6 @@ let Models = getModels();
 class HistoryController {
 	constructor() {
 		this.getAddressHistory = this.getAddressHistory.bind(this);
-		
-		let bytes = bitcoin.address.fromBase58Check('1KU9GrtrWS54fbXmqBc127rQth5cMEcJQG');
 	}
 	
 	getAddressHistory(cb, data) {

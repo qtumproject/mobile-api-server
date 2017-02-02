@@ -5,7 +5,10 @@ let Controllers = getControllers();
 let Models = getModels();
 
 class OutputsControllers {
-	constructor() {}
+	constructor() {
+		this.getUnspent = this.getUnspent.bind(this);
+		this.getUnspentForList = this.getUnspentForList.bind(this);
+	}
 	
 	getUnspent(cb, data) {
 		let address = data._get.address;
