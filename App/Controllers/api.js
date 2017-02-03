@@ -5,6 +5,7 @@ let async = require('async'),
 	moment = require('moment'),
 	express = require('express'),
 	extend = require('extend'),
+	morgan = require('morgan'),
 	bodyParser = require('body-parser'),
 	crypto = require('crypto'),
 	cors = require('cors'),
@@ -28,6 +29,7 @@ let APIController = {
 			methods: ['GET', 'PUT', 'POST', 'OPTIONS', 'DELETE', 'PATCH'],
 			headers: ['x-user', 'X-Signature', 'accept', 'content-type']
 		};
+		APIController.app.use(morgan('combined'));
 		APIController.app.use(cors(corsOptions));
 		APIController.app.use(bodyParser.urlencoded({extended: true}));
 		APIController.app.use(bodyParser.json());
