@@ -26,6 +26,8 @@ class BlockchainController {
 	}
 	
 	sendRawTransaction(cb, data) {
+		logger.info('sendRawTransaction');
+		logger.info(data._post);
 		let transaction = data._post.data;
 		let allowHighFee = parseInt(data._post.allowHighFees) == 1;
 		this.client.sendRawTransaction(transaction, allowHighFee, (err, result) => {
