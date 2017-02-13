@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
 		freezeTableName: true
 	});
 	
-	pubkey.getHistory = (address, limit, offset, cb) => {
+	pubkey.getHistory = (addresses, limit, offset, cb) => {
 		let query = `
 			SELECT
 	            b.block_nTime as block_time,
@@ -40,12 +40,12 @@ module.exports = (sequelize) => {
 	        JOIN pubkey from_pubkey ON (from_pubkey.pubkey_id = prevout.pubkey_id)
 	        JOIN pubkey to_pubkey ON (to_pubkey.pubkey_id = txout.pubkey_id)
 	        WHERE 
-	            (from_pubkey.pubkey_hash = :address OR to_pubkey.pubkey_hash = :address) 
+	            (from_pubkey.pubkey_hash IN (:addresses) OR to_pubkey.pubkey_hash IN (:addresses)) 
 	        AND 
 	            cc.in_longest = 1 
 	        LIMIT :limit OFFSET :offset
 		`;
-		sequelize.query(query, {replacements: {address, limit, offset}, type: sequelize.QueryTypes.SELECT}).then(result => {
+		sequelize.query(query, {replacements: {addresses, limit, offset}, type: sequelize.QueryTypes.SELECT}).then(result => {
 			cb(null, result);
 		}).catch(err => {
 			cb(err);

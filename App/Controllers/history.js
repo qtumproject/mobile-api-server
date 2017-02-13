@@ -9,12 +9,23 @@ let Models = getModels();
 class HistoryController {
 	constructor() {
 		this.getAddressHistory = this.getAddressHistory.bind(this);
+		this.getAddressHistoryForList = this.getAddressHistoryForList.bind(this);
+	}
+	
+	getAddressHistoryForList(cb, data) {
+		let {addresses, limit, offset} = data._get;
+		return this.getHistory(addresses, limit, offset, cb);
 	}
 	
 	getAddressHistory(cb, data) {
 		let {address, limit, offset} = data._get;
+		return this.getHistory([address], limit, offset, cb);
+	}
+	
+	getHistory(addresses, limit, offset, cb) {
+		let addressesInBytes = [];
 		try {
-			address = Controllers.utils.decodeAddress(address);
+			addressesInBytes = addresses.map(address => Controllers.utils.decodeAddress(address));
 		} catch(e) {
 			return cb(e.message);
 		}
@@ -27,7 +38,7 @@ class HistoryController {
 			limit = 100;
 		}
 		
-		Models.pubkey.getHistory(address, limit, offset, (err, result) => {
+		Models.pubkey.getHistory(addressesInBytes, limit, offset, (err, result) => {
 			if(err) return GlobalError('15:02', err, cb);
 			result = result.map(row => {
 				return {
