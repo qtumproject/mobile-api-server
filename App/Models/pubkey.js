@@ -29,7 +29,7 @@ module.exports = (sequelize) => {
 	            txin.txin_pos,
 	            from_pubkey.pubkey_hash as from_address,
 	            to_pubkey.pubkey_hash as to_address,
-	            IF(from_pubkey.pubkey_hash = :address, -prevout.txout_value, txout.txout_value) as amount
+	            IF(from_pubkey.pubkey_hash IN (:addresses), -prevout.txout_value, txout.txout_value) as amount
 	        FROM chain_candidate cc
 	        JOIN block b ON (b.block_id = cc.block_id)
 	        JOIN block_tx ON (block_tx.block_id = b.block_id)
