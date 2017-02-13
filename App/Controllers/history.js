@@ -14,7 +14,6 @@ class HistoryController {
 	
 	getAddressHistoryForList(cb, data) {
 		let {addresses, limit, offset} = data._get;
-		logger.info(addresses);
 		return this.getHistory(addresses, limit, offset, cb);
 	}
 	
