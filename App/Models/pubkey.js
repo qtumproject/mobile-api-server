@@ -43,6 +43,7 @@ module.exports = (sequelize) => {
 	            (from_pubkey.pubkey_hash IN (:addresses) OR to_pubkey.pubkey_hash IN (:addresses)) 
 	        AND 
 	            cc.in_longest = 1 
+	        ORDER BY b.block_height DESC
 	        LIMIT :limit OFFSET :offset
 		`;
 		sequelize.query(query, {replacements: {addresses, limit, offset}, type: sequelize.QueryTypes.SELECT}).then(result => {
