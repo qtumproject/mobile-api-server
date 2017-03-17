@@ -1,3 +1,6 @@
+# phpstorm project files
+.idea
+
 node_modules
 *.log
 config/main.json

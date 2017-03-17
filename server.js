@@ -35,25 +35,18 @@ let Server = {
 				let name = file.replace(/.*\/([A-z]+)\.js/, '$1');
 				logger.info(name);
 				let r = require(file);
-				if(typeof r == 'function') r();
+
+				if(typeof r == 'function')  {
+                    Server.controllers[name] = new r();
+				}
+
 			});
 			cb();
 		});
 	},
 	bindDefault: (cb) => cb(),
 	run: function() {
-		Server.controllers.models.init((err, Models) => {
-			if(err) {
-				return logger.error('Init models error', err);
-			}
-			
-			Object.keys(Models).forEach(name => {
-				Server.models[name] = Models[name];
-			});
-			
-			Server.controllers.api.init(5931);
-			
-		});
+    	Server.controllers.api.init(5931);
 	}
 };
 

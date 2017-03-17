@@ -23,5 +23,8 @@
     "raven": "^1.1.1",
     "request": "^2.79.0",
     "sequelize": "^3.30.0"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }

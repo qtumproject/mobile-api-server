@@ -13,14 +13,13 @@ let async = require('async'),
 	fs = require('fs');
 
 let Controllers = getControllers();
-let Models = getModels();
 
 let APIController = {
 	app: {},
 	io: null,
 	init: function(port) {
 		this.runServer(port);
-		
+
 		let corsOptions = {
 			origin: function(origin, callback) {
 				callback(null, true);
@@ -34,13 +33,17 @@ let APIController = {
 		APIController.app.use(bodyParser.urlencoded({extended: true}));
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
-		
-		APIController.addHandler('get', '/outputs/unspent/:address', Controllers.outputs.getUnspent);
-		APIController.addHandler('get', '/outputs/unspent', Controllers.outputs.getUnspentForList);
-		APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryForList);
-		APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory);
-		APIController.addHandler('post', '/send-raw-transaction', Controllers.blockchain.sendRawTransaction);
+
+        APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
+
+        APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryList);
+        APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory);
+
+		APIController.addHandler('get', '/outputs/unspent/:address', Controllers.outputs.getUnspentByAddress);
+		APIController.addHandler('get', '/outputs/unspent', Controllers.outputs.getUnspentByAddresses);
+
 		APIController.addHandler('get', '/news/:lang', Controllers.news.getNews);
+
 		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
 	},
 	server: null,
@@ -90,4 +93,5 @@ let APIController = {
 		});
 	}
 };
+
 Controllers.api = APIController;
