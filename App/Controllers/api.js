@@ -34,6 +34,8 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
+        APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
+
         APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
 
         APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryList);

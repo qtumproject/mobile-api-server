@@ -1,4 +1,28 @@
+## Contracts / Generate token bytecode
+`POST`
 
+/contracts/generate-token-bytecode
+
+[http://139.162.178.174/contracts/generate-token-bytecode](http://139.162.178.174/contracts/generate-token-bytecode)
+
+request
+
+```
+{
+	"initialSupply": uint256,
+	"tokenName": String
+	"decimalUnits": uint8
+	"tokenSymbol": String
+}
+```
+
+response
+
+```
+{
+	"bytecode": String
+}
+```
 ## Send Raw Transaction
 `POST`
 
