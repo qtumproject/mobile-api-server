@@ -1,3 +1,7 @@
+
+
+# API
+
 ## Contracts / Generate token bytecode
 `POST`
 
@@ -178,4 +182,71 @@ response
 	"relayfee": 0.00001,
 	"errors": ""
 }
+```
+
+# Web Socket API
+
+The web socket API is served using [socket.io](http://socket.io).
+
+``quantumd/addresstxid``
+
+Subscribe:
+
+```
+    socket.emit('subscribe', 'quantumd/addresstxid', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+```
+
+Unsubscribe:
+
+```
+    socket.emit('unsubscribe', 'quantumd/addresstxid', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+```
+
+or
+
+```
+    socket.emit('unsubscribe', 'quantumd/addresstxid');
+```
+
+Listen:
+
+```
+    socket.on('quantumd/addresstxid', function(data) {
+         console.log("New data received: " + data.txid);
+         console.log("New data received: " + data.address);
+    });
+```
+
+Sample output:
+
+```
+{
+    "txid": String,
+    "address": String
+}
+```
+
+
+### Example Usage
+
+html
+```
+<html>
+<body>
+  <script src="http://<insight-server>:<port>/socket.io/socket.io.js"></script>
+  <script>
+    
+    var eventToListenTo = 'quantumd/addresstxid',
+        socket = io("http://<insight-server>:<port>/");
+    
+    socket.on('connect', function() {
+      socket.emit('subscribe', eventToListenTo, ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    });
+    
+    socket.on(eventToListenTo, function(data) {
+      console.log("New data received: " + data.txid)
+    });
+  </script>
+</body>
+</html>
 ```

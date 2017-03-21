@@ -47,6 +47,12 @@ let APIController = {
 		APIController.addHandler('get', '/news/:lang', Controllers.news.getNews);
 
 		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
+
+        APIController.app.get('/test', function(req, res) {
+            var path = require('path');
+            res.sendFile(path.resolve('App/Views/index.html'));
+        });
+
 	},
 	server: null,
 	getServer: function() {

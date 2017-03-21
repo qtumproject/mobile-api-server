@@ -47,6 +47,7 @@ let Server = {
 	bindDefault: (cb) => cb(),
 	run: function() {
     	Server.controllers.api.init(config.PORT || 5931);
+    	Server.controllers.socket.init(Server.controllers.api.server);
 	}
 };
 
