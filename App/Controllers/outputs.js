@@ -44,15 +44,14 @@ class OutputsControllers {
             while(bytes.length < 25) {
             	bytes = Buffer.concat([new Buffer('\0'), bytes]);
             }
-
+            console.log('address', address.height);
             newAddresses.push({
                 tx_hash: address.txid,
                 vout: address.vout,
                 txout_scriptPubKey: address.scriptPubKey,
                 amount: address.satoshis * address.amount,
-                block_height: address.height,
-                pubkey_hash: bytes.slice(1, 21).toString('hex'),
-                block_hash: ''
+                block_height: address.height ? address.height : null,
+                pubkey_hash: bytes.slice(1, 21).toString('hex')
 			});
 		});
     	return newAddresses;
