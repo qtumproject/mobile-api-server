@@ -239,7 +239,7 @@ html
   <script src="http://<insight-server>:<port>/socket.io/socket.io.js"></script>
   <script>
     
-    var eventToListenTo = 'quantumd/addresstxid',
+    var eventToListenTo = 'quantumd/addressbalance',
         socket = io("http://<insight-server>:<port>/");
     
     socket.on('connect', function() {

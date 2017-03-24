@@ -167,6 +167,7 @@ class SocketController {
             }
             if (emitters.length === 0) {
                 delete this.subscriptions.address[hashHex];
+                this.unsubscribeRemoteAddress([hashHex]);
             }
         }
         logger.info('unsubscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
