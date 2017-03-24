@@ -41,19 +41,19 @@ class SocketController {
             for (var addr in self.subscriptions.address) {
                 self.subscribeRemoteAddress([addr]);
             }
-            logger.info('subscribe:', 'quantumd/addresstxid', 'total:', _.size(self.subscriptions.address));
+            logger.info('subscribe:', 'quantumd/addressbalance', 'total:', _.size(self.subscriptions.address));
         });
 
         this.socketClient.on('disconnect', function() {
             logger.info('disconnect socketClient');
         });
 
-        this.socketClient.on('bitcoind/addresstxid', function (data) {
+        this.socketClient.on('quantumd/addressbalance', function (data) {
 
             if (self.subscriptions.address[data.address] && self.subscriptions.address[data.address].length) {
 
                 for (var idx in self.subscriptions.address[data.address]) {
-                    self.subscriptions.address[data.address][idx].emit('quantumd/addresstxid', data);
+                    self.subscriptions.address[data.address][idx].emit('quantumd/addressbalance', data);
                 }
             }
 
@@ -61,11 +61,11 @@ class SocketController {
     }
 
     subscribeRemoteAddress(addresses) {
-        this.socketClient.emit('subscribe', 'bitcoind/addresstxid', addresses);
+        this.socketClient.emit('subscribe', 'quantumd/addressbalance', addresses);
     }
 
     unsubscribeRemoteAddress(addresses) {
-        this.socketClient.emit('unsubscribe', 'bitcoind/addresstxid', addresses);
+        this.socketClient.emit('unsubscribe', 'quantumd/addressbalance', addresses);
     }
 
     socketHandler(socket) {
@@ -80,7 +80,7 @@ class SocketController {
             logger.info(remoteAddress, 'web socket subscribe:', name, params);
 
             switch (name) {
-                case 'quantumd/addresstxid':
+                case 'quantumd/addressbalance':
                     self.subscribeAddress(socket, params);
                     break;
             }
@@ -91,7 +91,7 @@ class SocketController {
             logger.info(remoteAddress, 'web socket unsubscribe:', name);
 
             switch (name) {
-                case 'quantumd/addresstxid':
+                case 'quantumd/addressbalance':
                     self.unsubscribeAddress(socket, params);
                     break;
             }
@@ -127,7 +127,7 @@ class SocketController {
             // }
         }
 
-        logger.info('subscribe:', 'quantumd/addresstxid', 'total:', _.size(this.subscriptions.address));
+        logger.info('subscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
     };
 
     unsubscribeAddress(emitter, addresses) {
@@ -155,7 +155,7 @@ class SocketController {
             }
         }
 
-        logger.info('unsubscribe:', 'quantumd/addresstxid', 'total:', _.size(this.subscriptions.address));
+        logger.info('unsubscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
     };
 
     unsubscribeAddressAll(emitter) {
@@ -169,7 +169,7 @@ class SocketController {
                 delete this.subscriptions.address[hashHex];
             }
         }
-        logger.info('unsubscribe:', 'quantumd/addresstxid', 'total:', _.size(this.subscriptions.address));
+        logger.info('unsubscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
     };
 
     _getRemoteAddress(socket) {
