@@ -184,32 +184,35 @@ response
 
 The web socket API is served using [socket.io](http://socket.io).
 
-``quantumd/addresstxid``
+``quantumd/addressbalance``
 
 Subscribe:
 
 ```
-    socket.emit('subscribe', 'quantumd/addresstxid', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('subscribe', 'quantumd/addressbalance', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
 
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'quantumd/addresstxid', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('unsubscribe', 'quantumd/addressbalance', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'quantumd/addresstxid');
+    socket.emit('unsubscribe', 'quantumd/addressbalance');
 ```
 
 Listen:
 
 ```
-    socket.on('quantumd/addresstxid', function(data) {
+    socket.on('quantumd/addressbalance', function(data) {
          console.log("New data received: " + data.txid);
          console.log("New data received: " + data.address);
+         console.log("New data received: " + data.balance);
+         console.log("New data received: " + data.totalReceived);
+         console.log("New data received: " + data.totalSpent);
     });
 ```
 
@@ -218,7 +221,11 @@ Sample output:
 ```
 {
     "txid": String,
-    "address": String
+    "address": String,
+    "balance": Integer,
+    "totalReceived": Integer,
+    "totalSpent": Integer
+    
 }
 ```
 
