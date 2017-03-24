@@ -44,7 +44,7 @@ class OutputsControllers {
             while(bytes.length < 25) {
             	bytes = Buffer.concat([new Buffer('\0'), bytes]);
             }
-            console.log('address', address.height);
+            
             newAddresses.push({
                 tx_hash: address.txid,
                 vout: address.vout,
