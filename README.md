@@ -98,16 +98,14 @@ response
 
 ```
 [{
-	"amount": 99989999995420,
-	"vout": 0,
-	"tx_id": 18398,
-	"block_id": 15305,
-	"block_height": 14111,
-	"txout_id": 36775,
-	"txout_scriptPubKey": "76a914ca9466c29560b9fdfa1deb95c95af9ddfb40c79d88ac",
-	"tx_hash": "85c71cc1a065e8607821df764891397cf5d5a8a4af3126987ab4632de5b2eb68",
-	"block_hash": "85aebc2ea4488e0d68cda6fd53b37e0589b2c3c38538d3040d34090ea7a9de5f",
-	"pubkey_hash": "ca9466c29560b9fdfa1deb95c95af9ddfb40c79d"
+    address: "mxDkwrDixgLNhNW9HHq73d1VpLcwYUtyja",
+    txid: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
+    vout: 1,
+    scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
+    amount: 1,
+    satoshis: 100000000,
+    confirmations: 0,
+    ts: 1490344474
 }]
 ```
 
@@ -122,16 +120,14 @@ response
 
 ```
 [{
-	"amount": 99989999995420,
-	"vout": 0,
-	"tx_id": 18398,
-	"block_id": 15305,
-	"block_height": 14111,
-	"txout_id": 36775,
-	"txout_scriptPubKey": "76a914ca9466c29560b9fdfa1deb95c95af9ddfb40c79d88ac",
-	"tx_hash": "85c71cc1a065e8607821df764891397cf5d5a8a4af3126987ab4632de5b2eb68",
-	"block_hash": "85aebc2ea4488e0d68cda6fd53b37e0589b2c3c38538d3040d34090ea7a9de5f",
-	"pubkey_hash": "ca9466c29560b9fdfa1deb95c95af9ddfb40c79d"
+    address: "mxDkwrDixgLNhNW9HHq73d1VpLcwYUtyja",
+    txid: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
+    vout: 1,
+    scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
+    amount: 1,
+    satoshis: 100000000,
+    confirmations: 0,
+    ts: 1490344474
 }]
 ```
 
