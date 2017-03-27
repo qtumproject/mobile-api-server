@@ -46,6 +46,7 @@ class OutputsControllers {
             }
 
             newAddresses.push({
+                address: address.address,
                 tx_hash: address.txid,
                 vout: address.vout,
                 txout_scriptPubKey: address.scriptPubKey,

@@ -99,13 +99,12 @@ response
 ```
 [{
     address: "mxDkwrDixgLNhNW9HHq73d1VpLcwYUtyja",
-    txid: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
+    tx_hash: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
     vout: 1,
-    scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
+    txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
     amount: 1,
-    satoshis: 100000000,
-    confirmations: 0,
-    ts: 1490344474
+    block_height: 100000000,
+    pubkey_hash: String
 }]
 ```
 
@@ -121,13 +120,13 @@ response
 ```
 [{
     address: "mxDkwrDixgLNhNW9HHq73d1VpLcwYUtyja",
-    txid: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
+    tx_hash: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
     vout: 1,
-    scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
+    txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
     amount: 1,
-    satoshis: 100000000,
-    confirmations: 0,
-    ts: 1490344474
+    block_height: 100000000,
+    pubkey_hash: String
+    
 }]
 ```
 
@@ -213,6 +212,7 @@ Listen:
          console.log("New data received: " + data.balance);
          console.log("New data received: " + data.totalReceived);
          console.log("New data received: " + data.totalSpent);
+         console.log("New data received: " + data.unconfirmedBalance);
     });
 ```
 
