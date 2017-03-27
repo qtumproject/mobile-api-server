@@ -53,7 +53,7 @@ class OutputsControllers {
                     tx_hash: address.txid,
                     vout: address.vout,
                     txout_scriptPubKey: address.scriptPubKey,
-                    amount: address.satoshis * address.amount,
+                    amount: address.satoshis,
                     block_height: address.height ? address.height : null,
                     pubkey_hash: bytes.slice(1, 21).toString('hex')
                 };
