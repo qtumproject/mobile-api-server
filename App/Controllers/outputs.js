@@ -47,8 +47,10 @@ class OutputsControllers {
             	bytes = Buffer.concat([new Buffer('\0'), bytes]);
             }
 
-            if (!newAddressesObjects[address.txid] || (newAddressesObjects[address.txid] && !newAddressesObjects[address.txid]['block_height'])) {
-                newAddressesObjects[address.txid] = {
+            var uniqueKey = address.txid + '_' + address.address;
+
+            if (!newAddressesObjects[uniqueKey] || (newAddressesObjects[uniqueKey] && !newAddressesObjects[uniqueKey]['block_height'])) {
+                newAddressesObjects[uniqueKey] = {
                     address: address.address,
                     tx_hash: address.txid,
                     vout: address.vout,
