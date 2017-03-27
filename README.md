@@ -124,7 +124,7 @@ response
     vout: 1,
     txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
     amount: 1,
-    block_height: 100000000,
+    block_height: 100000000|null,
     pubkey_hash: String
     
 }]
