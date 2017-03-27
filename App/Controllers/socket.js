@@ -124,6 +124,7 @@ class SocketController {
             //TODO::validate
             // if (bitcore.Address.isValid(addresses[i], this.node.network)) {
                 addAddress(addresses[i]);
+            logger.info('addAddress', addresses[i]);
             // }
         }
 
