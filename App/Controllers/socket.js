@@ -14,6 +14,7 @@ class SocketController {
 
         this.subscriptions = {};
         this.subscriptions.address = {};
+
     }
 
     init(server) {
@@ -21,6 +22,24 @@ class SocketController {
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
 
+    }
+
+    sendTestEvent(cb) {
+        var objects = Object.keys(this.subscriptions.address);
+
+        var addrs = [];
+        objects.forEach((address) => {
+            for (var idx in this.subscriptions.address[address]) {
+                addrs.push(address);
+                this.subscriptions.address[address][idx].emit('quantumd/test', {
+                    test1: 'test',
+                    test2: 'test',
+                    test3: 'test'
+                });
+            }
+        });
+        logger.info('sendTestEvent');
+        cb(null, addrs);
     }
 
     initSocket(server) {
