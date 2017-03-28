@@ -72,7 +72,8 @@ class HistoryController {
         if (history && history.items && history.items.length) {
             history.items.forEach(function (item) {
                 var from_address = [],
-                    to_address = [];
+                    to_address = [],
+                    vout = [];
 
                 item.vin.forEach(function (vIn) {
                     if (to_address.indexOf(vIn.addr) === -1) {
@@ -93,6 +94,12 @@ class HistoryController {
 
                         });
 
+                        vout.push({
+                            value: vOut.value,
+                            scriptPubKey: {
+                                addresses: vOut.scriptPubKey.addresses
+                            }
+                        })
                     }
 
 
@@ -103,9 +110,10 @@ class HistoryController {
                     block_height: item.blockheight ? item.blockheight : null,
                     block_hash: item.blockhash ? item.blockhash : null,
                     tx_hash: item.txid,
-                    amount: item.valueIn ? parseInt(item.valueIn * 10e8)  : 0,
+                    amount: item.valueIn,
                     from_address: from_address,
-                    to_address: to_address
+                    to_address: to_address,
+                    vout: vout
                 });
             });
         }

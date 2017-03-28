@@ -60,7 +60,7 @@ response
     "block_height": 23552|-1,
     "block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
     "tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
-    "amount": 16876000000,
+    "amount": 1, //qtum
     "from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
     "to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
 }]
@@ -83,7 +83,7 @@ response
 	"block_height": 23552|-1,
 	"block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
 	"tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
-	"amount": 16876000000,
+	"amount": 1, //qtum
 	"from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
 	"to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
 }]
@@ -104,7 +104,7 @@ response
     tx_hash: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
     vout: 1,
     txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
-    amount: 1,
+    amount: 1, //qtum
     block_height: 100000000|-1,
     pubkey_hash: String
 }]
@@ -125,7 +125,7 @@ response
     tx_hash: "c038b71aaa6fa6a1fab239fa880483ecf36d664553456ad3985b522b1612f7e5",
     vout: 1,
     txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
-    amount: 1,
+    amount: 1, //qtum
     block_height: 100000000|-1,
     pubkey_hash: String
     
@@ -211,10 +211,10 @@ Listen:
     socket.on('quantumd/addressbalance', function(data) {
          console.log("New data received: " + data.txid);
          console.log("New data received: " + data.address);
-         console.log("New data received: " + data.balance);
-         console.log("New data received: " + data.totalReceived);
-         console.log("New data received: " + data.totalSpent);
-         console.log("New data received: " + data.unconfirmedBalance);
+         console.log("New data received: " + data.balance); //satoshis
+         console.log("New data received: " + data.totalReceived); //satoshis
+         console.log("New data received: " + data.totalSpent); //satoshis
+         console.log("New data received: " + data.unconfirmedBalance); //satoshis
     });
 ```
 
@@ -225,9 +225,9 @@ Sample output:
     "txid": String,
     "address": String,
     "balance": Integer,
-    "totalReceived": Integer,
-    "totalSpent": Integer,
-    "unconfirmedBalance": Integer
+    "totalReceived": Integer, //satoshis
+    "totalSpent": Integer, //satoshis
+    "unconfirmedBalance": Integer //satoshis
     
 }
 ```
