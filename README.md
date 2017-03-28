@@ -54,20 +54,22 @@ response
 
 ```
 [{
-	"block_time": 1479825024,
-	"block_height": 14111,
-	"block_hash": "abda6c7c88c2300fd9c62f494d742a2ec070683284492c8f77fc58ce02dff488",
-	"tx_hash": "ae80a3ec71b2a58b03585e379f1e08fd1ac7412f1e9f96181ec2f5af072648f2",
-	"amount": -1000000000000,
-	"from_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2",
-	"to_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2"
+    "block_time": 1490695912|null,
+    "block_height": 23552|-1,
+    "block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
+    "tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
+    "amount": 16876000000,
+    "from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
+    "to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
 }]
 ```
 
 ## Get History for several addresses
 `GET`
-
+ 
 /history/{limit}/{offset}?addresses[]={:address}&addresses[]={:address2}
+
+`MAX_LIMIT = 50;`
 
 [http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
@@ -75,13 +77,13 @@ response
 
 ```
 [{
-	"block_time": 1479825024,
-	"block_height": 14111,
-	"block_hash": "abda6c7c88c2300fd9c62f494d742a2ec070683284492c8f77fc58ce02dff488",
-	"tx_hash": "ae80a3ec71b2a58b03585e379f1e08fd1ac7412f1e9f96181ec2f5af072648f2",
-	"amount": -1000000000000,
-	"from_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2",
-	"to_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2"
+	"block_time": 1490695912|null,
+	"block_height": 23552|-1,
+	"block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
+	"tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
+	"amount": 16876000000,
+	"from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
+	"to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
 }]
 ```
 

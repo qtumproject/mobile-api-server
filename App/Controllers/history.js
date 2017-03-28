@@ -39,7 +39,7 @@ class HistoryController {
 
 	_formatOptions(limit, offset) {
 
-	    var MAX_LIMIT = 20;
+	    var MAX_LIMIT = 50;
 
         limit = parseInt(limit, 10);
         offset = parseInt(offset, 10);
@@ -54,6 +54,10 @@ class HistoryController {
 
         limit = Math.abs(limit);
         offset = Math.abs(offset);
+
+        if (limit > MAX_LIMIT) {
+            limit = MAX_LIMIT;
+        }
 
         return {
             from: offset,
