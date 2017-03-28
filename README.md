@@ -226,7 +226,8 @@ Sample output:
     "address": String,
     "balance": Integer,
     "totalReceived": Integer,
-    "totalSpent": Integer
+    "totalSpent": Integer,
+    "unconfirmedBalance": Integer
     
 }
 ```
