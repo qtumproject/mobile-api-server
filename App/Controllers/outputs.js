@@ -37,7 +37,6 @@ class OutputsControllers {
 
 	_formatAddresses(addresses) {
     	var newAddresses = [];
-    	var newAddressesObjects = {};
 
         addresses.forEach(function (address) {
 
@@ -47,26 +46,17 @@ class OutputsControllers {
             	bytes = Buffer.concat([new Buffer('\0'), bytes]);
             }
 
-            var uniqueKey = address.txid + '_' + address.address;
-
-            if (!newAddressesObjects[uniqueKey] || (newAddressesObjects[uniqueKey] && !newAddressesObjects[uniqueKey]['block_height'])) {
-                newAddressesObjects[uniqueKey] = {
-                    address: address.address,
-                    tx_hash: address.txid,
-                    vout: address.vout,
-                    txout_scriptPubKey: address.scriptPubKey,
-                    amount: address.satoshis,
-                    block_height: address.height ? address.height : null,
-                    pubkey_hash: bytes.slice(1, 21).toString('hex')
-                };
-            }
+            newAddresses.push({
+                address: address.address,
+                tx_hash: address.txid,
+                vout: address.vout,
+                txout_scriptPubKey: address.scriptPubKey,
+                amount: address.satoshis,
+                block_height: address.height ? address.height : null,
+                pubkey_hash: bytes.slice(1, 21).toString('hex')
+            });
 
 		});
-
-        for (var txid in newAddressesObjects) {
-            newAddresses.push(newAddressesObjects[txid]);
-        }
-
 
     	return newAddresses;
 	}
