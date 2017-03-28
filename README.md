@@ -32,7 +32,7 @@ response
 
 /send-raw-transaction
 
-[http://139.162.178.174/send-raw-transaction](http://139.162.178.174/send-raw-transaction)
+[http://163.172.68.103:5931/send-raw-transaction](http://163.172.68.103:5931/send-raw-transaction)
 
 request parameters
 
@@ -48,7 +48,7 @@ request parameters
 
 /history/{address}/{limit}/{offset}
 
-[http://139.162.178.174/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0](http://139.162.178.174/history/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5/2/0)
+[http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0](http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0)
 
 response
 
@@ -58,7 +58,6 @@ response
 	"block_height": 14111,
 	"block_hash": "abda6c7c88c2300fd9c62f494d742a2ec070683284492c8f77fc58ce02dff488",
 	"tx_hash": "ae80a3ec71b2a58b03585e379f1e08fd1ac7412f1e9f96181ec2f5af072648f2",
-	"txin_pos": 0,
 	"amount": -1000000000000,
 	"from_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2",
 	"to_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2"
@@ -70,7 +69,7 @@ response
 
 /history/{limit}/{offset}?addresses[]={:address}&addresses[]={:address2}
 
-[http://139.162.178.174/history/2/0?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.178.174/history/2/0?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+[http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
 response
 
@@ -80,7 +79,6 @@ response
 	"block_height": 14111,
 	"block_hash": "abda6c7c88c2300fd9c62f494d742a2ec070683284492c8f77fc58ce02dff488",
 	"tx_hash": "ae80a3ec71b2a58b03585e379f1e08fd1ac7412f1e9f96181ec2f5af072648f2",
-	"txin_pos": 0,
 	"amount": -1000000000000,
 	"from_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2",
 	"to_address": "1LsLpGVYKSwrvHwqPpzvth18Wk8i5pyca2"
@@ -92,7 +90,7 @@ response
 
 /outputs/unspent/{address}
 
-[http://139.162.178.174/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.178.174/outputs/unspent/1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+[http://163.172.68.103:5931/outputs/unspent/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/outputs/unspent/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
 response
 
@@ -113,7 +111,7 @@ response
 
 /outputs/unspent?addresses[]={:address}&addresses[]={:address2}
 
-[http://139.162.178.174/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5](http://139.162.178.174/outputs/unspent?addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5&addresses[]=1HQSVAgFkMwwQ8xuhgQPQ8jFxKBk9kHWD5)
+[http://163.172.68.103:5931/outputs/unspent?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3&addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/outputs/unspent?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3&addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
 response
 
@@ -135,7 +133,7 @@ response
 
 /news/{lang}
 
-[http://139.162.178.174/news/en](http://139.162.178.174/news/en)
+[http://163.172.68.103:5931/news/en](http://163.172.68.103:5931/news/en)
 
 response
 ```
@@ -156,7 +154,7 @@ response
 
 /blockchain/info
 
-[http://139.162.178.174/blockchain/info](http://139.162.178.174/blockchain/info)
+[http://163.172.68.103:5931/blockchain/info](http://163.172.68.103:5931/blockchain/info)
 
 response
 ```

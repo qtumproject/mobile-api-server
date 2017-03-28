@@ -33,6 +33,16 @@ class InsightApi {
                 cb(error, body);
             });
     }
+
+    static getAddressesHistory(addresses, options, cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/txs?from=${options.from}&to=${options.to}`,
+            json: true
+        }, (error, response, body) => {
+            cb(error, body);
+        });
+    }
 }
 
 module.exports = InsightApi;

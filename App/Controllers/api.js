@@ -40,8 +40,8 @@ let APIController = {
 
         APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
 
-        APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryList);
-        APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory);
+        APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryList.bind(Controllers.history));
+        APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory.bind(Controllers.history));
 
 		APIController.addHandler('get', '/outputs/unspent/:address', Controllers.outputs.getUnspentByAddress.bind(Controllers.outputs));
 		APIController.addHandler('get', '/outputs/unspent', Controllers.outputs.getUnspentByAddresses.bind(Controllers.outputs));

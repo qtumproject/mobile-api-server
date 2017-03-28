@@ -1,4 +1,5 @@
 let logger = require('log4js').getLogger('History Controller'),
+    InsightApi = require("../Services/InsightApi"),
 	async = require('async');
 
 
@@ -8,13 +9,107 @@ class HistoryController {
         logger.info('Init');
 	}
 	
-	getAddressHistoryList(cb) {
-        return cb(null, []);
+	getAddressHistoryList(cb, data) {
+        var req = data.req,
+            options = this._formatOptions(req.params.limit, req.params.offset),
+            addresses = data._get.addresses && Array.isArray(data._get.addresses) ? data._get.addresses : [];
+
+        if (addresses.length) {
+
+            InsightApi.getAddressesHistory(addresses, options, (error, body) => {
+                return cb(error, this._formatHistory(body));
+            });
+
+        } else {
+            return cb(null, []);
+        }
+
 	}
 	
-	getAddressHistory(cb) {
-        return cb(null, []);
+	getAddressHistory(cb, data) {
+	    var req = data.req,
+            options = this._formatOptions(req.params.limit, req.params.offset);
+
+
+	    InsightApi.getAddressesHistory([data._get.address], options, (error, body) => {
+            return cb(error, this._formatHistory(body));
+        });
+
 	}
+
+	_formatOptions(limit, offset) {
+
+	    var MAX_LIMIT = 20;
+
+        limit = parseInt(limit, 10);
+        offset = parseInt(offset, 10);
+
+        if (isNaN(limit)) {
+            limit = MAX_LIMIT;
+        }
+
+        if (isNaN(offset)) {
+            offset = 0
+        }
+
+        limit = Math.abs(limit);
+        offset = Math.abs(offset);
+
+        return {
+            from: offset,
+            to: offset + limit
+        };
+    }
+
+    _formatHistory(history) {
+
+        var items = [];
+
+        if (history && history.items && history.items.length) {
+            history.items.forEach(function (item) {
+                var from_address = [],
+                    to_address = [];
+
+                item.vin.forEach(function (vIn) {
+                    if (to_address.indexOf(vIn.addr) === -1) {
+                        to_address.push(vIn.addr);
+                    }
+
+                });
+
+                item.vout.forEach(function (vOut) {
+
+                    if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
+
+                        vOut.scriptPubKey.addresses.forEach(function (addr) {
+
+                            if (from_address.indexOf(addr) === -1) {
+                                from_address.push(addr)
+                            }
+
+                        });
+
+                    }
+
+
+                });
+
+                items.push({
+                    block_time: item.blocktime ? item.blocktime : null,
+                    block_height: item.blockheight ? item.blockheight : null,
+                    block_hash: item.blockhash ? item.blockhash : null,
+                    tx_hash: item.txid,
+                    amount: item.valueIn ? parseInt(item.valueIn * 10e8)  : 0,
+                    from_address: from_address,
+                    to_address: to_address
+                });
+            });
+        }
+
+
+
+        return items;
+    }
 
 }
 
