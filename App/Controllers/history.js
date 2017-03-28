@@ -78,7 +78,7 @@ class HistoryController {
 
                     vin.push({
                         value: vIn.value,
-                        addr: vIn.addr
+                        address: vIn.addr
                     });
 
                 });

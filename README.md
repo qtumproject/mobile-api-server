@@ -83,7 +83,7 @@ response
         "vin": [
             {
                 value: 1.875, //qtum
-                addr: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ]
     },
@@ -131,7 +131,7 @@ response
         "vin": [
             {
                 value: 1.875, //qtum
-                addr: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ]
     },
