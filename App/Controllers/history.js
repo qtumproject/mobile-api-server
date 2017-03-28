@@ -71,14 +71,15 @@ class HistoryController {
 
         if (history && history.items && history.items.length) {
             history.items.forEach(function (item) {
-                var from_address = [],
-                    to_address = [],
-                    vout = [];
+                var vout = [],
+                    vin = [];
 
                 item.vin.forEach(function (vIn) {
-                    if (to_address.indexOf(vIn.addr) === -1) {
-                        to_address.push(vIn.addr);
-                    }
+
+                    vin.push({
+                        value: vIn.value,
+                        addr: vIn.addr
+                    });
 
                 });
 
@@ -86,20 +87,12 @@ class HistoryController {
 
                     if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
 
-                        vOut.scriptPubKey.addresses.forEach(function (addr) {
-
-                            if (from_address.indexOf(addr) === -1) {
-                                from_address.push(addr)
-                            }
-
-                        });
-
                         vout.push({
-                            value: vOut.value,
+                            value: parseFloat(vOut.value),
                             scriptPubKey: {
                                 addresses: vOut.scriptPubKey.addresses
                             }
-                        })
+                        });
                     }
 
 
@@ -111,9 +104,8 @@ class HistoryController {
                     block_hash: item.blockhash ? item.blockhash : null,
                     tx_hash: item.txid,
                     amount: item.valueIn,
-                    from_address: from_address,
-                    to_address: to_address,
-                    vout: vout
+                    vout: vout,
+                    vin: vin
                 });
             });
         }

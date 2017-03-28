@@ -13,9 +13,9 @@ request
 
 ```
 {
-	"initialSupply": uint256,
+	"initialSupply": Uint256,
 	"tokenName": String
-	"decimalUnits": uint8
+	"decimalUnits": Uint8
 	"tokenSymbol": String
 }
 ```
@@ -55,15 +55,40 @@ request parameters
 response
 
 ```
-[{
-    "block_time": 1490695912|null,
-    "block_height": 23552|-1,
-    "block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
-    "tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
-    "amount": 1, //qtum
-    "from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
-    "to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
-}]
+[
+    {
+        "block_time": 1490705700|null,
+        "block_height": 23701|-1,
+        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589",
+        "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+        "amount": 1.875, //qtum
+        "vout": [
+            {
+                "value": 1, //qtum
+                "scriptPubKey": {
+                    "addresses": [
+                        "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                    ]
+                } 
+            },
+            {
+                "value": 0.874, //qtum
+                "scriptPubKey": {
+                    "addresses": [
+                        "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                    ]
+                }
+            }
+        ],
+        "vin": [
+            {
+                value: 1.875, //qtum
+                addr: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+            }
+        ]
+    },
+    ...
+]
 ```
 
 ## Get History for several addresses
@@ -78,15 +103,40 @@ response
 response
 
 ```
-[{
-	"block_time": 1490695912|null,
-	"block_height": 23552|-1,
-	"block_hash": "3d36b340291a59a900cd889de9190da83f041dcd2032d86a047294659dc81467"|null,
-	"tx_hash": "ead66f4c2cbaeece281d4b66ae89b65f0a46f9a2e57936d55dcd8ec1f16f5817",
-	"amount": 1, //qtum
-	"from_address": ["mhwwh16xzmc996rr9656RYt1M4fDXerYTW", "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"],
-	"to_address": ["mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"]
-}]
+[
+    {
+        "block_time": 1490705700|null,
+        "block_height": 23701|-1,
+        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589",
+        "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+        "amount": 1.875, //qtum
+        "vout": [
+            {
+                "value": 1, //qtum
+                "scriptPubKey": {
+                    "addresses": [
+                        "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                    ]
+                } 
+            },
+            {
+                "value": 0.874 //qtum
+                "scriptPubKey": {
+                    "addresses": [
+                        "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                    ]
+                }
+            }
+        ],
+        "vin": [
+            {
+                value: 1.875, //qtum
+                addr: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+            }
+        ]
+    },
+    ...
+]
 ```
 
 ## Get unspent outputs
