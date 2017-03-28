@@ -113,19 +113,15 @@ response
         "vout": [
             {
                 "value": 1, //qtum
-                "scriptPubKey": {
-                    "addresses": [
-                        "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
-                    ]
-                } 
+                "addresses": [
+                    "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                ]
             },
             {
                 "value": 0.874 //qtum
-                "scriptPubKey": {
-                    "addresses": [
-                        "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
-                    ]
-                }
+                "addresses": [
+                    "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                ]
             }
         ],
         "vin": [
