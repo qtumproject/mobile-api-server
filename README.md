@@ -48,6 +48,8 @@ request parameters
 
 /history/{address}/{limit}/{offset}
 
+`MAX_LIMIT = 50;`
+
 [http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0](http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0)
 
 response
