@@ -89,7 +89,7 @@ class HistoryController {
 
                         vout.push({
                             value: parseFloat(vOut.value),
-                            addresses: vOut.scriptPubKey.addresses
+                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
                         });
                     }
 

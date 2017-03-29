@@ -65,17 +65,11 @@ response
         "vout": [
             {
                 "value": 1, //qtum
-                "addresses": [
-                    "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
-                ]
-                 
+                "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
             },
             {
                 "value": 0.874, //qtum
-                "addresses": [
-                    "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
-                ]
-                
+                "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ],
         "vin": [
@@ -111,15 +105,11 @@ response
         "vout": [
             {
                 "value": 1, //qtum
-                "addresses": [
-                    "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
-                ]
+                "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
             },
             {
-                "value": 0.874 //qtum
-                "addresses": [
-                    "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
-                ]
+                "value": 0.874, //qtum
+                "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ],
         "vin": [
