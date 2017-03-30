@@ -1,5 +1,6 @@
 let logger = require('log4js').getLogger('History Controller'),
     InsightApi = require("../Services/InsightApi"),
+    HistoryService = require("../Services/HistoryService"),
 	async = require('async');
 
 
@@ -88,7 +89,7 @@ class HistoryController {
                     if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
 
                         vout.push({
-                            value: parseFloat(vOut.value),
+                            value: vOut.value,
                             address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
                         });
                     }

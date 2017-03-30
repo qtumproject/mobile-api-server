@@ -1,9 +1,10 @@
-let InsightApi = require("../Services/InsightApi"),
-    logger = require('log4js').getLogger('Socket Controller'),
-    config = require('../../config/main.json'),
-    socketIO = require('socket.io'),
-    socketIOClient = require('socket.io-client'),
-    _ = require('lodash');
+const InsightApi = require("../Services/InsightApi");
+const HistoryService = require("../Services/HistoryService");
+const logger = require('log4js').getLogger('Socket Controller');
+const config = require('../../config/main.json');
+const socketIO = require('socket.io');
+const socketIOClient = require('socket.io-client');
+const _ = require('lodash');
 
 class SocketController {
 
@@ -14,6 +15,7 @@ class SocketController {
 
         this.subscriptions = {};
         this.subscriptions.address = {};
+        this.subscriptions.emitterAddress = {};
 
     }
 
@@ -22,24 +24,6 @@ class SocketController {
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
 
-    }
-
-    sendTestEvent(cb) {
-        var objects = Object.keys(this.subscriptions.address);
-
-        var addrs = [];
-        objects.forEach((address) => {
-            for (var idx in this.subscriptions.address[address]) {
-                addrs.push(address);
-                this.subscriptions.address[address][idx].emit('quantumd/test', {
-                    test1: 'test',
-                    test2: 'test',
-                    test3: 'test'
-                });
-            }
-        });
-        logger.info('sendTestEvent');
-        cb(null, addrs);
     }
 
     initSocket(server) {
@@ -57,34 +41,214 @@ class SocketController {
 
             logger.info('connect socketClient');
 
-            for (var addr in self.subscriptions.address) {
-                self.subscribeRemoteAddress([addr]);
-            }
-            logger.info('subscribe:', 'quantumd/addressbalance', 'total:', _.size(self.subscriptions.address));
+            self.subscribeRemoteQtumRoom();
+
         });
 
         this.socketClient.on('disconnect', function() {
             logger.info('disconnect socketClient');
         });
 
-        this.socketClient.on('quantumd/addressbalance', function (data) {
+        this.subscribeToQtumBlock();
+        this.subscribeToQtumTrx();
 
-            if (self.subscriptions.address[data.address] && self.subscriptions.address[data.address].length) {
+    }
 
-                for (var idx in self.subscriptions.address[data.address]) {
-                    self.subscriptions.address[data.address][idx].emit('quantumd/addressbalance', data);
-                }
+    subscribeToQtumBlock() {
+        var self = this;
+
+        this.socketClient.on('qtum/block', function (data) {
+
+            if (data && data.transactions) {
+
+                var addresses = {};
+
+                data.transactions.forEach(function (transaction) {
+                    var trxAddresses = {};
+
+                    if (transaction.vout) {
+
+                        transaction.vout.forEach(function (vOut) {
+
+                            if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
+                                addresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
+                                trxAddresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
+                            }
+
+                        });
+
+                    }
+
+                    if (transaction.vin) {
+
+                        transaction.vin.forEach(function (vIn) {
+
+                            if (vIn.addr) {
+                                addresses[vIn.addr] = vIn.addr;
+                                trxAddresses[vIn.addr] = vIn.addr;
+                            }
+
+                        });
+
+                    }
+
+                    self.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid);
+
+                });
+
+                self.notifyBalanceChanged(Object.keys(addresses));
+
             }
 
         });
     }
+    subscribeToQtumTrx() {
+        var self = this;
 
-    subscribeRemoteAddress(addresses) {
-        this.socketClient.emit('subscribe', 'quantumd/addressbalance', addresses);
+        this.socketClient.on('qtum/tx', function (data) {
+
+            var addresses = {};
+
+            if (data) {
+                if (data.vout && data.vout.length) {
+                    data.vout.forEach(function (vOut) {
+
+                        if (vOut && vOut.address && !addresses[vOut.address]) {
+                            addresses[vOut.address] = vOut.address;
+                        }
+
+                    });
+                }
+
+                if (data.vin && data.vin.length) {
+
+                    data.vin.forEach(function (vIn) {
+
+                        if (vIn.address && !addresses[vIn.address]) {
+                            addresses[vIn.address] = vIn.address;
+                        }
+
+                    });
+
+                }
+
+                self.notifyNewTransaction(Object.keys(addresses), data.txid);
+            }
+
+
+
+        });
     }
 
-    unsubscribeRemoteAddress(addresses) {
-        this.socketClient.emit('unsubscribe', 'quantumd/addressbalance', addresses);
+    notifyNewTransaction(addresses, txid) {
+
+        if (!addresses || !addresses.length) {
+            return;
+        }
+
+        var self = this,
+            emitters = this.getEmittersByAddresses(addresses);
+
+        if (emitters.length) {
+            self.notifyNewTransactionEmitters(emitters, txid);
+        }
+    }
+
+    notifyBalanceChanged(addresses) {
+
+        if (!addresses || !addresses.length) {
+            return;
+        }
+
+        var self = this,
+            emitters = this.getEmittersByAddresses(addresses);
+
+
+        if (emitters.length) {
+            self.notifyBalanceChangedEmitters(emitters);
+        }
+
+
+    }
+
+    notifyNewTransactionEmitters(emitters, txid) {
+        var self = this;
+
+        InsightApi.getTrx(txid, function (err, data) {
+
+            if (err) return false;
+
+            if (data) {
+
+                var formatHistoryItem = HistoryService.formatHistoryItem(data);
+
+                emitters.forEach(function (emitter) {
+
+                    self.notifyNewTransactionEmitter(emitter, formatHistoryItem);
+
+                });
+
+            }
+
+        });
+
+    }
+
+    notifyBalanceChangedEmitters(emitters) {
+        var self = this;
+
+        emitters.forEach(function (emitter) {
+
+            self.notifyBalanceChangedEmitter(emitter);
+
+        });
+    }
+
+    notifyNewTransactionEmitter(emitter, data) {
+        emitter.emit('new_transaction', data);
+    }
+
+    notifyBalanceChangedEmitter(emitter) {
+
+        if (this.subscriptions.emitterAddress[emitter.id]) {
+
+            InsightApi.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], function (err, data) {
+                if (err) {
+                    return;
+                }
+
+                emitter.emit('balance_changed', data);
+            });
+
+        }
+
+
+
+    }
+
+    getEmittersByAddresses(addresses) {
+        var emitters = [];
+        var self = this;
+        addresses.forEach(function (address) {
+
+            if (self.subscriptions.address[address]) {
+                self.subscriptions.address[address].forEach(function (emitter) {
+
+                    if (emitters.indexOf(emitter) === -1) {
+                        emitters.push(emitter);
+                    }
+
+                });
+            }
+
+        });
+
+        return emitters;
+    }
+
+
+    subscribeRemoteQtumRoom() {
+        this.socketClient.emit('subscribe', 'qtum');
     }
 
     socketHandler(socket) {
@@ -99,7 +263,7 @@ class SocketController {
             logger.info(remoteAddress, 'web socket subscribe:', name, params);
 
             switch (name) {
-                case 'quantumd/addressbalance':
+                case 'balance_subscribe':
                     self.subscribeAddress(socket, params);
                     break;
             }
@@ -110,7 +274,7 @@ class SocketController {
             logger.info(remoteAddress, 'web socket unsubscribe:', name);
 
             switch (name) {
-                case 'quantumd/addressbalance':
+                case 'balance_subscribe':
                     self.unsubscribeAddress(socket, params);
                     break;
             }
@@ -124,9 +288,15 @@ class SocketController {
     }
 
     subscribeAddress(emitter, addresses) {
+
+        if (!_.isArray(addresses)) {
+            return false;
+        }
+
         var self = this;
 
         function addAddress(addressStr) {
+
             if(self.subscriptions.address[addressStr]) {
                 var emitters = self.subscriptions.address[addressStr];
                 var index = emitters.indexOf(emitter);
@@ -136,18 +306,30 @@ class SocketController {
             } else {
                 self.subscriptions.address[addressStr] = [emitter];
             }
-            self.subscribeRemoteAddress([addressStr]);
+
+            if (self.subscriptions.emitterAddress[emitter.id]) {
+                var addrs = self.subscriptions.emitterAddress[emitter.id];
+                var index = addrs.indexOf(addressStr);
+                if (index === -1) {
+                    self.subscriptions.emitterAddress[emitter.id].push(addressStr);
+                }
+            } else {
+                self.subscriptions.emitterAddress[emitter.id] = [addressStr]
+            }
+
         }
 
         for(var i = 0; i < addresses.length; i++) {
             //TODO::validate
             // if (bitcore.Address.isValid(addresses[i], this.node.network)) {
-                addAddress(addresses[i]);
+            addAddress(addresses[i]);
             logger.info('addAddress', addresses[i]);
             // }
         }
 
-        logger.info('subscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
+        self.notifyBalanceChanged(self.subscriptions.emitterAddress[emitter.id]);
+
+        logger.info('subscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
     };
 
     unsubscribeAddress(emitter, addresses) {
@@ -164,7 +346,16 @@ class SocketController {
                 emitters.splice(index, 1);
                 if (emitters.length === 0) {
                     delete self.subscriptions.address[addressStr];
-                    self.unsubscribeRemoteAddress([addressStr]);
+                }
+            }
+
+            var addrs = self.subscriptions.emitterAddress[emitter.id];
+            var addrIndex = addrs.indexOf(addressStr);
+
+            if(addrIndex > -1) {
+                addrs.splice(addrIndex, 1);
+                if (addrs.length === 0) {
+                    delete self.subscriptions.emitterAddress[emitter.id];
                 }
             }
         }
@@ -175,7 +366,7 @@ class SocketController {
             }
         }
 
-        logger.info('unsubscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
+        logger.info('unsubscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
     };
 
     unsubscribeAddressAll(emitter) {
@@ -187,16 +378,19 @@ class SocketController {
             }
             if (emitters.length === 0) {
                 delete this.subscriptions.address[hashHex];
-                this.unsubscribeRemoteAddress([hashHex]);
             }
         }
-        logger.info('unsubscribe:', 'quantumd/addressbalance', 'total:', _.size(this.subscriptions.address));
+
+        if (this.subscriptions.emitterAddress[emitter.id]) {
+            delete this.subscriptions.emitterAddress[emitter.id];
+        }
+
+        logger.info('unsubscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
     };
 
     _getRemoteAddress(socket) {
         return socket.client.request.headers['cf-connecting-ip'] || socket.conn.remoteAddress;
     };
-
 }
 
 module.exports = SocketController;

@@ -59,7 +59,7 @@ response
     {
         "block_time": 1490705700|null,
         "block_height": 23701|-1,
-        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589",
+        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
         "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
         "amount": 1.875, //qtum
         "vout": [
@@ -99,7 +99,7 @@ response
     {
         "block_time": 1490705700|null,
         "block_height": 23701|-1,
-        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589",
+        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
         "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
         "amount": 1.875, //qtum
         "vout": [
@@ -219,36 +219,36 @@ response
 
 The web socket API is served using [socket.io](http://socket.io).
 
-``quantumd/addressbalance``
+``balance_subscribe``
 
 Subscribe:
 
 ```
-    socket.emit('subscribe', 'quantumd/addressbalance', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
+
+After subscribe emit ``balance_changed``
 
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'quantumd/addressbalance', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('unsubscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'quantumd/addressbalance');
+    socket.emit('unsubscribe', 'balance_subscribe');
 ```
+
+``balance_changed``
 
 Listen:
 
 ```
-    socket.on('quantumd/addressbalance', function(data) {
-         console.log("New data received: " + data.txid);
-         console.log("New data received: " + data.address);
+    socket.on('balance_changed', function(data) {
          console.log("New data received: " + data.balance); //satoshis
-         console.log("New data received: " + data.totalReceived); //satoshis
-         console.log("New data received: " + data.totalSpent); //satoshis
-         console.log("New data received: " + data.unconfirmedBalance); //satoshis
+         console.log("New data received: " + data.received); //satoshis
     });
 ```
 
@@ -256,16 +256,51 @@ Sample output:
 
 ```
 {
-    "txid": String,
-    "address": String,
-    "balance": Integer,
-    "totalReceived": Integer, //satoshis
-    "totalSpent": Integer, //satoshis
-    "unconfirmedBalance": Integer //satoshis
-    
+    "balance": 1400000000,
+    "received": 7900000000
 }
 ```
 
+
+
+``new_transaction``
+
+
+Listen:
+
+```
+    socket.on('new_transaction', function(data) {
+         console.log(data) // Sample output
+    });
+```
+
+Sample output:
+
+```
+{
+        "block_time": 1490705700|null,
+        "block_height": 23701|-1,
+        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
+        "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+        "amount": 1.875, //qtum
+        "vout": [
+            {
+                "value": 1, //qtum
+                "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+            },
+            {
+                "value": 0.874, //qtum
+                "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+            }
+        ],
+        "vin": [
+            {
+                value: 1.875, //qtum
+                address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+            }
+        ]
+    }
+```
 
 ### Example Usage
 
@@ -276,7 +311,7 @@ html
   <script src="http://<insight-server>:<port>/socket.io/socket.io.js"></script>
   <script>
     
-    var eventToListenTo = 'quantumd/addressbalance',
+    var eventToListenTo = 'balance_subscribe',
         socket = io("http://<insight-server>:<port>/");
     
     socket.on('connect', function() {

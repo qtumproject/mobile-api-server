@@ -34,7 +34,7 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
-        APIController.addHandler('get', '/sendTestEvent/3Sdsw2423SADcdt324lsdcas213dfll___', Controllers.socket.sendTestEvent.bind(Controllers.socket));
+        // APIController.addHandler('get', '/sendTestEvent/3Sdsw2423SADcdt324lsdcas213dfll___', Controllers.socket.sendTestEvent.bind(Controllers.socket));
 
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
 
@@ -53,6 +53,11 @@ let APIController = {
         APIController.app.get('/test', function(req, res) {
             var path = require('path');
             res.sendFile(path.resolve('App/Views/index.html'));
+        });
+
+        APIController.app.get('/insight', function(req, res) {
+            var path = require('path');
+            res.sendFile(path.resolve('App/Views/insight.html'));
         });
 
 	},
