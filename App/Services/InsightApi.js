@@ -36,7 +36,7 @@ class InsightApi {
 
     static getUnspentAddresses(addresses, cb) {
         return request.get({
-            url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/utxo`,
+            url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/utxo-only`,
             json: true
         }, (error, response, body) => {
                 cb(error, body);
