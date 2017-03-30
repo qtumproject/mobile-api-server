@@ -227,7 +227,7 @@ Subscribe:
     socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
 
-> After subscribe emit ``balance_changed``
+> After subscribe will emit ``balance_changed``
 
 Unsubscribe:
 
