@@ -1,7 +1,6 @@
 let logger = require('log4js').getLogger('History Controller'),
     InsightApi = require("../Services/InsightApi"),
-    HistoryService = require("../Services/HistoryService"),
-	async = require('async');
+    HistoryService = require("../Services/HistoryService");
 
 
 class HistoryController {
@@ -40,7 +39,7 @@ class HistoryController {
 
 	_formatOptions(limit, offset) {
 
-	    var MAX_LIMIT = 50;
+	    const MAX_LIMIT = 50;
 
         limit = parseInt(limit, 10);
         offset = parseInt(offset, 10);
