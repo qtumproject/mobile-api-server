@@ -219,7 +219,7 @@ response
 
 The web socket API is served using [socket.io](http://socket.io).
 
-``balance_subscribe``
+### Event ``balance_subscribe``
 
 Subscribe:
 
@@ -241,7 +241,7 @@ or
     socket.emit('unsubscribe', 'balance_subscribe');
 ```
 
-``balance_changed``
+### Event ``balance_changed``
 
 Listen:
 
@@ -263,7 +263,7 @@ Sample output:
 
 
 
-``new_transaction``
+### Event ``new_transaction``
 
 
 Listen:
