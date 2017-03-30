@@ -2,7 +2,17 @@
 class HistoryService {
 
     static formatHistory(history) {
+
         var items = [];
+
+        if (!history) {
+            return {
+                totalItems: 0,
+                items: []
+            }
+        }
+
+
 
         if (history && history.items && history.items.length) {
             history.items.forEach(function (item) {
@@ -10,7 +20,10 @@ class HistoryService {
             });
         }
 
-        return items;
+        return {
+            totalItems: history && history.totalItems ? history.totalItems : 0,
+            items: items
+        };
     }
 
     static formatHistoryItem(item) {
