@@ -146,7 +146,8 @@ response
     txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
     amount: 1, //qtum
     block_height: 100000000|-1,
-    pubkey_hash: String
+    pubkey_hash: String,
+    confirmations: Int
 }]
 ```
 
@@ -167,8 +168,8 @@ response
     txout_scriptPubKey: "76a914b739980629d47e0de6e3fac7513cff7fe36e6fff88ac",
     amount: 1, //qtum
     block_height: 100000000|-1,
-    pubkey_hash: String
-    
+    pubkey_hash: String,
+    confirmations: Int
 }]
 ```
 
