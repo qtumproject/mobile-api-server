@@ -48,7 +48,7 @@ request parameters
 
 /history/{address}/{limit}/{offset}
 
-`MAX_LIMIT = 50;`
+> `MAX_LIMIT = 50;`
 
 [http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0](http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0)
 
@@ -88,7 +88,7 @@ response
  
 /history/{limit}/{offset}?addresses[]={:address}&addresses[]={:address2}
 
-`MAX_LIMIT = 50;`
+> `MAX_LIMIT = 50;`
 
 [http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
@@ -227,7 +227,7 @@ Subscribe:
     socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
 ```
 
-After subscribe emit ``balance_changed``
+> After subscribe emit ``balance_changed``
 
 Unsubscribe:
 
