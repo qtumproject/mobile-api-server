@@ -1,3 +1,4 @@
+var BigNumber = require('bignumber.js');
 
 class HistoryService {
 
@@ -32,9 +33,11 @@ class HistoryService {
 
         if (item.vin) {
             item.vin.forEach(function (vIn) {
+                
+                var num = new BigNumber(vIn.value);
 
                 vin.push({
-                    value: vIn.value,
+                    value: num.toString(10),
                     address: vIn.addr
                 });
 
