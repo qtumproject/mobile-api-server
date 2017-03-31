@@ -92,7 +92,7 @@ class SocketController {
 
                     }
 
-                    self.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid);
+                    self.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid, {withHeight: true});
 
                 });
 
@@ -132,7 +132,7 @@ class SocketController {
 
                 }
 
-                self.notifyNewTransaction(Object.keys(addresses), data.txid);
+                self.notifyNewTransaction(Object.keys(addresses), data.txid, {withHeight: false});
             }
 
 
@@ -140,7 +140,7 @@ class SocketController {
         });
     }
 
-    notifyNewTransaction(addresses, txid) {
+    notifyNewTransaction(addresses, txid, options) {
 
         if (!addresses || !addresses.length) {
             return;
@@ -150,7 +150,7 @@ class SocketController {
             emitters = this.getEmittersByAddresses(addresses);
 
         if (emitters.length) {
-            self.notifyNewTransactionEmitters(emitters, txid);
+            self.notifyNewTransactionEmitters(emitters, txid, options);
         }
     }
 
@@ -171,8 +171,11 @@ class SocketController {
 
     }
 
-    notifyNewTransactionEmitters(emitters, txid) {
-        var self = this;
+    notifyNewTransactionEmitters(emitters, txid, options) {
+        var self = this,
+            withHeight = options.withHeight;
+
+
 
         InsightApi.getTrx(txid, function (err, data) {
 
@@ -181,12 +184,17 @@ class SocketController {
             if (data) {
 
                 var formatHistoryItem = HistoryService.formatHistoryItem(data);
+                
+                if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
 
-                emitters.forEach(function (emitter) {
+                    emitters.forEach(function (emitter) {
 
-                    self.notifyNewTransactionEmitter(emitter, formatHistoryItem);
+                        self.notifyNewTransactionEmitter(emitter, formatHistoryItem);
 
-                });
+                    });
+
+                }
+
 
             }
 

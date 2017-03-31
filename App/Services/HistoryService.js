@@ -54,7 +54,7 @@ class HistoryService {
 
         return {
             block_time: item.blocktime ? item.blocktime : null,
-            block_height: item.blockheight ? item.blockheight : null,
+            block_height: item.blockheight ? item.blockheight : -1,
             block_hash: item.blockhash ? item.blockhash : null,
             tx_hash: item.txid,
             amount: item.valueIn,
