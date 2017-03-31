@@ -66,17 +66,17 @@ response
              "amount": 1.875, //qtum
              "vout": [
                  {
-                     "value": 1, //qtum
+                     "value": "1", //qtum
                      "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
                  },
                  {
-                     "value": 0.874, //qtum
+                     "value": "0.874", //qtum
                      "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
                  }
              ],
              "vin": [
                  {
-                     value: 1.875, //qtum
+                     value: "1.875", //qtum
                      address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
                  }
              ]
@@ -109,17 +109,17 @@ response
              "amount": 1.875, //qtum
              "vout": [
                  {
-                     "value": 1, //qtum
+                     "value": "1", //qtum
                      "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
                  },
                  {
-                     "value": 0.874, //qtum
+                     "value": "0.874", //qtum
                      "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
                  }
              ],
              "vin": [
                  {
-                     value: 1.875, //qtum
+                     value: "1.875", //qtum
                      address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
                  }
              ]
@@ -292,17 +292,17 @@ Sample output:
         "amount": 1.875, //qtum
         "vout": [
             {
-                "value": 1, //qtum
+                "value": "1", //qtum
                 "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
             },
             {
-                "value": 0.874, //qtum
+                "value": "0.874", //qtum
                 "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ],
         "vin": [
             {
-                value: 1.875, //qtum
+                value: "1.875", //qtum
                 address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
             }
         ]

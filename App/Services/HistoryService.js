@@ -33,7 +33,7 @@ class HistoryService {
 
         if (item.vin) {
             item.vin.forEach(function (vIn) {
-                
+
                 var num = new BigNumber(vIn.value);
 
                 vin.push({
