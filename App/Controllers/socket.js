@@ -184,7 +184,7 @@ class SocketController {
             if (data) {
 
                 var formatHistoryItem = HistoryService.formatHistoryItem(data);
-                
+
                 if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
 
                     emitters.forEach(function (emitter) {
