@@ -292,7 +292,7 @@ Listen:
 ```
     socket.on('balance_changed', function(data) {
          console.log("New data received: " + data.balance); //satoshis
-         console.log("New data received: " + data.received); //satoshis
+         console.log("New data received: " + data.unconfirmedBalance); //satoshis
     });
 ```
 
@@ -301,7 +301,7 @@ Sample output:
 ```
 {
     "balance": 1400000000,
-    "received": 7900000000
+    "unconfirmedBalance": 7900000000
 }
 ```
 
