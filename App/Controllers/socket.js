@@ -112,7 +112,7 @@ class SocketController {
                 }
 
                 this.notifyNewTransaction(Object.keys(addresses), data.txid, {withHeight: false});
-
+                this.notifyBalanceChanged(Object.keys(addresses));
             }
         });
     }
