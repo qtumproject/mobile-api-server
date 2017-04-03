@@ -42,6 +42,8 @@ let APIController = {
         APIController.addHandler('get', '/history/:limit/:offset', Controllers.history.getAddressHistoryList.bind(Controllers.history));
         APIController.addHandler('get', '/history/:address/:limit/:offset', Controllers.history.getAddressHistory.bind(Controllers.history));
 
+		APIController.addHandler('get', '/transactions/:txhash', Controllers.transactions.getTransaction.bind(Controllers.transactions));
+
 		APIController.addHandler('get', '/outputs/unspent/:address', Controllers.outputs.getUnspentByAddress.bind(Controllers.outputs));
 		APIController.addHandler('get', '/outputs/unspent', Controllers.outputs.getUnspentByAddresses.bind(Controllers.outputs));
 

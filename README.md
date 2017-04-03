@@ -27,6 +27,7 @@ response
 	"bytecode": String
 }
 ```
+
 ## Send Raw Transaction
 `POST`
 
@@ -40,6 +41,42 @@ request parameters
 {
 	"data": "raw transaction" // string,
 	"allowHighFee": 1 // 1 or 0
+}
+```
+
+
+## Get Transaction
+`GET`
+
+/transactions/{txhash}
+
+[http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f](http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f)
+
+response: Object | null
+
+```
+{
+    "block_time": 1491219489|null,
+    "block_height": 31111|-1,
+    "block_hash": "b0589be37f4e24bffea77bfc87f5bbd6f9a90c629306f7c3340c7c52a982e592"|null,
+    "tx_hash": "25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f",
+    "amount": 5, //qtum
+    "vout": [
+        {
+            "value": "2.00000000", //qtum
+            "address": "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7"
+        },
+        {
+            "value": "2.99995400", //qtum
+            "address": "mk5aX8HDEpSWF2P2dtdSN9aiAC7AHdzHEa"
+        }
+    ],
+    "vin": [
+        {
+            value: "5", //qtum
+            address: "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7"
+        }
+    ]
 }
 ```
 
@@ -285,28 +322,28 @@ Sample output:
 
 ```
 {
-        "block_time": 1490705700|null,
-        "block_height": 23701|-1,
-        "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
-        "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
-        "amount": 1.875, //qtum
-        "vout": [
-            {
-                "value": "1", //qtum
-                "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
-            },
-            {
-                "value": "0.874", //qtum
-                "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
-            }
-        ],
-        "vin": [
-            {
-                value: "1.875", //qtum
-                address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
-            }
-        ]
-    }
+    "block_time": 1490705700|null,
+    "block_height": 23701|-1,
+    "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
+    "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+    "amount": 1.875, //qtum
+    "vout": [
+        {
+            "value": "1", //qtum
+            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+        },
+        {
+            "value": "0.874", //qtum
+            "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+        }
+    ],
+    "vin": [
+        {
+            value: "1.875", //qtum
+            address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+        }
+    ]
+}
 ```
 
 ### Example Usage

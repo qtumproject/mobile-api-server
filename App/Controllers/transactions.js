@@ -1,4 +1,5 @@
 let InsightApi = require("../Services/InsightApi"),
+    HistoryService = require("../Services/HistoryService"),
     logger = require('log4js').getLogger('Transactions Controller');
 
 let Controllers = getControllers();
@@ -17,6 +18,17 @@ class TransactionsController {
             cb(error, body);
         });
 
+    }
+
+    getTransaction(cb, data) {
+
+        InsightApi.getTrx(data.req.params.txhash, (err, data) => {
+
+            if (err) return cb(err);
+
+            return cb(null, data ? HistoryService.formatHistoryItem(data) : null);
+
+        });
     }
 
 }

@@ -111,8 +111,10 @@ class SocketController {
                     });
                 }
 
-                this.notifyNewTransaction(Object.keys(addresses), data.txid, {withHeight: false});
-                this.notifyBalanceChanged(Object.keys(addresses));
+                let addressKeys = Object.keys(addresses);
+
+                this.notifyNewTransaction(addressKeys, data.txid, {withHeight: false});
+                this.notifyBalanceChanged(addressKeys);
             }
         });
     }

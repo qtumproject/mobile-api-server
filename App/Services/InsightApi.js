@@ -1,4 +1,5 @@
 let request = require('request'),
+    _ = require('lodash'),
     config = require('../../config/main.json');
 
 class InsightApi {
@@ -17,6 +18,11 @@ class InsightApi {
             url: config.INSIGHT_API_URL + `/tx/${txid}`,
             json: true
         }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                body = null;
+            }
+
             cb(error, body);
         });
     }
