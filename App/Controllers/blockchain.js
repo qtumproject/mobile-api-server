@@ -1,6 +1,7 @@
 let InsightApi = require("../Services/InsightApi"),
     logger = require('log4js').getLogger('Blockchain Controller');
 
+let Controllers = getControllers();
 
 class BlockchainController {
 
@@ -9,12 +10,11 @@ class BlockchainController {
     }
 
 	getInfo(cb) {
-
 		InsightApi.getInfo((error, body) => {
             cb(error, body && body.info ? body.info : {});
 		});
-
 	}
+
 }
 
-module.exports = BlockchainController;
+Controllers.blockchain = new BlockchainController();

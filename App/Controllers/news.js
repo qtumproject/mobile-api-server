@@ -1,6 +1,7 @@
 let async = require('async'),
     logger = require('log4js').getLogger('News Controller');
 
+let Controllers = getControllers();
 
 class NewsController {
 
@@ -13,4 +14,4 @@ class NewsController {
     }
 }
 
-module.exports = NewsController;
+Controllers.news = new NewsController();

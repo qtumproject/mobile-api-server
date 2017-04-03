@@ -2,6 +2,7 @@ let logger = require('log4js').getLogger('History Controller'),
     InsightApi = require("../Services/InsightApi"),
     HistoryService = require("../Services/HistoryService");
 
+let Controllers = getControllers();
 
 class HistoryController {
 
@@ -10,7 +11,7 @@ class HistoryController {
 	}
 	
 	getAddressHistoryList(cb, data) {
-        var req = data.req,
+        let req = data.req,
             options = this._formatOptions(req.params.limit, req.params.offset),
             addresses = data._get.addresses && Array.isArray(data._get.addresses) ? data._get.addresses : [];
 
@@ -27,9 +28,8 @@ class HistoryController {
 	}
 	
 	getAddressHistory(cb, data) {
-	    var req = data.req,
+	    let req = data.req,
             options = this._formatOptions(req.params.limit, req.params.offset);
-
 
 	    InsightApi.getAddressesHistory([data._get.address], options, (error, body) => {
             return cb(error, this._formatHistory(body));
@@ -71,5 +71,4 @@ class HistoryController {
 
 }
 
-module.exports = HistoryController;
-
+Controllers.history = new HistoryController();

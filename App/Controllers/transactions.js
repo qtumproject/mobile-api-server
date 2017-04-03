@@ -1,6 +1,7 @@
 let InsightApi = require("../Services/InsightApi"),
-    logger = require('log4js').getLogger('Outputs Controller');
+    logger = require('log4js').getLogger('Transactions Controller');
 
+let Controllers = getControllers();
 
 class TransactionsController {
 
@@ -20,4 +21,4 @@ class TransactionsController {
 
 }
 
-module.exports = TransactionsController;
+Controllers.transactions = new TransactionsController();

@@ -35,11 +35,7 @@ let Server = {
 				let name = file.replace(/.*\/([A-z]+)\.js/, '$1');
 				logger.info(name);
 				let r = require(file);
-
-				if(typeof r == 'function')  {
-                    Server.controllers[name] = new r();
-				}
-
+                if(typeof r == 'function') r();
 			});
 			cb();
 		});

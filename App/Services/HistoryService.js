@@ -1,10 +1,10 @@
-var BigNumber = require('bignumber.js');
+let BigNumber = require('bignumber.js');
 
 class HistoryService {
 
     static formatHistory(history) {
 
-        var items = [];
+        let items = [];
 
         if (!history) {
             return {
@@ -13,10 +13,8 @@ class HistoryService {
             }
         }
 
-
-
         if (history && history.items && history.items.length) {
-            history.items.forEach(function (item) {
+            history.items.forEach((item) => {
                 items.push(HistoryService.formatHistoryItem(item));
             });
         }
@@ -28,13 +26,13 @@ class HistoryService {
     }
 
     static formatHistoryItem(item) {
-        var vout = [],
+        let vout = [],
             vin = [];
 
         if (item.vin) {
-            item.vin.forEach(function (vIn) {
+            item.vin.forEach((vIn) => {
 
-                var num = new BigNumber(vIn.value);
+                let num = new BigNumber(vIn.value);
 
                 vin.push({
                     value: num.toString(10),
@@ -46,7 +44,7 @@ class HistoryService {
 
 
         if (item.vout) {
-            item.vout.forEach(function (vOut) {
+            item.vout.forEach((vOut) => {
 
                 if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
 

@@ -10,7 +10,8 @@ let async = require('async'),
 	crypto = require('crypto'),
 	cors = require('cors'),
 	multer = require('multer'),
-	fs = require('fs');
+	fs = require('fs'),
+	path = require('path');
 
 let Controllers = getControllers();
 
@@ -34,8 +35,6 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
-        // APIController.addHandler('get', '/sendTestEvent/3Sdsw2423SADcdt324lsdcas213dfll___', Controllers.socket.sendTestEvent.bind(Controllers.socket));
-
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
 
         APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
@@ -50,22 +49,20 @@ let APIController = {
 
 		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
 
-        APIController.app.get('/test', function(req, res) {
-            var path = require('path');
+        APIController.app.get('/test', (req, res) => {
             res.sendFile(path.resolve('App/Views/index.html'));
         });
 
-        APIController.app.get('/insight', function(req, res) {
-            var path = require('path');
+        APIController.app.get('/insight', (req, res) => {
             res.sendFile(path.resolve('App/Views/insight.html'));
         });
 
 	},
 	server: null,
-	getServer: function() {
+	getServer: () => {
 		return APIController.server;
 	},
-	runServer: function(port) {
+	runServer: (port) => {
 		let express = require('express');
 		APIController.app = express();
 		APIController.server = require('http').Server(APIController.app);

@@ -1,10 +1,12 @@
-const InsightApi = require("../Services/InsightApi");
-const HistoryService = require("../Services/HistoryService");
-const logger = require('log4js').getLogger('Socket Controller');
-const config = require('../../config/main.json');
-const socketIO = require('socket.io');
-const socketIOClient = require('socket.io-client');
-const _ = require('lodash');
+let InsightApi = require("../Services/InsightApi"),
+    HistoryService = require("../Services/HistoryService"),
+    logger = require('log4js').getLogger('Socket Controller'),
+    config = require('../../config/main.json'),
+    socketIO = require('socket.io'),
+    socketIOClient = require('socket.io-client'),
+     _ = require('lodash');
+
+let Controllers = getControllers();
 
 class SocketController {
 
@@ -12,18 +14,14 @@ class SocketController {
         logger.info('Init');
         this.socket = null;
         this.socketClient = null;
-
         this.subscriptions = {};
         this.subscriptions.address = {};
         this.subscriptions.emitterAddress = {};
-
     }
 
     init(server) {
-
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
-
     }
 
     initSocket(server) {
@@ -33,19 +31,14 @@ class SocketController {
 
     initRemoteSocket(SOCKET_SERVER) {
 
-        var self = this;
-
         this.socketClient = socketIOClient(SOCKET_SERVER);
 
-        this.socketClient.on('connect', function() {
-
+        this.socketClient.on('connect', () => {
             logger.info('connect socketClient');
-
-            self.subscribeRemoteQtumRoom();
-
+            this.subscribeRemoteQtumRoom();
         });
 
-        this.socketClient.on('disconnect', function() {
+        this.socketClient.on('disconnect', () => {
             logger.info('disconnect socketClient');
         });
 
@@ -55,88 +48,72 @@ class SocketController {
     }
 
     subscribeToQtumBlock() {
-        var self = this;
 
-        this.socketClient.on('qtum/block', function (data) {
+        this.socketClient.on('qtum/block', (data) => {
 
             if (data && data.transactions) {
 
-                var addresses = {};
+                let addresses = {};
 
-                data.transactions.forEach(function (transaction) {
-                    var trxAddresses = {};
+                data.transactions.forEach((transaction) => {
+
+                    let trxAddresses = {};
 
                     if (transaction.vout) {
-
-                        transaction.vout.forEach(function (vOut) {
-
+                        transaction.vout.forEach((vOut) => {
                             if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
                                 addresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
                                 trxAddresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
                             }
-
                         });
-
                     }
 
                     if (transaction.vin) {
-
-                        transaction.vin.forEach(function (vIn) {
-
+                        transaction.vin.forEach((vIn) => {
                             if (vIn.addr) {
                                 addresses[vIn.addr] = vIn.addr;
                                 trxAddresses[vIn.addr] = vIn.addr;
                             }
-
                         });
-
                     }
 
-                    self.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid, {withHeight: true});
+                    this.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid, {withHeight: true});
 
                 });
 
-                self.notifyBalanceChanged(Object.keys(addresses));
+                this.notifyBalanceChanged(Object.keys(addresses));
 
             }
 
         });
     }
     subscribeToQtumTrx() {
-        var self = this;
 
-        this.socketClient.on('qtum/tx', function (data) {
+        this.socketClient.on('qtum/tx', (data) => {
 
-            var addresses = {};
+            let addresses = {};
 
             if (data) {
-                if (data.vout && data.vout.length) {
-                    data.vout.forEach(function (vOut) {
 
+                if (data.vout && data.vout.length) {
+                    data.vout.forEach((vOut) => {
                         if (vOut && vOut.address && !addresses[vOut.address]) {
                             addresses[vOut.address] = vOut.address;
                         }
-
                     });
                 }
 
                 if (data.vin && data.vin.length) {
-
-                    data.vin.forEach(function (vIn) {
-
+                    data.vin.forEach((vIn) => {
                         if (vIn.address && !addresses[vIn.address]) {
                             addresses[vIn.address] = vIn.address;
                         }
-
                     });
-
                 }
 
-                self.notifyNewTransaction(Object.keys(addresses), data.txid, {withHeight: false});
+                this.notifyNewTransaction(Object.keys(addresses), data.txid, {withHeight: false});
+
             }
-
-
-
         });
     }
 
@@ -146,69 +123,48 @@ class SocketController {
             return;
         }
 
-        var self = this,
-            emitters = this.getEmittersByAddresses(addresses);
+        let emitters = this.getEmittersByAddresses(addresses);
 
         if (emitters.length) {
-            self.notifyNewTransactionEmitters(emitters, txid, options);
+            this.notifyNewTransactionEmitters(emitters, txid, options);
         }
     }
 
     notifyBalanceChanged(addresses) {
-
         if (!addresses || !addresses.length) {
             return;
         }
 
-        var self = this,
-            emitters = this.getEmittersByAddresses(addresses);
-
+        let emitters = this.getEmittersByAddresses(addresses);
 
         if (emitters.length) {
-            self.notifyBalanceChangedEmitters(emitters);
+            this.notifyBalanceChangedEmitters(emitters);
         }
-
-
     }
 
     notifyNewTransactionEmitters(emitters, txid, options) {
-        var self = this,
-            withHeight = options.withHeight;
+        let withHeight = options.withHeight;
 
-
-
-        InsightApi.getTrx(txid, function (err, data) {
+        InsightApi.getTrx(txid, (err, data) => {
 
             if (err) return false;
 
             if (data) {
-
-                var formatHistoryItem = HistoryService.formatHistoryItem(data);
+                let formatHistoryItem = HistoryService.formatHistoryItem(data);
 
                 if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
-
-                    emitters.forEach(function (emitter) {
-
-                        self.notifyNewTransactionEmitter(emitter, formatHistoryItem);
-
+                    emitters.forEach((emitter) => {
+                        this.notifyNewTransactionEmitter(emitter, formatHistoryItem);
                     });
-
                 }
-
-
             }
 
         });
-
     }
 
     notifyBalanceChangedEmitters(emitters) {
-        var self = this;
-
-        emitters.forEach(function (emitter) {
-
-            self.notifyBalanceChangedEmitter(emitter);
-
+        emitters.forEach((emitter) => {
+            this.notifyBalanceChangedEmitter(emitter);
         });
     }
 
@@ -217,43 +173,32 @@ class SocketController {
     }
 
     notifyBalanceChangedEmitter(emitter) {
-
         if (this.subscriptions.emitterAddress[emitter.id]) {
-
-            InsightApi.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], function (err, data) {
+            InsightApi.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
                 if (err) {
-                    return;
+                    return false;
                 }
 
                 emitter.emit('balance_changed', data);
             });
-
         }
-
-
-
     }
 
     getEmittersByAddresses(addresses) {
-        var emitters = [];
-        var self = this;
-        addresses.forEach(function (address) {
+        let emitters = [];
 
-            if (self.subscriptions.address[address]) {
-                self.subscriptions.address[address].forEach(function (emitter) {
-
+        addresses.forEach((address) => {
+            if (this.subscriptions.address[address]) {
+                this.subscriptions.address[address].forEach((emitter) => {
                     if (emitters.indexOf(emitter) === -1) {
                         emitters.push(emitter);
                     }
-
                 });
             }
-
         });
 
         return emitters;
     }
-
 
     subscribeRemoteQtumRoom() {
         this.socketClient.emit('subscribe', 'qtum');
@@ -261,36 +206,35 @@ class SocketController {
 
     socketHandler(socket) {
 
-        var self = this,
-            remoteAddress = this._getRemoteAddress(socket);
+        let remoteAddress = this._getRemoteAddress(socket);
 
         logger.info('a user connected', remoteAddress);
 
-        socket.on('subscribe', function (name, params) {
+        socket.on('subscribe', (name, params) => {
 
             logger.info(remoteAddress, 'web socket subscribe:', name, params);
 
             switch (name) {
                 case 'balance_subscribe':
-                    self.subscribeAddress(socket, params);
+                    this.subscribeAddress(socket, params);
                     break;
             }
 
         });
 
-        socket.on('unsubscribe', function(name, params) {
+        socket.on('unsubscribe', (name, params) => {
             logger.info(remoteAddress, 'web socket unsubscribe:', name);
 
             switch (name) {
                 case 'balance_subscribe':
-                    self.unsubscribeAddress(socket, params);
+                    this.unsubscribeAddress(socket, params);
                     break;
             }
 
         });
 
-        socket.on('disconnect', function() {
-            self.unsubscribeAddress(socket);
+        socket.on('disconnect', () => {
+            this.unsubscribeAddress(socket);
             logger.info('user disconnected', remoteAddress);
         });
     }
@@ -301,55 +245,60 @@ class SocketController {
             return false;
         }
 
-        var self = this;
+        let self = this;
 
         function addAddress(addressStr) {
 
             if(self.subscriptions.address[addressStr]) {
-                var emitters = self.subscriptions.address[addressStr];
-                var index = emitters.indexOf(emitter);
+
+                let emitters = self.subscriptions.address[addressStr],
+                    index = emitters.indexOf(emitter);
+
                 if (index === -1) {
                     self.subscriptions.address[addressStr].push(emitter);
                 }
+
             } else {
                 self.subscriptions.address[addressStr] = [emitter];
             }
 
             if (self.subscriptions.emitterAddress[emitter.id]) {
-                var addrs = self.subscriptions.emitterAddress[emitter.id];
-                var index = addrs.indexOf(addressStr);
+
+                let addrs = self.subscriptions.emitterAddress[emitter.id],
+                    index = addrs.indexOf(addressStr);
+
                 if (index === -1) {
                     self.subscriptions.emitterAddress[emitter.id].push(addressStr);
                 }
+
             } else {
                 self.subscriptions.emitterAddress[emitter.id] = [addressStr]
             }
 
         }
 
-        for(var i = 0; i < addresses.length; i++) {
-            //TODO::validate
-            // if (bitcore.Address.isValid(addresses[i], this.node.network)) {
+        for(let i = 0; i < addresses.length; i++) {
             addAddress(addresses[i]);
             logger.info('addAddress', addresses[i]);
-            // }
         }
 
-        self.notifyBalanceChanged(self.subscriptions.emitterAddress[emitter.id]);
+        this.notifyBalanceChanged(this.subscriptions.emitterAddress[emitter.id]);
 
         logger.info('subscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
     };
 
     unsubscribeAddress(emitter, addresses) {
-        var self = this;
 
         if(!addresses) {
             return this.unsubscribeAddressAll(emitter);
         }
 
+        let self = this;
+
         function removeAddress(addressStr) {
-            var emitters = self.subscriptions.address[addressStr];
-            var index = emitters.indexOf(emitter);
+            let emitters = self.subscriptions.address[addressStr],
+                index = emitters.indexOf(emitter);
+
             if(index > -1) {
                 emitters.splice(index, 1);
                 if (emitters.length === 0) {
@@ -357,8 +306,8 @@ class SocketController {
                 }
             }
 
-            var addrs = self.subscriptions.emitterAddress[emitter.id];
-            var addrIndex = addrs.indexOf(addressStr);
+            let addrs = self.subscriptions.emitterAddress[emitter.id],
+                addrIndex = addrs.indexOf(addressStr);
 
             if(addrIndex > -1) {
                 addrs.splice(addrIndex, 1);
@@ -368,7 +317,7 @@ class SocketController {
             }
         }
 
-        for(var i = 0; i < addresses.length; i++) {
+        for(let i = 0; i < addresses.length; i++) {
             if(this.subscriptions.address[addresses[i]]) {
                 removeAddress(addresses[i]);
             }
@@ -378,12 +327,15 @@ class SocketController {
     };
 
     unsubscribeAddressAll(emitter) {
-        for(var hashHex in this.subscriptions.address) {
-            var emitters = this.subscriptions.address[hashHex];
-            var index = emitters.indexOf(emitter);
+        for(let hashHex in this.subscriptions.address) {
+
+            let emitters = this.subscriptions.address[hashHex],
+                index = emitters.indexOf(emitter);
+
             if(index > -1) {
                 emitters.splice(index, 1);
             }
+
             if (emitters.length === 0) {
                 delete this.subscriptions.address[hashHex];
             }
@@ -401,4 +353,4 @@ class SocketController {
     };
 }
 
-module.exports = SocketController;
+Controllers.socket = new SocketController();

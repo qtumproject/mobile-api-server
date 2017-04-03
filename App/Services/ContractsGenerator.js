@@ -1,9 +1,8 @@
-var solc = require('solc'),
+let solc = require('solc'),
     Mustache = require('mustache'),
     fs = require('fs'),
     CONTRACT_NAME = 'MyToken',
     MyTokenTemplate = fs.readFileSync( __dirname + '/../Components/ContractTemplates/' + CONTRACT_NAME + '.solc.tpl', "utf8");
-
 
 class ContractsGenerator {
 
@@ -29,6 +28,5 @@ class ContractsGenerator {
     }
 
 }
-
 
 module.exports = ContractsGenerator;

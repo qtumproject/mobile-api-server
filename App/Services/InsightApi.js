@@ -44,7 +44,6 @@ class InsightApi {
     }
 
     static getAddressesHistory(addresses, options, cb) {
-        console.log(config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/txs?from=${options.from}&to=${options.to}`);
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/txs?from=${options.from}&to=${options.to}`,
             json: true
@@ -54,7 +53,6 @@ class InsightApi {
     }
 
     static getAddressesBalance(addresses, cb) {
-
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/balance`,
             json: true

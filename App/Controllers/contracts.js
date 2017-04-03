@@ -1,6 +1,8 @@
 let ContractsGenerator = require("../Services/ContractsGenerator"),
     logger = require('log4js').getLogger('Contracts Controller');
 
+let Controllers = getControllers();
+
 class ContractsController {
 
     constructor() {
@@ -24,8 +26,7 @@ class ContractsController {
             cb(e.message, null);
         }
 
-
     }
 }
 
-module.exports = ContractsController;
+Controllers.contracts = new ContractsController();

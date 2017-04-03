@@ -1,8 +1,8 @@
-let async = require('async'),
-	logger = require('log4js').getLogger('Outputs Controller'),
+let logger = require('log4js').getLogger('Outputs Controller'),
 	InsightApi = require("../Services/InsightApi"),
     bs58 = require('bs58');
 
+let Controllers = getControllers();
 
 class OutputsControllers {
 
@@ -11,12 +11,9 @@ class OutputsControllers {
     }
 
     getUnspentByAddress(cb, data) {
-
-
         InsightApi.getUnspentAddresses([data._get.address], (error, body) => {
             cb(error, this._formatAddresses(body));
     	});
-
 	}
 
 	getUnspentByAddresses(cb, data) {
@@ -24,11 +21,9 @@ class OutputsControllers {
 		let addresses = data._get.addresses && Array.isArray(data._get.addresses) ? data._get.addresses : [];
 
 		if (addresses.length) {
-
             InsightApi.getUnspentAddresses(addresses, (error, body) => {
                 cb(error, this._formatAddresses(body));
         	});
-
 		} else {
             cb(error, []);
 		}
@@ -36,9 +31,9 @@ class OutputsControllers {
 	}
 
 	_formatAddresses(addresses) {
-    	var newAddresses = [];
+    	let newAddresses = [];
 
-        addresses.forEach(function (address) {
+        addresses.forEach((address) => {
 
             let bytes = bs58.decode(address.address);
 
@@ -64,4 +59,4 @@ class OutputsControllers {
 
 }
 
-module.exports = OutputsControllers;
+Controllers.outputs = new OutputsControllers();
