@@ -7,7 +7,7 @@
 
 /contracts/generate-token-bytecode
 
-[http://139.162.178.174/contracts/generate-token-bytecode](http://139.162.178.174/contracts/generate-token-bytecode)
+[http://163.172.68.103:5931/contracts/generate-token-bytecode](http://139.162.178.174/contracts/generate-token-bytecode)
 
 request
 
@@ -25,6 +25,24 @@ response
 ```
 {
 	"bytecode": String
+}
+```
+
+
+## Contracts / Params
+`GET`
+
+/contracts/{address_contract}/params
+
+[http://163.172.68.103:5931/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params](http://139.162.178.174/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params)
+
+response: Object | null
+
+```
+{
+	"symbol": String,
+	"decimals": Integer
+	"name": String
 }
 ```
 
@@ -48,7 +66,7 @@ request parameters
 ## Get Transaction
 `GET`
 
-/transactions/{txhash}
+/transactions/{tx_hash}
 
 [http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f](http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f)
 

@@ -1,5 +1,5 @@
 let logger = require('log4js').getLogger('Outputs Controller'),
-	InsightApi = require("../Services/InsightApi"),
+	InsightApi = require("../Repositories/InsightApi"),
     bs58 = require('bs58');
 
 let Controllers = getControllers();

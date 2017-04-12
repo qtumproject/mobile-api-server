@@ -48,8 +48,10 @@ class HistoryService {
 
                 if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
 
+                    let num = new BigNumber(vOut.value);
+
                     vout.push({
-                        value: vOut.value,
+                        value: num.toString(10),
                         address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
                     });
                 }

@@ -1,4 +1,4 @@
-let InsightApi = require("../Services/InsightApi"),
+let InsightApi = require("../Repositories/InsightApi"),
     HistoryService = require("../Services/HistoryService"),
     logger = require('log4js').getLogger('Transactions Controller');
 

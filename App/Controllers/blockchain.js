@@ -1,4 +1,4 @@
-let InsightApi = require("../Services/InsightApi"),
+let InsightApi = require("../Repositories/InsightApi"),
     logger = require('log4js').getLogger('Blockchain Controller');
 
 let Controllers = getControllers();

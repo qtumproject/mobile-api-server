@@ -22,6 +22,7 @@ class ContractsGenerator {
 
             return {
                 bytecode: output.contracts[':' + CONTRACT_NAME]['bytecode']
+                // t: output.contracts[':' + CONTRACT_NAME]
             }
 
         }

@@ -36,6 +36,7 @@ let APIController = {
 		APIController.app.options('*', cors());
 
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
+        APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams.bind(Controllers.contracts));
 
         APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
 
