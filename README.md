@@ -32,17 +32,19 @@ response
 ## Contracts / Params
 `GET`
 
-/contracts/{address_contract}/params
+/contracts/{address_contract}/params?keys=symbol,decimals,name,totalSupply
 
-[http://163.172.68.103:5931/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params](http://139.162.178.174/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params)
+[http://163.172.68.103:5931/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params?keys=symbol,decimals,name,totalSupply](http://139.162.178.174/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params?keys=symbol,decimals,name,totalSupply)
+
 
 response: Object | null
 
 ```
 {
 	"symbol": String,
-	"decimals": Integer
-	"name": String
+	"decimals": Integer,
+	"name": String,
+	"totalSupply": String
 }
 ```
 

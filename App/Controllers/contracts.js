@@ -1,9 +1,9 @@
-const async = require('async');
 const ContractsGenerator = require("../Services/ContractsGenerator");
-const InsightApi = require("../Repositories/InsightApi");
 const logger = require('log4js').getLogger('Contracts Controller');
 const SolidityEncoder = require('../Components/Solidity/SolidityEncoder');
-const MyTokenData = require('../Components/ContractData/MyTokenData');
+const TokenInterface = require('../Components/ContractData/TokenInterface');
+const ContractsInfoService = require('../Services/ContractsInfoService');
+const _ = require('lodash');
 
 let Controllers = getControllers();
 
@@ -12,6 +12,8 @@ class ContractsController {
     constructor() {
         logger.info('Init');
         this.solidities = {};
+        this.fetchContractParams = this.fetchContractParams.bind(this);
+        this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
     }
 
     generateTokenBytecode(cb, data) {
@@ -36,56 +38,42 @@ class ContractsController {
     fetchContractParams(cb, data) {
 
         let req = data.req,
-            symbolHash = MyTokenData.functionHashes['symbol()'],
-            decimalsHash = MyTokenData.functionHashes['decimals()'],
-            nameHash = MyTokenData.functionHashes['name()'],
-            result = {};
+            paramNames = [],
+            paramsWhiteHash = {
+                symbol:'symbol',
+                decimals: 'decimals',
+                totalSupply: 'totalSupply',
+                name: 'name'
+            };
 
-        async.eachSeries([{index: 'symbol', hash: symbolHash, type: "String"}, {index: 'decimals', hash: decimalsHash, type: "Integer"}, {index: 'name', hash: nameHash, type: "String"}], (item, callback) => {
+        if (req.query.keys && _.isString(req.query.keys)) {
 
-            InsightApi.callContract(req.params.contractAddress, item.hash, (err, data) => {
+            let fields = req.query.keys.split(',');
 
-                try {
+            if (fields && fields.length) {
 
-                    let solidity = this._getSolidityInterfaceEncoder(item.index);
-                    result[item.index] = solidity.unpackOutput(data.output);
+                fields.forEach((field) => {
 
-                    switch (item.type) {
-                        case "Integer":
-                            result[item.index] = parseInt(result[item.index]);
+                    if (paramsWhiteHash.hasOwnProperty(field)) {
+                        paramNames.push(field);
                     }
 
-                } catch (e) {
-                    return callback(e.message);
-                }
+                });
 
-                return callback(err, data);
-
-            });
-
-        }, (err) => {
-
-            if (err) {
-                return cb(null, null);
             }
 
-            return cb(null, result);
+        }
 
+        if (!paramNames.length) {
+            paramNames = Object.keys(paramsWhiteHash);
+        }
+
+        this.contractsInfoService.fetchInfoByParams(req.params.contractAddress, paramNames, (err, result) => {
+            return cb(err, result);
         });
 
     }
 
-    _getSolidityInterfaceEncoder(fieldName) {
-
-        if (!this.solidities[fieldName]) {
-            this.solidities[fieldName] = new SolidityEncoder(MyTokenData.interface.find((itemInterface) => {
-                return itemInterface.name === fieldName;
-            }));
-        }
-
-        return this.solidities[fieldName];
-
-    }
 }
 
 Controllers.contracts = new ContractsController();
