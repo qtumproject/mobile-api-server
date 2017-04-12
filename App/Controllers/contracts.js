@@ -1,5 +1,9 @@
-let ContractsGenerator = require("../Services/ContractsGenerator"),
-    logger = require('log4js').getLogger('Contracts Controller');
+const ContractsGenerator = require("../Services/ContractsGenerator");
+const logger = require('log4js').getLogger('Contracts Controller');
+const SolidityEncoder = require('../Components/Solidity/SolidityEncoder');
+const TokenInterface = require('../Components/ContractData/TokenInterface');
+const ContractsInfoService = require('../Services/ContractsInfoService');
+const _ = require('lodash');
 
 let Controllers = getControllers();
 
@@ -7,6 +11,9 @@ class ContractsController {
 
     constructor() {
         logger.info('Init');
+        this.solidities = {};
+        this.fetchContractParams = this.fetchContractParams.bind(this);
+        this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
     }
 
     generateTokenBytecode(cb, data) {
@@ -27,6 +34,46 @@ class ContractsController {
         }
 
     }
+
+    fetchContractParams(cb, data) {
+
+        let req = data.req,
+            paramNames = [],
+            paramsWhiteHash = {
+                symbol:'symbol',
+                decimals: 'decimals',
+                totalSupply: 'totalSupply',
+                name: 'name'
+            };
+
+        if (req.query.keys && _.isString(req.query.keys)) {
+
+            let fields = req.query.keys.split(',');
+
+            if (fields && fields.length) {
+
+                fields.forEach((field) => {
+
+                    if (paramsWhiteHash.hasOwnProperty(field)) {
+                        paramNames.push(field);
+                    }
+
+                });
+
+            }
+
+        }
+
+        if (!paramNames.length) {
+            paramNames = Object.keys(paramsWhiteHash);
+        }
+
+        this.contractsInfoService.fetchInfoByParams(req.params.contractAddress, paramNames, (err, result) => {
+            return cb(err, result);
+        });
+
+    }
+
 }
 
 Controllers.contracts = new ContractsController();

@@ -24,6 +24,7 @@ class InsightApi {
             }
 
             cb(error, body);
+
         });
     }
 
@@ -64,6 +65,22 @@ class InsightApi {
             json: true
         }, (error, response, body) => {
             cb(error, body);
+        });
+    }
+
+    static callContract(address, hash, cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/contracts/${address}/hash/${hash}/call`,
+            json: true
+        }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                body = null;
+            }
+
+            cb(error, body);
+
         });
     }
 }

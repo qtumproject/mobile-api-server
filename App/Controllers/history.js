@@ -1,5 +1,5 @@
 let logger = require('log4js').getLogger('History Controller'),
-    InsightApi = require("../Services/InsightApi"),
+    InsightApi = require("../Repositories/InsightApi"),
     HistoryService = require("../Services/HistoryService");
 
 let Controllers = getControllers();

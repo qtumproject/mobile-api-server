@@ -28,7 +28,8 @@
     "sequelize": "^3.30.0",
     "socket.io": "^1.7.3",
     "socket.io-client": "^1.7.3",
-    "solc": "^0.4.10"
+    "solc": "^0.4.10",
+    "web3": "^0.18.4"
   },
   "scripts": {
     "start": "node server.js"
