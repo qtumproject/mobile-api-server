@@ -283,6 +283,51 @@ response
 
 The web socket API is served using [socket.io](http://socket.io).
 
+### Event ``token_balance_change``
+
+Subscribe:
+
+```
+    socket.emit('subscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak", "mzXrAjgbFca8yGo8wxkzLuZJAsAhMvHfJx"]})
+```
+
+> After subscribe will emit ``token_balance_change``
+
+Unsubscribe:
+
+```
+    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"]})
+```
+
+or
+
+```
+    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e'})
+```
+
+or
+
+```
+    socket.emit('unsubscribe', 'token_balance_change');
+```
+
+
+Sample output:
+
+```
+{
+    "contract_address": "804ca5244b5ba927565398f861adcc17363d617e",
+    "balances": [
+        {
+            "address": "mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"
+            "balance": 123456
+        },
+        ...
+    ]
+}
+```
+
+
 ### Event ``balance_subscribe``
 
 Subscribe:

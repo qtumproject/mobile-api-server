@@ -151,7 +151,7 @@ class TokenBalanceChangeEvents {
             return this.unsubscribeAddressAll(emitter);
         }
 
-        if (!_.isObject(data) || !data.contract_address || !data.addresses || !data.addresses.length) {
+        if (!_.isObject(data) || !data.contract_address) {
             return false;
         }
 
@@ -189,10 +189,24 @@ class TokenBalanceChangeEvents {
             }
         }
 
-        for(let i = 0; i < addresses.length; i++) {
-            if(this.subscriptions.contract_address[contract_address] && Address.isValid(addresses[i], config.NETWORK)) {
-                removeAddress(contract_address, addresses[i]);
+        if (!addresses) {
+
+            let currentAddresses = this.subscriptions.emitterAddresses[this.getUniqueContractKey(emitter, contract_address)];
+
+            if (currentAddresses) {
+                addresses = _.clone(currentAddresses);
             }
+
+        }
+
+        if (addresses && addresses.length) {
+
+            for(let i = 0; i < addresses.length; i++) {
+                if(this.subscriptions.contract_address[contract_address] && Address.isValid(addresses[i], config.NETWORK)) {
+                    removeAddress(contract_address, addresses[i]);
+                }
+            }
+
         }
 
         logger.info('unsubscribe:', 'token_balance_change', 'total:', _.size(this.subscriptions.contract_address));
