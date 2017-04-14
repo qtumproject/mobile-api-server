@@ -1,9 +1,8 @@
 const ContractsGenerator = require("../Services/ContractsGenerator");
 const logger = require('log4js').getLogger('Contracts Controller');
-const SolidityEncoder = require('../Components/Solidity/SolidityEncoder');
+const _ = require('lodash');
 const TokenInterface = require('../Components/ContractData/TokenInterface');
 const ContractsInfoService = require('../Services/ContractsInfoService');
-const _ = require('lodash');
 
 let Controllers = getControllers();
 
@@ -39,12 +38,8 @@ class ContractsController {
 
         let req = data.req,
             paramNames = [],
-            paramsWhiteHash = {
-                symbol:'symbol',
-                decimals: 'decimals',
-                totalSupply: 'totalSupply',
-                name: 'name'
-            };
+            contractAddress = req.params.contractAddress,
+            paramsWhiteList = ['symbol', 'decimals', 'totalSupply', 'name'];
 
         if (req.query.keys && _.isString(req.query.keys)) {
 
@@ -54,7 +49,7 @@ class ContractsController {
 
                 fields.forEach((field) => {
 
-                    if (paramsWhiteHash.hasOwnProperty(field)) {
+                    if (paramsWhiteList.indexOf(field) !== -1) {
                         paramNames.push(field);
                     }
 
@@ -65,10 +60,14 @@ class ContractsController {
         }
 
         if (!paramNames.length) {
-            paramNames = Object.keys(paramsWhiteHash);
+            paramNames = paramsWhiteList;
         }
 
-        this.contractsInfoService.fetchInfoByParams(req.params.contractAddress, paramNames, (err, result) => {
+        let solidityParams = paramNames.map((paramName) => {
+            return this.contractsInfoService.createParam(paramName)
+        });
+
+        this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, solidityParams, (err, result) => {
             return cb(err, result);
         });
 

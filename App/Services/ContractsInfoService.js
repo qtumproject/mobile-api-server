@@ -1,6 +1,7 @@
 const InsightApi = require("../Repositories/InsightApi");
-const SolidityEncoder = require('../Components/Solidity/SolidityEncoder');
+const SolidityCoder = require('../Components/Solidity/SolidityCoder');
 const async = require('async');
+const SolidityParamCreator = require('../Components/Solidity/SolidityParamCreator');
 
 class ContractsInfoService {
 
@@ -9,25 +10,24 @@ class ContractsInfoService {
         this.functionHashes = functionHashes;
         this.findedFields = {};
         this.solidities = {};
+        this.paramCreator = new SolidityParamCreator(this.interface, this.functionHashes);
     }
 
-    fetchInfoByParams(contractAddress, paramNames, cb) {
-
+    fetchInfoBySolidityParams(contractAddress, args, cb) {
         let result = {};
 
-        async.each(this.getParamsFromInterface(paramNames, this.interface, this.functionHashes), (item, callback) => {
+        async.each(args, (param, callback) => {
 
-            this.callContract(contractAddress, item, (err, data) => {
+            this.call(contractAddress, param, (err, data) => {
 
                 if (err) {
                     return callback(err);
                 }
 
-                result[item.param] = data;
+                result[param.paramName] = data;
 
                 callback();
             });
-
         }, (err) => {
 
             if (err) {
@@ -37,21 +37,22 @@ class ContractsInfoService {
             return cb(null, result);
 
         });
+
     }
 
-    callContract(contractAddress, item, callback) {
+    call(contractAddress, param, callback) {
 
         let result;
 
-        InsightApi.callContract(contractAddress, item.hash, (err, data) => {
+        InsightApi.callContract(contractAddress, param.hash, (err, data) => {
 
             try {
 
-                let solidity = this._getSolidityInterfaceEncoder(item.param);
+                let solidity = this._getSolidityInterfaceEncoder(param.paramName);
 
                 result = solidity.unpackOutput(data.output);
 
-                switch (item.type) {
+                switch (param.type) {
                     case "uint8":
                     case "uint256":
                         result = parseInt(result);
@@ -67,54 +68,20 @@ class ContractsInfoService {
 
     }
 
-    getParamsFromInterface(paramNames, solidityInterface, functionHashes) {
-        let result = [];
-
-        paramNames.forEach((paramName) => {
-
-            if (!this.findedFields[paramName]) {
-                this.findedFields[paramName] = ContractsInfoService.findFieldInInterface(paramName, solidityInterface);
-            }
-
-            let field = this.findedFields[paramName];
-
-            if (!field) {
-                 throw new Error('Wrong interface or param name');
-            }
-
-            let functionHashesKeys = Object.keys(functionHashes),
-                hashKey = functionHashesKeys.find((hash) => {
-                    return hash.replace(/\(.*\)/,'') === paramName;
-                });
-
-            result.push({
-                param: paramName,
-                type: field['outputs'][0]['type'],
-                hash: functionHashes[hashKey]
-            });
-
-        });
-
-        return result;
-    }
-
-    static findFieldInInterface(fieldName, solidityInterface) {
-        return solidityInterface.find((itemInterface) => {
-            return itemInterface.name === fieldName;
-        });
-    }
-
-
     _getSolidityInterfaceEncoder(fieldName) {
 
         if (!this.solidities[fieldName]) {
-            this.solidities[fieldName] = new SolidityEncoder(this.interface.find((itemInterface) => {
+            this.solidities[fieldName] = new SolidityCoder(this.interface.find((itemInterface) => {
                 return itemInterface.name === fieldName;
             }));
         }
 
         return this.solidities[fieldName];
 
+    }
+
+    createParam(paramName, paramDataArray) {
+        return this.paramCreator.createParam(paramName, paramDataArray)
     }
 
 }
