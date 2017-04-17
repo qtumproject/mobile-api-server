@@ -49,13 +49,17 @@ class HistoryService {
 
                 if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
 
-                    let num = new BigNumber(vOut.value);
+                    let num = new BigNumber(vOut.value),
+                        vOutItem = {
+                            value: num.toString(10),
+                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
+                        };
 
-                    vout.push({
-                        value: num.toString(10),
-                        address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null,
-                        contract_has_been_created: ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)
-                    });
+                    if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
+                        vOutItem.contract_has_been_created = true;
+                    }
+
+                    vout.push(vOutItem);
 
                 }
 
