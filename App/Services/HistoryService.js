@@ -77,7 +77,6 @@ class HistoryService {
             block_hash: item.blockhash ? item.blockhash : null,
             tx_hash: item.txid,
             amount: item.valueIn,
-            contract_has_been_created: contract_has_been_created,
             vout: vout,
             vin: vin
         };
