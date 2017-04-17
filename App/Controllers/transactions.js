@@ -14,6 +14,10 @@ class TransactionsController {
 
         let allowAbsurdFees = parseInt(data._post.allowHighFee) === 1;
 
+        if (!data._post.data) {
+            return cb('Bad Request', 400);
+        }
+
         InsightApi.sendRawTransaction(data._post.data, allowAbsurdFees, (error, body) => {
             cb(error, body);
         });

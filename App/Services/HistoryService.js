@@ -1,4 +1,5 @@
 let BigNumber = require('bignumber.js');
+let ContractsHelper = require('../Helpers/ContractsHelper');
 
 class HistoryService {
 
@@ -42,8 +43,8 @@ class HistoryService {
             });
         }
 
-
         if (item.vout) {
+
             item.vout.forEach((vOut) => {
 
                 if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
@@ -52,14 +53,15 @@ class HistoryService {
 
                     vout.push({
                         value: num.toString(10),
-                        address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
+                        address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null,
+                        contract_has_been_created: ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)
                     });
+
                 }
 
-
             });
-        }
 
+        }
 
         return {
             block_time: item.blocktime ? item.blocktime : null,

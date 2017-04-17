@@ -36,7 +36,22 @@ class InsightApi {
                     allowAbsurdFees: allowAbsurdFees
                 }
             }, (error, response, body) => {
-                cb(error, body);
+
+                try {
+
+                    let json = JSON.parse(body);
+
+                    if (_.isObject(json)) {
+                        return cb(null, json)
+                    } else {
+                        return cb(body);
+                    }
+
+                } catch (e) {
+
+                    return cb(body);
+                }
+
             });
 
     }
