@@ -84,7 +84,9 @@ response: Object | null
     "vout": [
         {
             "value": "2.00000000", //qtum
-            "address": "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7"
+            "address": "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7",
+            "contract_has_been_created": true
+            
         },
         {
             "value": "2.99995400", //qtum
@@ -124,7 +126,8 @@ response
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+                     "contract_has_been_created": true
                  },
                  {
                      "value": "0.874", //qtum
@@ -167,7 +170,8 @@ response
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+                     "contract_has_been_created": true
                  },
                  {
                      "value": "0.874", //qtum
@@ -395,7 +399,8 @@ Sample output:
     "vout": [
         {
             "value": "1", //qtum
-            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+            "contract_has_been_created": true
         },
         {
             "value": "0.874", //qtum
