@@ -2,6 +2,7 @@
   "name": "quantum_server",
   "description": "Node.JS server for Quantum application",
   "dependencies": {
+    "bitcore-lib": "git+ssh://git@gitlab.pixelplex.by:593_qtum/bitcore-lib.git",
     "async": "^2.1.4",
     "bignumber.js": "^4.0.0",
     "bitcoin": "^3.0.1",
