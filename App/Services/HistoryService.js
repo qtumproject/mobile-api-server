@@ -28,7 +28,8 @@ class HistoryService {
 
     static formatHistoryItem(item) {
         let vout = [],
-            vin = [];
+            vin = [],
+            contract_has_been_created = false;
 
         if (item.vin) {
             item.vin.forEach((vIn) => {
@@ -47,19 +48,22 @@ class HistoryService {
 
             item.vout.forEach((vOut) => {
 
-                if (vOut.scriptPubKey && vOut.scriptPubKey.addresses) {
-
-                    let num = new BigNumber(vOut.value),
-                        vOutItem = {
-                            value: num.toString(10),
-                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
-                        };
+                if (vOut.scriptPubKey) {
 
                     if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
-                        vOutItem.contract_has_been_created = true;
+                        contract_has_been_created = true;
                     }
 
-                    vout.push(vOutItem);
+                    if (vOut.scriptPubKey.addresses) {
+
+                        let num = new BigNumber(vOut.value);
+
+                        vout.push({
+                            value: num.toString(10),
+                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
+                        });
+
+                    }
 
                 }
 
@@ -67,15 +71,22 @@ class HistoryService {
 
         }
 
-        return {
+        let result = {
             block_time: item.blocktime ? item.blocktime : null,
             block_height: item.blockheight ? item.blockheight : -1,
             block_hash: item.blockhash ? item.blockhash : null,
             tx_hash: item.txid,
             amount: item.valueIn,
+            contract_has_been_created: contract_has_been_created,
             vout: vout,
             vin: vin
+        };
+
+        if (contract_has_been_created) {
+            result.contract_has_been_created = true;
         }
+
+        return result;
     }
 }
 

@@ -80,12 +80,12 @@ response: Object | null
     "block_height": 31111|-1,
     "block_hash": "b0589be37f4e24bffea77bfc87f5bbd6f9a90c629306f7c3340c7c52a982e592"|null,
     "tx_hash": "25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f",
-    "amount": 5, //qtum
+    "amount": 5, //qtum,
+    "contract_has_been_created": true,
     "vout": [
         {
             "value": "2.00000000", //qtum
-            "address": "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7",
-            "contract_has_been_created": true
+            "address": "mopkoZaJGQE32h8WME5F2oBk8hvD1CVdP7"
             
         },
         {
@@ -123,11 +123,11 @@ response
              "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
              "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
              "amount": 1.875, //qtum
+             "contract_has_been_created": true,
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
-                     "contract_has_been_created": true
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
                  },
                  {
                      "value": "0.874", //qtum
@@ -167,11 +167,11 @@ response
              "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
              "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
              "amount": 1.875, //qtum
+             "contract_has_been_created": true,
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
-                     "contract_has_been_created": true
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
                  },
                  {
                      "value": "0.874", //qtum
@@ -396,11 +396,11 @@ Sample output:
     "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
     "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
     "amount": 1.875, //qtum
+    "contract_has_been_created": true,
     "vout": [
         {
             "value": "1", //qtum
-            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
-            "contract_has_been_created": true
+            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
         },
         {
             "value": "0.874", //qtum
