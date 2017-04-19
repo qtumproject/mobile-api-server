@@ -2,6 +2,7 @@ const _ = require('lodash');
 const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
 const InsightApi = require("../../Repositories/InsightApi");
 const HistoryService = require("../../Services/HistoryService");
+const async = require('async');
 
 class QtumRoomEvents {
 
@@ -142,18 +143,32 @@ class QtumRoomEvents {
 
         let withHeight = options.withHeight;
 
-        InsightApi.getTrx(txid, (err, data) => {
+        async.waterfall([
+            (callback) => {
+                InsightApi.getTrx(txid, (err, data) => {
+                    return callback(err, data);
+                });
+            },
+            (body, callback) => {
 
-            if (err) return false;
-
-            if (data) {
-                let formatHistoryItem = HistoryService.formatHistoryItem(data);
-
-                if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
-                    emitters.forEach((emitter) => {
-                        this.notifyNewTransactionEmitter(emitter, formatHistoryItem);
+                if (body) {
+                    HistoryService.formatHistoryItem(body, (err, result) => {
+                        return callback(err, result);
                     });
+
+                } else {
+                    return callback(null, null);
                 }
+
+            }
+        ], (err, formatHistoryItem) => {
+
+            if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
+
+                emitters.forEach((emitter) => {
+                    this.notifyNewTransactionEmitter(emitter, formatHistoryItem);
+                });
+
             }
 
         });
