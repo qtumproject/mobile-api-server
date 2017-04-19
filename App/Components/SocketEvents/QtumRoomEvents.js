@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
 const InsightApi = require("../../Repositories/InsightApi");
-const HistoryService = require("../../Services/HistoryService");
+const TransactionService = require("../../Services/TransactionService");
 const async = require('async');
 
 class QtumRoomEvents {
@@ -143,25 +143,7 @@ class QtumRoomEvents {
 
         let withHeight = options.withHeight;
 
-        async.waterfall([
-            (callback) => {
-                InsightApi.getTrx(txid, (err, data) => {
-                    return callback(err, data);
-                });
-            },
-            (body, callback) => {
-
-                if (body) {
-                    HistoryService.formatHistoryItem(body, (err, result) => {
-                        return callback(err, result);
-                    });
-
-                } else {
-                    return callback(null, null);
-                }
-
-            }
-        ], (err, formatHistoryItem) => {
+        TransactionService.getTransaction(txid, (err, formatHistoryItem) => {
 
             if (formatHistoryItem && ((withHeight && parseInt(formatHistoryItem.block_height) !== -1) || (!withHeight && parseInt(formatHistoryItem.block_height) === -1))) {
 

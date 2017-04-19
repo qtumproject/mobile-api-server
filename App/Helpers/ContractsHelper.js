@@ -1,6 +1,7 @@
 const bitcore = require('bitcore-lib');
 const OP_CALL = 194;
 const OP_CREATE = 193;
+let crypto = require('crypto');
 
 class ContractsHelper {
 
@@ -17,6 +18,21 @@ class ContractsHelper {
            return false;
         }
 
+    }
+
+    static getContractAddress(txid, num) {
+
+        let reverseTxId = txid.match(/.{2}/g).reverse().join(""),
+            buf = new Buffer(1);
+
+        buf.writeUInt8(num, 0);
+
+        let nHex = buf.toString('hex'),
+            addr = reverseTxId + nHex,
+            sha256 = crypto.createHash('sha256').update(addr, 'hex').digest(),
+            rpm = crypto.createHash('rmd160').update(sha256).digest();
+
+        return rpm.toString('hex');
     }
 
 }

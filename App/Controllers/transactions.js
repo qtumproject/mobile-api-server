@@ -1,7 +1,6 @@
 let InsightApi = require("../Repositories/InsightApi"),
-    HistoryService = require("../Services/HistoryService"),
-    logger = require('log4js').getLogger('Transactions Controller'),
-    async = require('async');
+    TransactionService = require("../Services/TransactionService"),
+    logger = require('log4js').getLogger('Transactions Controller');
 
 let Controllers = getControllers();
 
@@ -27,25 +26,7 @@ class TransactionsController {
 
     getTransaction(cb, data) {
 
-
-        async.waterfall([
-            (callback) => {
-                InsightApi.getTrx(data.req.params.txhash, (err, data) => {
-                    return callback(err, data);
-                });
-            },
-            (body, callback) => {
-
-                if (body) {
-                    HistoryService.formatHistoryItem(body, (err, result) => {
-                        return callback(err, result);
-                    });
-                } else {
-                    callback(null, null)
-                }
-
-            }
-        ], (err, result) => {
+        TransactionService.getTransaction(data.req.params.txhash, (err, result) => {
             return cb(err, result);
         });
 

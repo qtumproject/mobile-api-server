@@ -2,7 +2,7 @@ let BigNumber = require('bignumber.js');
 let ContractsHelper = require('../Helpers/ContractsHelper');
 let InsightApi = require('../Repositories/InsightApi');
 let async = require('async');
-let crypto = require('crypto');
+
 
 class HistoryService {
 
@@ -68,19 +68,7 @@ class HistoryService {
 
                     try {
                         if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
-                            let reverseTxId = item.txid.match(/.{2}/g).reverse().join(""),
-                                num = vOut.n;
-
-                            let buf = new Buffer(1);
-                            buf.writeUInt8(num, 0);
-
-                            let nHex = buf.toString('hex'),
-                                addr = reverseTxId + nHex,
-                                sha256 = crypto.createHash('sha256').update(addr, 'hex').digest(),
-                                rpm = crypto.createHash('rmd160').update(sha256).digest();
-
-                            addressString = rpm.toString('hex');
-
+                            addressString = ContractsHelper.getContractAddress(item.txid, vOut.n);
                         }
                     } catch (e) {
                     }
@@ -112,25 +100,23 @@ class HistoryService {
             vin: vin
         };
 
-        if (addressString) {
-
-            InsightApi.getAccountInfo(addressString, (err, res) => {
-
-                if (err) {
-                    return cb(err)
-                }
-
-                if (res) {
-                    result.contract_has_been_created = true;
-                }
-
-                return cb(null, result);
-
-            });
-
-        } else {
+        if (!addressString) {
             return cb(null, result);
         }
+
+        InsightApi.getAccountInfo(addressString, (err, res) => {
+
+            if (err) {
+                return cb(err)
+            }
+
+            if (res) {
+                result.contract_has_been_created = true;
+            }
+
+            return cb(null, result);
+
+        });
 
     }
 }
