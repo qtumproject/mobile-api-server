@@ -2,7 +2,6 @@ const async = require('async');
 const HistoryService = require('./HistoryService');
 const InsightApi = require('../Repositories/InsightApi');
 
-
 class TransactionService {
 
     static getTransaction(txId, next) {

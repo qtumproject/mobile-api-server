@@ -1,7 +1,7 @@
 const bitcore = require('bitcore-lib');
 const OP_CALL = 194;
 const OP_CREATE = 193;
-let crypto = require('crypto');
+const crypto = require('crypto');
 
 class ContractsHelper {
 
