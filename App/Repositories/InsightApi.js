@@ -70,6 +70,11 @@ class InsightApi {
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/txs?from=${options.from}&to=${options.to}`,
             json: true
         }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                body = null;
+            }
+
             cb(error, body);
         });
     }
@@ -87,6 +92,22 @@ class InsightApi {
 
         return request.get({
             url: config.INSIGHT_API_URL + `/contracts/${address}/hash/${hash}/call`,
+            json: true
+        }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                body = null;
+            }
+
+            cb(error, body);
+
+        });
+    }
+
+    static getAccountInfo(address, cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/contracts/${address}/info`,
             json: true
         }, (error, response, body) => {
 

@@ -1,5 +1,5 @@
 let InsightApi = require("../Repositories/InsightApi"),
-    HistoryService = require("../Services/HistoryService"),
+    TransactionService = require("../Services/TransactionService"),
     logger = require('log4js').getLogger('Transactions Controller');
 
 let Controllers = getControllers();
@@ -26,13 +26,10 @@ class TransactionsController {
 
     getTransaction(cb, data) {
 
-        InsightApi.getTrx(data.req.params.txhash, (err, data) => {
-
-            if (err) return cb(err);
-
-            return cb(null, data ? HistoryService.formatHistoryItem(data) : null);
-
+        TransactionService.getTransaction(data.req.params.txhash, (err, result) => {
+            return cb(err, result);
         });
+
     }
 
 }

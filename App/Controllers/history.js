@@ -1,6 +1,7 @@
 let logger = require('log4js').getLogger('History Controller'),
     InsightApi = require("../Repositories/InsightApi"),
-    HistoryService = require("../Services/HistoryService");
+    HistoryService = require("../Services/HistoryService"),
+    async = require('async');
 
 let Controllers = getControllers();
 
@@ -11,18 +12,32 @@ class HistoryController {
 	}
 	
 	getAddressHistoryList(cb, data) {
+
         let req = data.req,
             options = this._formatOptions(req.params.limit, req.params.offset),
             addresses = data._get.addresses && Array.isArray(data._get.addresses) ? data._get.addresses : [];
 
         if (addresses.length) {
 
-            InsightApi.getAddressesHistory(addresses, options, (error, body) => {
-                return cb(error, this._formatHistory(body));
+            async.waterfall([
+                (callback) => {
+                    InsightApi.getAddressesHistory(addresses, options, (error, body) => {
+                       return callback(error, body);
+                    });
+                },
+                (body, callback) => {
+                    this._formatHistory(body, (err, result) => {
+                        return callback(err, result);
+                    });
+                }
+            ], (err, result) => {
+                return cb(err, result);
             });
 
         } else {
-            return cb(null, this._formatHistory(null));
+            this._formatHistory(null, (err, result) => {
+                return cb(err, result);
+            });
         }
 
 	}
@@ -31,8 +46,19 @@ class HistoryController {
 	    let req = data.req,
             options = this._formatOptions(req.params.limit, req.params.offset);
 
-	    InsightApi.getAddressesHistory([data._get.address], options, (error, body) => {
-            return cb(error, this._formatHistory(body));
+        async.waterfall([
+            (callback) => {
+                InsightApi.getAddressesHistory([data._get.address], options, (error, body) => {
+                    return callback(error, body);
+                });
+        },
+            (body, callback) => {
+                this._formatHistory(body, (err, result) => {
+                    return callback(err, result);
+                });
+            }
+        ], (err, result) => {
+            return cb(err, result);
         });
 
 	}
@@ -65,8 +91,8 @@ class HistoryController {
         };
     }
 
-    _formatHistory(history) {
-        return HistoryService.formatHistory(history);
+    _formatHistory(history, cb) {
+        return HistoryService.formatHistory(history, cb);
     }
 
 }

@@ -1,45 +1,61 @@
 let BigNumber = require('bignumber.js');
 let ContractsHelper = require('../Helpers/ContractsHelper');
+let InsightApi = require('../Repositories/InsightApi');
+let async = require('async');
+
 
 class HistoryService {
 
-    static formatHistory(history) {
+    static formatHistory(history, next) {
 
         let items = [];
 
         if (!history) {
-            return {
+            return next(null, {
                 totalItems: 0,
                 items: []
-            }
-        }
-
-        if (history && history.items && history.items.length) {
-            history.items.forEach((item) => {
-                items.push(HistoryService.formatHistoryItem(item));
             });
         }
 
-        return {
-            totalItems: history && history.totalItems ? history.totalItems : 0,
-            items: items
-        };
+        if (history && history.items && history.items.length) {
+
+            async.each(history.items, (item, callback) => {
+
+                HistoryService.formatHistoryItem(item, (err, result) => {
+
+                    items.push(result);
+
+                    return callback();
+                });
+
+            }, (err) => {
+                return next(err, {
+                    totalItems: history && history.totalItems ? history.totalItems : 0,
+                    items: items
+                });
+            });
+        }
+
     }
 
-    static formatHistoryItem(item) {
+    static formatHistoryItem(item, cb) {
         let vout = [],
             vin = [],
-            contract_has_been_created = false;
+            addressString;
 
         if (item.vin) {
             item.vin.forEach((vIn) => {
 
-                let num = new BigNumber(vIn.value);
+                if (vIn.addr) {
 
-                vin.push({
-                    value: num.toString(10),
-                    address: vIn.addr
-                });
+                    let num = new BigNumber(vIn.value);
+
+                    vin.push({
+                        value: num.toString(10),
+                        address: vIn.addr
+                    });
+
+                }
 
             });
         }
@@ -50,11 +66,14 @@ class HistoryService {
 
                 if (vOut.scriptPubKey) {
 
-                    if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
-                        contract_has_been_created = true;
+                    try {
+                        if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
+                            addressString = ContractsHelper.getContractAddress(item.txid, vOut.n);
+                        }
+                    } catch (e) {
                     }
 
-                    if (vOut.scriptPubKey.addresses) {
+                    if (vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length && typeof vOut.value !== 'undefined') {
 
                         let num = new BigNumber(vOut.value);
 
@@ -81,11 +100,24 @@ class HistoryService {
             vin: vin
         };
 
-        if (contract_has_been_created) {
-            result.contract_has_been_created = true;
+        if (!addressString) {
+            return cb(null, result);
         }
 
-        return result;
+        InsightApi.getAccountInfo(addressString, (err, res) => {
+
+            if (err) {
+                return cb(err)
+            }
+
+            if (res) {
+                result.contract_has_been_created = true;
+            }
+
+            return cb(null, result);
+
+        });
+
     }
 }
 
