@@ -8,33 +8,33 @@ class HistoryService {
 
     static formatHistory(history, next) {
 
-        let items = [];
-
-        if (!history) {
+        if (!history || !history.items || !history.items.length) {
             return next(null, {
                 totalItems: 0,
                 items: []
             });
         }
 
-        if (history && history.items && history.items.length) {
+        let items = new Array(history.items.length);
 
-            async.each(history.items, (item, callback) => {
+        async.each(history.items, (item, callback) => {
 
-                HistoryService.formatHistoryItem(item, (err, result) => {
+            let idx = history.items.indexOf(item);
 
-                    items.push(result);
+            HistoryService.formatHistoryItem(item, (err, result) => {
 
-                    return callback();
-                });
+                items[idx] = result;
 
-            }, (err) => {
-                return next(err, {
-                    totalItems: history && history.totalItems ? history.totalItems : 0,
-                    items: items
-                });
+                return callback();
             });
-        }
+
+        }, (err) => {
+            return next(err, {
+                totalItems: history && history.totalItems ? history.totalItems : 0,
+                items: items
+            });
+        });
+
 
     }
 
