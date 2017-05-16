@@ -8,9 +8,20 @@ class ContractsGenerator {
 
 
     static encodeContract(contract) {
-        let output = solc.compile(contract);
+        let encodeData = solc.compile(contract),
+            contractsNames = Object.keys(encodeData.contracts),
+            returnData = {};
 
-        return output;
+        contractsNames.forEach((contractName) => {
+
+            returnData[contractName] = {
+                bytecode: encodeData.contracts[contractName]['bytecode'],
+                interface: JSON.parse(encodeData.contracts[contractName]['interface'])
+            };
+
+        });
+
+        return returnData;
     }
 
     static generateToken(data) {
@@ -29,7 +40,6 @@ class ContractsGenerator {
 
             return {
                 bytecode: output.contracts[':' + CONTRACT_NAME]['bytecode']
-                // t: output.contracts[':' + CONTRACT_NAME]
             }
 
         }

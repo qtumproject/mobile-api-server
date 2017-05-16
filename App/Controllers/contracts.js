@@ -26,22 +26,7 @@ class ContractsController {
         }
 
         try {
-
-            let returnData = {},
-                encodeData = ContractsGenerator.encodeContract(contract),
-                contractsNames = Object.keys(encodeData.contracts);
-
-            contractsNames.forEach((contractName) => {
-
-                returnData[contractName] = {
-                    bytecode: encodeData.contracts[contractName]['bytecode'],
-                    interface: JSON.parse(encodeData.contracts[contractName]['interface'])
-                };
-
-            });
-
-            return cb(null, returnData);
-
+            return cb(null, ContractsGenerator.encodeContract(contract));
         } catch (e) {
             return cb(e.message, 400);
         }
