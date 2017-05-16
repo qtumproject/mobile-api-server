@@ -1,6 +1,49 @@
 
 
 # API
+## Contracts / Encoder
+`POST`
+
+/contracts/encoder
+
+Request
+```
+{
+	"contract": String
+}
+```
+Response
+```
+{
+    ":MyToken": {
+        bytecode: String,
+        interface: [
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "name",
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "payable": false,
+              "type": "function"
+            },
+            ...
+        ]
+    },
+    ":tokenRecipient": {
+        bytecode: String,
+        interface: [
+            ...
+        ]
+    },
+    ...
+}
+```
+
 
 ## Contracts / Generate token bytecode
 `POST`

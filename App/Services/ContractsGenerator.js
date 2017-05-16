@@ -6,6 +6,13 @@ let solc = require('solc'),
 
 class ContractsGenerator {
 
+
+    static encodeContract(contract) {
+        let output = solc.compile(contract);
+
+        return output;
+    }
+
     static generateToken(data) {
 
         let input = Mustache.render(MyTokenTemplate, {
