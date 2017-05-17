@@ -38,7 +38,7 @@ class ContractsController {
 
         let req = data.req,
             contractAddress = req.params.contractAddress,
-            hashes = req.query.hashes;
+            hashes = req.body.hashes;
 
         if (!_.isArray(hashes) || !_.isString(contractAddress) || !contractAddress.trim()) {
             return cb("Bad Request", 400);

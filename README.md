@@ -3,9 +3,16 @@
 # API
 
 ## Contracts / Call
-`GET`
+`POST`
 
-/contracts/{addressContract}/call?hashes[]={paramHash1}&hashes[]={paramHash2}
+/contracts/{addressContract}/call
+
+Request
+```
+{
+	"hashes": [String, String, ...]
+}
+```
 
 Response
 ```
