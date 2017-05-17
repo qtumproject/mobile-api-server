@@ -35,6 +35,8 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
+        APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);
+
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
         APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams);
 

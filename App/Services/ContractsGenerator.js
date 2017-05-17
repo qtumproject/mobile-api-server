@@ -6,6 +6,24 @@ let solc = require('solc'),
 
 class ContractsGenerator {
 
+
+    static encodeContract(contract) {
+        let encodeData = solc.compile(contract),
+            contractsNames = Object.keys(encodeData.contracts),
+            returnData = {};
+
+        contractsNames.forEach((contractName) => {
+
+            returnData[contractName] = {
+                bytecode: encodeData.contracts[contractName]['bytecode'],
+                interface: JSON.parse(encodeData.contracts[contractName]['interface'])
+            };
+
+        });
+
+        return returnData;
+    }
+
     static generateToken(data) {
 
         let input = Mustache.render(MyTokenTemplate, {
@@ -22,7 +40,6 @@ class ContractsGenerator {
 
             return {
                 bytecode: output.contracts[':' + CONTRACT_NAME]['bytecode']
-                // t: output.contracts[':' + CONTRACT_NAME]
             }
 
         }

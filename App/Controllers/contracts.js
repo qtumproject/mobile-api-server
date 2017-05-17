@@ -12,7 +12,25 @@ class ContractsController {
         logger.info('Init');
         this.solidities = {};
         this.fetchContractParams = this.fetchContractParams.bind(this);
+        this.encodeContract = this.encodeContract.bind(this);
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
+    }
+
+    encodeContract(cb, data) {
+
+        let req = data.req,
+            contract = req.body.contract;
+
+        if (!req.body.contract) {
+            return cb("Bad request", 400);
+        }
+
+        try {
+            return cb(null, ContractsGenerator.encodeContract(contract));
+        } catch (e) {
+            return cb(e.message, 400);
+        }
+
     }
 
     generateTokenBytecode(cb, data) {
