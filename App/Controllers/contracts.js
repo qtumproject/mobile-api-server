@@ -11,6 +11,7 @@ class ContractsController {
     constructor() {
         logger.info('Init');
         this.solidities = {};
+        this.fetchEncodedParams = this.fetchEncodedParams.bind(this);
         this.fetchContractParams = this.fetchContractParams.bind(this);
         this.encodeContract = this.encodeContract.bind(this);
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
@@ -33,6 +34,36 @@ class ContractsController {
 
     }
 
+    fetchEncodedParams(cb, data) {
+
+        let req = data.req,
+            contractAddress = req.params.contractAddress,
+            hashes = req.query.hashes;
+
+        if (!_.isArray(hashes) || !_.isString(contractAddress) || !contractAddress.trim()) {
+            return cb("Bad Request", 400);
+        }
+
+        hashes = hashes.filter((hash) => {
+            return !!(hash && hash.trim());
+        });
+
+        if(!hashes.length) {
+            return cb("Bad Request", 400);
+        }
+
+        return this.contractsInfoService.callEncodedParams(contractAddress, hashes, (err, data) => {
+
+            if (err) {
+                return cb("Not Found", 404);
+            }
+
+            return cb(null, data);
+
+        });
+
+    }
+
     generateTokenBytecode(cb, data) {
 
         try {
@@ -44,10 +75,10 @@ class ContractsController {
                 tokenSymbol: data._post.tokenSymbol
             });
 
-            cb(null, tokens);
+            return cb(null, tokens);
 
         } catch (e) {
-            cb(e.message, null);
+            return cb(e.message, null);
         }
 
     }

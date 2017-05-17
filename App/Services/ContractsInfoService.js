@@ -1,6 +1,7 @@
 const InsightApi = require("../Repositories/InsightApi");
 const SolidityCoder = require('../Components/Solidity/SolidityCoder');
 const async = require('async');
+const _ = require('lodash');
 const SolidityParamCreator = require('../Components/Solidity/SolidityParamCreator');
 
 class ContractsInfoService {
@@ -82,6 +83,42 @@ class ContractsInfoService {
 
     createParam(paramName, paramDataArray) {
         return this.paramCreator.createParam(paramName, paramDataArray)
+    }
+
+    /**
+     *
+     * @param contractAddress String
+     * @param paramHashes Array
+     * @param next function
+     * @returns {*}
+     */
+    callEncodedParams(contractAddress, paramHashes, next) {
+
+        let result = [];
+
+        paramHashes = _.uniq(paramHashes);
+
+        return async.each(paramHashes, (paramHash, callback) => {
+
+            return InsightApi.callContract(contractAddress, paramHash, (err, data) => {
+
+                if (err) {
+                    return callback(err);
+                }
+
+                result.push({
+                    hash: paramHash,
+                    output: data.output
+                });
+
+                return callback(err, data);
+
+            });
+
+        }, (err) => {
+            return next(err, result);
+        });
+
     }
 
 }

@@ -96,10 +96,10 @@ class InsightApi {
         }, (error, response, body) => {
 
             if (body && _.isString(body)) { //Fix "Not Found" api response
-                body = null;
+                return cb(body);
             }
 
-            cb(error, body);
+            return cb(error, body);
 
         });
     }

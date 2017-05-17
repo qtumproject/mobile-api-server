@@ -8,6 +8,7 @@ class ContractsGenerator {
 
 
     static encodeContract(contract) {
+
         let encodeData = solc.compile(contract),
             contractsNames = Object.keys(encodeData.contracts),
             returnData = {};

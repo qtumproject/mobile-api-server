@@ -1,6 +1,23 @@
 
 
 # API
+
+## Contracts / Call
+`GET`
+
+/contracts/{addressContract}/call?hashes[]={paramHash1}&hashes[]={paramHash2}
+
+Response
+```
+[
+     {
+        "hash": String,
+        "output": String
+      },
+      ...
+]
+```
+
 ## Contracts / Encoder
 `POST`
 
