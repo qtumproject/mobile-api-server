@@ -16,13 +16,15 @@ Request
 
 Response
 ```
-[
-     {
-        "hash": String,
-        "output": String
-      },
-      ...
-]
+{
+    "outputs": [
+          {
+             "hash": String,
+             "output": String
+           },
+           ...
+     ]
+}
 ```
 
 ## Contracts / Encoder

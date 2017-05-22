@@ -58,7 +58,9 @@ class ContractsController {
                 return cb("Not Found", 404);
             }
 
-            return cb(null, data);
+            return cb(null, {
+                items: data
+            });
 
         });
 
