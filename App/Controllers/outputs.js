@@ -33,26 +33,29 @@ class OutputsControllers {
 	_formatAddresses(addresses) {
     	let newAddresses = [];
 
-        addresses.forEach((address) => {
+    	if (Array.isArray(addresses)) {
+            addresses.forEach((address) => {
 
-            let bytes = bs58.decode(address.address);
+                let bytes = bs58.decode(address.address);
 
-            while(bytes.length < 25) {
-            	bytes = Buffer.concat([new Buffer('\0'), bytes]);
-            }
+                while(bytes.length < 25) {
+                    bytes = Buffer.concat([new Buffer('\0'), bytes]);
+                }
 
-            newAddresses.push({
-                address: address.address,
-                tx_hash: address.txid,
-                vout: address.vout,
-                txout_scriptPubKey: address.scriptPubKey,
-                amount: address.amount,
-                block_height: address.height ? address.height : -1,
-                pubkey_hash: bytes.slice(1, 21).toString('hex'),
-                confirmations: address.confirmations
+                newAddresses.push({
+                    address: address.address,
+                    tx_hash: address.txid,
+                    vout: address.vout,
+                    txout_scriptPubKey: address.scriptPubKey,
+                    amount: address.amount,
+                    block_height: address.height ? address.height : -1,
+                    pubkey_hash: bytes.slice(1, 21).toString('hex'),
+                    confirmations: address.confirmations
+                });
+
             });
+        }
 
-		});
 
     	return newAddresses;
 	}
