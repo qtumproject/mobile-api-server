@@ -3,6 +3,8 @@ const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
 const InsightApi = require("../../Repositories/InsightApi");
 const TransactionService = require("../../Services/TransactionService");
 const async = require('async');
+const Address = require('../../Components/Address');
+const config = require('../../../config/main.json');
 
 class QtumRoomEvents {
 
@@ -106,7 +108,9 @@ class QtumRoomEvents {
 
                 this.notifyNewTransaction(addressKeys, data.txid, {withHeight: false});
                 this.notifyBalanceChanged(addressKeys);
+
             }
+
         });
 
     }
@@ -173,11 +177,13 @@ class QtumRoomEvents {
 
         if (this.subscriptions.emitterAddress[emitter.id]) {
             InsightApi.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
+
                 if (err) {
                     return false;
                 }
 
                 emitter.emit('balance_changed', data);
+                
             });
         }
 
@@ -243,14 +249,26 @@ class QtumRoomEvents {
 
         }
 
+        let addressAdded = false;
+
         for(let i = 0; i < addresses.length; i++) {
-            addAddress(addresses[i]);
-            logger.info('addAddress', addresses[i]);
+
+            if (Address.isValid(addresses[i], config.NETWORK)) {
+
+                addressAdded = true;
+                addAddress(addresses[i]);
+                logger.info('addAddress', addresses[i]);
+
+            }
+
         }
 
-        this.notifyBalanceChanged(this.subscriptions.emitterAddress[emitter.id]);
-
-        logger.info('subscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
+        if (addressAdded) {
+            this.notifyBalanceChanged(this.subscriptions.emitterAddress[emitter.id]);
+            logger.info('subscribe:', 'Subscribed. balance_subscribe', 'total:', _.size(this.subscriptions.address));
+        } else {
+            logger.info('subscribe:', 'Not subscribed. Invalid addresses.', 'total:', _.size(this.subscriptions.address));
+        }
 
     };
 
