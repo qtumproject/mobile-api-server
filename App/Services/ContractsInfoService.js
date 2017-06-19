@@ -51,7 +51,7 @@ class ContractsInfoService {
 
                 let solidity = this._getSolidityInterfaceEncoder(param.paramName);
 
-                result = solidity.unpackOutput(data.output);
+                result = solidity.unpackOutput(data.executionResult.output);
 
                 switch (param.type) {
                     case "uint8":
