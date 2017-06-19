@@ -108,7 +108,7 @@ class ContractsInfoService {
 
                 result.push({
                     hash: paramHash,
-                    output: data.output
+                    output: data.executionResult.output
                 });
 
                 return callback(err, data);

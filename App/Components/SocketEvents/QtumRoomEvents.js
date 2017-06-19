@@ -183,7 +183,7 @@ class QtumRoomEvents {
                 }
 
                 emitter.emit('balance_changed', data);
-                
+
             });
         }
 
