@@ -6,7 +6,7 @@ const ContractsInfoService = require('../../Services/ContractsInfoService');
 const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 const bs58 = require('bs58');
-const BALANCE_CHECKER_TIMER_MS = 60000;
+const BALANCE_CHECKER_TIMER_MS = 30000;
 
 class TokenBalanceChangeEvents {
 
@@ -21,6 +21,7 @@ class TokenBalanceChangeEvents {
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
 
         this.runBalanceChecker();
+
     }
 
     subscribeAddress(emitter, data) {
@@ -84,22 +85,25 @@ class TokenBalanceChangeEvents {
 
         }
 
-        this.notifyTokenBalanceChange(contract_address, emitter);
+        return this.notifyTokenBalanceChange(contract_address, emitter);
     };
 
     getBalance(contractAddress, address, cb) {
+
         try {
+
             let hexAddress = new Buffer(bs58.decode(address)).toString('hex'),
                 onlyAddress = '0x' + hexAddress.slice(2, -8),
                 solidityParam = this.contractsInfoService.createParam('balanceOf', [onlyAddress]);
 
-            this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, [solidityParam], (err, result) => {
-                cb(err, result);
+            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, [solidityParam], (err, result) => {
+                return cb(err, result);
             });
 
         } catch (e) {
-            cb(e.message);
+            return cb(e.message);
         }
+
     }
 
     notifyTokenBalanceChange(contractAddress, emitter) {
@@ -108,9 +112,9 @@ class TokenBalanceChangeEvents {
             addresses = this.subscriptions.emitterAddresses[uniqueKey],
             balances = [];
 
-        async.each(addresses, (address, callback) => {
+        return async.eachSeries(addresses, (address, callback) => {
 
-            this.getBalance(contractAddress, address, (err, data) => {
+            return this.getBalance(contractAddress, address, (err, data) => {
 
                 let balance;
 
@@ -130,16 +134,18 @@ class TokenBalanceChangeEvents {
 
                 this.setEmitterAddressesBalance(emitter, balance.address, balance.balance, true);
 
-                callback();
+                return callback(err);
 
             });
 
-        }, () => {
+        }, (err) => {
 
-            emitter.emit('token_balance_change', {
-                contract_address: contractAddress,
-                balances: balances
-            });
+            if (!err) {
+                emitter.emit('token_balance_change', {
+                    contract_address: contractAddress,
+                    balances: balances
+                });
+            }
 
         });
 
@@ -175,6 +181,7 @@ class TokenBalanceChangeEvents {
                     delete self.subscriptions.emitterAddresses[uniqueKey];
 
                     if (self.subscriptions.contract_address[addressContract]) {
+
                         let emitterIndex = self.subscriptions.contract_address[addressContract].indexOf(emitter);
                         self.subscriptions.contract_address[addressContract].splice(emitterIndex, 1);
 
@@ -265,9 +272,9 @@ class TokenBalanceChangeEvents {
 
         let balances = {};
 
-        async.each(addresses, (address, callback) => {
+        return async.eachSeries(addresses, (address, callback) => {
 
-            this.getBalance(contractAddress, address, (err, data) => {
+            return this.getBalance(contractAddress, address, (err, data) => {
 
                 if (err || !data) {
                     balances[address] = 0;
@@ -275,11 +282,15 @@ class TokenBalanceChangeEvents {
                     balances[address] = data.balanceOf;
                 }
 
-                callback();
+                return callback(err);
 
             });
 
-        }, () => {
+        }, (err) => {
+
+            if (err) {
+                return next(err);
+            }
 
             let emitters = this.subscriptions.contract_address[contractAddress];
 
@@ -313,7 +324,7 @@ class TokenBalanceChangeEvents {
 
             });
 
-            next();
+            return next();
 
         });
 
@@ -334,7 +345,7 @@ class TokenBalanceChangeEvents {
             return runChecker();
         }
 
-        async.each(contracts, (contractAddress, callback) => {
+        return async.eachSeries(contracts, (contractAddress, callback) => {
 
             if (!this.subscriptions.contract_address[contractAddress] || !this.subscriptions.contract_address[contractAddress].length) {
                 return callback();
@@ -362,16 +373,16 @@ class TokenBalanceChangeEvents {
 
             if (allContractAddressesKeys.length) {
 
-                this.checkAddressesBalances(contractAddress, allContractAddresses, () => {
-                    callback();
+                return this.checkAddressesBalances(contractAddress, allContractAddresses, () => {
+                    return callback();
                 });
 
             } else {
-                callback();
+                return callback();
             }
 
         }, () => {
-            runChecker();
+            return runChecker();
         });
 
     }
