@@ -294,35 +294,40 @@ class TokenBalanceChangeEvents {
 
             let emitters = this.subscriptions.contract_address[contractAddress];
 
-            emitters.forEach((emitter) => {
+            if (emitters && emitters.length) {
 
-                let uniqueContractKey = this.getUniqueContractKey(emitter, contractAddress),
-                    addresses = this.subscriptions.emitterAddresses[uniqueContractKey],
-                    diffBalances = [];
 
-                addresses.forEach((address) => {
+                emitters.forEach((emitter) => {
 
-                    if (typeof balances[address] !== "undefined" && this.subscriptions.emitterAddressesBalance[this.getUniqueAddressKey(emitter, address)] !== balances[address]) {
+                    let uniqueContractKey = this.getUniqueContractKey(emitter, contractAddress),
+                        addresses = this.subscriptions.emitterAddresses[uniqueContractKey],
+                        diffBalances = [];
 
-                        diffBalances.push({
-                            address: address,
-                            balance: balances[address]
+                    addresses.forEach((address) => {
+
+                        if (typeof balances[address] !== "undefined" && this.subscriptions.emitterAddressesBalance[this.getUniqueAddressKey(emitter, address)] !== balances[address]) {
+
+                            diffBalances.push({
+                                address: address,
+                                balance: balances[address]
+                            });
+
+                            this.setEmitterAddressesBalance(emitter, address, balances[address], true);
+
+                        }
+
+                    });
+
+                    if (diffBalances.length) {
+                        emitter.emit('token_balance_change', {
+                            contract_address: contractAddress,
+                            balances: diffBalances
                         });
-
-                        this.setEmitterAddressesBalance(emitter, address, balances[address], true);
-
                     }
 
                 });
 
-                if (diffBalances.length) {
-                    emitter.emit('token_balance_change', {
-                        contract_address: contractAddress,
-                        balances: diffBalances
-                    });
-                }
-
-            });
+            }
 
             return next();
 
