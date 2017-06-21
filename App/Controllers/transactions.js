@@ -1,4 +1,4 @@
-let InsightApi = require("../Repositories/InsightApi"),
+let InsightApiRepository = require("../Repositories/InsightApiRepository"),
     TransactionService = require("../Services/TransactionService"),
     logger = require('log4js').getLogger('Transactions Controller');
 
@@ -18,7 +18,7 @@ class TransactionsController {
             return cb('Bad Request', 400);
         }
 
-        InsightApi.sendRawTransaction(data._post.data, allowAbsurdFees, (error, body) => {
+        return InsightApiRepository.sendRawTransaction(data._post.data, allowAbsurdFees, (error, body) => {
             cb(error, body);
         });
 
@@ -26,7 +26,7 @@ class TransactionsController {
 
     getTransaction(cb, data) {
 
-        TransactionService.getTransaction(data.req.params.txhash, (err, result) => {
+        return TransactionService.getTransaction(data.req.params.txhash, (err, result) => {
             return cb(err, result);
         });
 

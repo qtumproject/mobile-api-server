@@ -369,19 +369,19 @@ Subscribe:
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"]})
+    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"]}, ?NotificationToken<String>)
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e'})
+    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e'}, ?NotificationToken<String>)
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change');
+    socket.emit('unsubscribe', 'token_balance_change', null, ?NotificationToken<String>);
 ```
 
 
@@ -406,7 +406,7 @@ Sample output:
 Subscribe:
 
 ```
-    socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"], ?NotificationToken<String>);
 ```
 
 > After subscribe will emit ``balance_changed``
@@ -414,13 +414,13 @@ Subscribe:
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('unsubscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"], ?NotificationToken<String>);
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'balance_subscribe');
+    socket.emit('unsubscribe', 'balance_subscribe', null, ?NotificationToken<String>);
 ```
 
 ### Event ``balance_changed``

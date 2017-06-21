@@ -1,25 +1,25 @@
 const async = require('async');
 const HistoryService = require('./HistoryService');
-const InsightApi = require('../Repositories/InsightApi');
+const InsightApiRepository = require('../Repositories/InsightApiRepository');
 
 class TransactionService {
 
     static getTransaction(txId, next) {
 
-        async.waterfall([
+        return async.waterfall([
             (callback) => {
-                InsightApi.getTrx(txId, (err, data) => {
+                return InsightApiRepository.getTrx(txId, (err, data) => {
                     return callback(err, data);
                 });
             },
             (body, callback) => {
 
                 if (body) {
-                    HistoryService.formatHistoryItem(body, (err, result) => {
+                    return HistoryService.formatHistoryItem(body, (err, result) => {
                         return callback(err, result);
                     });
                 } else {
-                    callback("Transaction not found", null);
+                    return callback("Transaction not found", null);
                 }
 
             }

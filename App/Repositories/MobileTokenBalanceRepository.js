@@ -4,11 +4,46 @@ const _ = require('lodash');
 
 class MobileTokenBalanceRepository {
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Function} next
+     * @returns {*}
+     */
+    static fetchByTokenAndContract(tokenId, contractAddress, next) {
+        return MobileTokenBalance.findOne({token_id: tokenId, contract_address: contractAddress}, (err, token) => {
+            return next(err, token);
+        });
+    }
+
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} addressId
+     * @param {Number} balance
+     * @param {Function} next
+     * @returns {*}
+     */
+    static updateTokenAddressBalance(tokenId, addressId, balance, next) {
+        return MobileTokenBalance.update({ token_id: tokenId, 'addresses._id': addressId }, { $set: { 'addresses.$.balance': balance }}, (err) => {
+            return next(err);
+        });
+    }
+
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static createOrUpdateToken(tokenId, contractAddress, addresses, next) {
 
         return async.waterfall([(callback) => {
-            return MobileTokenBalance.findOne({token_id: tokenId, contract_address: contractAddress}, (err, token) => {
-                  return callback(err, token);
+            return MobileTokenBalanceRepository.fetchByTokenAndContract(tokenId, contractAddress, (err, token) => {
+                return callback(err, token);
             });
         }, (token, callback) => {
 
@@ -54,6 +89,14 @@ class MobileTokenBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String|null} contractAddress
+     * @param {Array.<String>|null} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static deleteToken(tokenId, contractAddress, addresses, next) {
 
         if (!contractAddress) {
@@ -109,6 +152,14 @@ class MobileTokenBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static createToken(tokenId, contractAddress, addresses, next) {
 
         return MobileTokenBalance.create({
@@ -121,6 +172,14 @@ class MobileTokenBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static updateToken(tokenId, contractAddress, addresses, next) {
 
         return MobileTokenBalance.update(

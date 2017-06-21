@@ -4,18 +4,37 @@ const _ = require('lodash');
 
 class MobileAddressBalanceRepository {
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static fetchByAddresses(addresses, next) {
         return MobileAddressBalance.find({'addresses.address': {$in: addresses}}, (err, tokens) => {
             return next(err, tokens);
         });
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Function} next
+     * @returns {*}
+     */
     static fetchById(tokenId, next) {
         return MobileAddressBalance.findOne({token_id: tokenId}, (err, token) => {
             return next(err, token);
         });
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static createOrUpdateToken(tokenId, addresses, next) {
 
         return async.waterfall([(callback) => {
@@ -66,6 +85,13 @@ class MobileAddressBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<String>|null} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static deleteToken(tokenId, addresses, next) {
 
         if (!addresses) {
@@ -93,6 +119,7 @@ class MobileAddressBalanceRepository {
             let newArray = _.difference(currentAddresses, addresses);
 
             if (newArray.length) {
+
                 return MobileAddressBalance.update({token_id: tokenId}, {$pull: { addresses: {address: {$in: addresses}} }}, (err, token) => {
                     if (err) {
                         return callback(err, token);
@@ -113,6 +140,13 @@ class MobileAddressBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static createToken(tokenId, addresses, next) {
 
         return MobileAddressBalance.create({
@@ -124,6 +158,13 @@ class MobileAddressBalanceRepository {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     static updateToken(tokenId, addresses, next) {
 
         return MobileAddressBalance.update(

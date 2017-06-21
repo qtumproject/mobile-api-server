@@ -2,14 +2,14 @@ let request = require('request'),
     _ = require('lodash'),
     config = require('../../config/main.json');
 
-class InsightApi {
+class InsightApiRepository {
 
     static getInfo(cb) {
         return request.get({
             url: config.INSIGHT_API_URL + '/status?q=getInfo',
             json: true
         }, (error, response, body) => {
-                cb(error, body);
+                return cb(error, body);
             });
     }
 
@@ -23,7 +23,7 @@ class InsightApi {
                 body = null;
             }
 
-            cb(error, body);
+            return cb(error, body);
 
         });
     }
@@ -61,7 +61,7 @@ class InsightApi {
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/utxo`,
             json: true
         }, (error, response, body) => {
-                cb(error, body);
+               return cb(error, body);
             });
     }
 
@@ -75,7 +75,7 @@ class InsightApi {
                 body = null;
             }
 
-            cb(error, body);
+            return cb(error, body);
         });
     }
 
@@ -84,7 +84,7 @@ class InsightApi {
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/balance`,
             json: true
         }, (error, response, body) => {
-            cb(error, body);
+            return cb(error, body);
         });
     }
 
@@ -115,10 +115,10 @@ class InsightApi {
                 body = null;
             }
 
-            cb(error, body);
+            return cb(error, body);
 
         });
     }
 }
 
-module.exports = InsightApi;
+module.exports = InsightApiRepository;

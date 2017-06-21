@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
-const InsightApi = require("../../Repositories/InsightApi");
+const InsightApiRepository = require("../../Repositories/InsightApiRepository");
 const TransactionService = require("../../Services/TransactionService");
 const async = require('async');
 const Address = require('../../Components/Address');
@@ -176,7 +176,7 @@ class QtumRoomEvents {
     notifyBalanceChangedEmitter(emitter) {
 
         if (this.subscriptions.emitterAddress[emitter.id]) {
-            InsightApi.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
+            InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 
                 if (err) {
                     return false;

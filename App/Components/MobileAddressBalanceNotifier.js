@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const logger = require('log4js').getLogger('MobileAddressBalanceNotifier');
-const InsightApi = require("../Repositories/InsightApi");
+const InsightApiRepository = require("../Repositories/InsightApiRepository");
 const MobileAddressBalanceRepository = require("../Repositories/MobileAddressBalanceRepository");
 const async = require('async');
 const config = require('../../config/main.json');
@@ -8,12 +8,11 @@ const gcm = require('node-gcm');
 
 class MobileAddressBalanceNotifier {
 
-    constructor(socket, socketClient) {
+    constructor(socketClient) {
 
         logger.info('Init');
-        this.sender = new gcm.Sender(config.FIREBASE_SERVER_TOKEN);
 
-        this.socket = socket;
+        this.notifier = new gcm.Sender(config.FIREBASE_SERVER_TOKEN);
         this.socketClient = socketClient;
 
         this.initRemoteSocket();
@@ -62,7 +61,7 @@ class MobileAddressBalanceNotifier {
                     }
                 });
 
-                this.notifyBalanceChanged(Object.keys(addresses));
+                return this.notifyBalanceChanged(Object.keys(addresses));
 
             }
 
@@ -83,6 +82,11 @@ class MobileAddressBalanceNotifier {
 
     }
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     * @returns {*}
+     */
     notifyBalanceChanged(addresses) {
 
         if (!addresses || !addresses.length) {
@@ -108,7 +112,7 @@ class MobileAddressBalanceNotifier {
                     notifyTokens.push(tokenObject.token_id);
                 });
 
-                return this.sender.send(message, { registrationTokens: notifyTokens}, (err, response) => {
+                return this.notifier.send(message, { registrationTokens: notifyTokens}, (err, response) => {
                     return callback(err, response, notifyTokens);
                 });
 
@@ -117,7 +121,7 @@ class MobileAddressBalanceNotifier {
                 logger.info(response);
 
                 if (!response.failure) {
-                    logger.info('DONE', notifyTokens);
+                    logger.info('Done', notifyTokens);
                     return callback();
                 }
 
@@ -158,6 +162,12 @@ class MobileAddressBalanceNotifier {
         this.socketClient.emit('subscribe', 'qtum');
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<String>} addresses
+     * @returns {*}
+     */
     subscribeAddress(tokenId, addresses) {
 
         if (!_.isArray(addresses)) {
@@ -201,7 +211,7 @@ class MobileAddressBalanceNotifier {
 
             return async.eachSeries(newAddresses, (address, callback) => {
 
-                return InsightApi.getAddressesBalance([address], (err, data) => {
+                return InsightApiRepository.getAddressesBalance([address], (err, data) => {
 
                     if (err) {
                         return false;
@@ -237,8 +247,6 @@ class MobileAddressBalanceNotifier {
                     newAddressesObjects,
                     (err) => {
                         return callback(err);
-
-
                     }
                 );
 
@@ -257,6 +265,12 @@ class MobileAddressBalanceNotifier {
 
     };
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {Array.<String>|null} addresses
+     * @returns {*}
+     */
     unsubscribeAddress(tokenId, addresses) {
         return MobileAddressBalanceRepository.deleteToken(tokenId, addresses, () => {
             logger.info('unsubscribe:', 'balance_subscribe', tokenId, addresses);

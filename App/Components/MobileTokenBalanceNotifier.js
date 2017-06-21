@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const async = require('async');
 const gcm = require('node-gcm');
 const logger = require('log4js').getLogger('MobileTokenBalanceNotifier');
@@ -10,18 +9,27 @@ const BALANCE_CHECKER_TIMER_MS = 60000;
 class MobileTokenBalanceNotifier {
 
     constructor(contractBalanceComponent) {
+
         logger.info('Init');
 
-        this.sender = new gcm.Sender(config.FIREBASE_SERVER_TOKEN);
-
+        this.notifier = new gcm.Sender(config.FIREBASE_SERVER_TOKEN);
         this.contractBalanceComponent = contractBalanceComponent;
+
         this.checkBalances();
+
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<String>} addresses
+     * @returns {*}
+     */
     subscribeMobileTokenBalance(tokenId, contractAddress, addresses) {
 
         return async.waterfall([(callback) => {
-            return MobileTokenBalance.findOne({token_id: tokenId, contract_address: contractAddress}, (err, token) => {
+            return MobileTokenBalanceRepository.fetchByTokenAndContract(tokenId, contractAddress, (err, token) => {
                 return callback(err, token);
             });
         }, (token, callback) => {
@@ -78,6 +86,7 @@ class MobileTokenBalanceNotifier {
                     return callback(err);
 
                 });
+
             }, (err) => {
 
                 if (err) {
@@ -106,13 +115,27 @@ class MobileTokenBalanceNotifier {
 
     }
 
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<String>|null} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     unsubscribeMobileTokenBalance(tokenId, contractAddress, addresses, next) {
         return MobileTokenBalanceRepository.deleteToken(tokenId, contractAddress, addresses, (err, key) => {
             return next(err, key);
         })
     }
 
-    notifyToken(tokenId, contractAddress, balances, next) {
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {Array.<{address: String, balance: Number}>} balances
+     * @returns {*}
+     */
+    getMessage(contractAddress, balances) {
 
         let message = new gcm.Message();
 
@@ -125,7 +148,22 @@ class MobileTokenBalanceNotifier {
         message.addData('contract_address', contractAddress);
         message.addData('balances', balances);
 
-        return this.sender.send(message, { registrationTokens: [tokenId] }, (err, response) => {
+        return message;
+
+    }
+
+    /**
+     *
+     * @param {String} tokenId
+     * @param {String} contractAddress
+     * @param {Array.<{address: String, balance: Number}>} balances
+     * @param {Function} next
+     */
+    notifyToken(tokenId, contractAddress, balances, next) {
+
+        let message = this.getMessage(contractAddress, balances);
+
+        return this.notifier.send(message, { registrationTokens: [tokenId]}, (err, response) => {
 
             if (err) {
                 return next(err);
@@ -147,8 +185,18 @@ class MobileTokenBalanceNotifier {
 
         });
 
+
     }
 
+    /**
+     *
+     * @param {Object} diffBalances
+     * @param {Object.<String>} diffBalances.token
+     * @param {Object.<String>} diffBalances.token.contract
+     * @param {String} diffBalances.token.contract.address
+     * @param {Function} next
+     * @returns {*}
+     */
     notifyTokens(diffBalances, next) {
 
         let tokens = Object.keys(diffBalances);
@@ -184,9 +232,6 @@ class MobileTokenBalanceNotifier {
             });
 
         } else {
-
-            console.log('not notify');
-
             return next();
         }
 
@@ -224,7 +269,8 @@ class MobileTokenBalanceNotifier {
                             let currentBalance = data.balanceOf;
 
                             if (previousBalance !== currentBalance) {
-                                return MobileTokenBalance.update({ token_id: tokenId, 'addresses._id': addressObject.id }, { $set: { 'addresses.$.balance': currentBalance }}, (err) => {
+
+                                return MobileTokenBalanceRepository.updateTokenAddressBalance(tokenId, addressObject.id, currentBalance, (err) => {
 
                                     if (err) {
                                         return callback(err);
@@ -258,8 +304,11 @@ class MobileTokenBalanceNotifier {
             },
             (err) => {
 
+                if (err) {
+                    logger.error(err);
+                }
+
                 return this.notifyTokens(diffBalances, () => {
-                    console.log('end!');
                     setTimeout(() => {
                         this.checkBalances();
                     }, BALANCE_CHECKER_TIMER_MS)

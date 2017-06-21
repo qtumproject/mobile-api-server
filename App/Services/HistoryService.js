@@ -1,6 +1,6 @@
 let BigNumber = require('bignumber.js');
 let ContractsHelper = require('../Helpers/ContractsHelper');
-let InsightApi = require('../Repositories/InsightApi');
+let InsightApiRepository = require('../Repositories/InsightApiRepository');
 let async = require('async');
 
 
@@ -17,11 +17,11 @@ class HistoryService {
 
         let items = new Array(history.items.length);
 
-        async.each(history.items, (item, callback) => {
+        return async.each(history.items, (item, callback) => {
 
             let idx = history.items.indexOf(item);
 
-            HistoryService.formatHistoryItem(item, (err, result) => {
+            return HistoryService.formatHistoryItem(item, (err, result) => {
 
                 items[idx] = result;
 
@@ -104,7 +104,7 @@ class HistoryService {
             return cb(null, result);
         }
 
-        InsightApi.getAccountInfo(addressString, (err, res) => {
+        return InsightApiRepository.getAccountInfo(addressString, (err, res) => {
 
             if (err) {
                 return cb(err)

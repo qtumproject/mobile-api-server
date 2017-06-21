@@ -1,4 +1,4 @@
-let InsightApi = require("../Repositories/InsightApi"),
+let InsightApiRepository = require("../Repositories/InsightApiRepository"),
     HistoryService = require("../Services/HistoryService"),
     MobileTokenBalanceNotifier = require("../Components/MobileTokenBalanceNotifier"),
     MobileAddressBalanceNotifier = require("../Components/MobileAddressBalanceNotifier"),
@@ -29,13 +29,11 @@ class SocketController {
         this.contractBalanceComponent = new ContractBalance();
         this.mobileBalanceNotifier = new MobileTokenBalanceNotifier(this.contractBalanceComponent);
 
-
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
         this.initSocketEvents();
 
-        this.mobileAddressBalanceNotifier = new MobileAddressBalanceNotifier(this.socket, this.socketClient);
-
+        this.mobileAddressBalanceNotifier = new MobileAddressBalanceNotifier(this.socketClient);
 
     }
 
@@ -60,7 +58,7 @@ class SocketController {
         logger.info('a user connected', remoteAddress);
 
         socket.on('subscribe', (name, params, tokenId) => {
-            console.log('name, params, tokenId', name, params, tokenId);
+
             logger.info(remoteAddress, 'Web socket subscribe:', name, params);
 
             switch (name) {
