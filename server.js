@@ -7,7 +7,8 @@ let async = require('async'),
 	log4js = require('log4js'),
 	logger = log4js.getLogger('Server js'),
 	dir = require('node-dir'),
-	moment = require('moment');
+	moment = require('moment'),
+    DB = require('./App/Components/DB');
 
 let Raven = null;
 if(!config.disableRaven) {
@@ -20,7 +21,7 @@ let Server = {
 	controllers: {},
 	init: function() {
 		async.waterfall([
-			// this.runModels,
+            this.connectToDB,
 			this.runControllers,
 			this.bindDefault,
 			this.run
@@ -28,6 +29,24 @@ let Server = {
 			logger.info('Server runned');
 		});
 	},
+    connectToDB(cb) {
+
+        let configDB = config.DB,
+            userUrl = (configDB['USER']) ? (configDB['USER'] + ':' + configDB['PASSWORD'] + '@') : '',
+            url = 'mongodb://' + userUrl + configDB['HOST'] + ':' + configDB['PORT'] + '/' + configDB['DATABASE'],
+            db = new DB(url);
+
+        db.connect((err) => {
+
+            if (err) {
+                return cb(err);
+            }
+
+            return cb();
+
+        });
+
+    },
 	runControllers: (cb) => {
 		dir.files(__dirname + '/App/Controllers', function(err, files) {
 			if(err) throw err;

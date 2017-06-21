@@ -1,8 +1,6 @@
 const _ = require('lodash');
 const async = require('async');
 const logger = require('log4js').getLogger('TokenBalanceChange Socket Events');
-const TokenInterface = require('../ContractData/TokenInterface');
-const ContractsInfoService = require('../../Services/ContractsInfoService');
 const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 const bs58 = require('bs58');
@@ -10,15 +8,16 @@ const BALANCE_CHECKER_TIMER_MS = 30000;
 
 class TokenBalanceChangeEvents {
 
-    constructor(socket) {
+    constructor(socket, contractBalanceComponent) {
         logger.info('Init');
 
         this.socket = socket;
+        this.contractBalanceComponent = contractBalanceComponent;
+
         this.subscriptions = {};
         this.subscriptions.contract_address = {};
         this.subscriptions.emitterAddresses = {};
         this.subscriptions.emitterAddressesBalance = {};
-        this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
 
         this.runBalanceChecker();
 
@@ -26,13 +25,14 @@ class TokenBalanceChangeEvents {
 
     subscribeAddress(emitter, data) {
 
-        if (!_.isObject(data) || !data.contract_address || !data.addresses || !data.addresses.length) {
+        if (!_.isObject(data) || !data.contract_address || !_.isString(data.contract_address) || !data.addresses || !_.isArray(data.addresses) || !data.addresses.length) {
             return false;
         }
 
         let self = this,
             contract_address = data.contract_address,
-            addresses = data.addresses;
+            addresses = data.addresses,
+            validAddresses = [];
 
         function addContractAddress(addressStr) {
             if(self.subscriptions.contract_address[addressStr]) {
@@ -50,6 +50,8 @@ class TokenBalanceChangeEvents {
         }
 
         function addAddress(addressContract, addr) {
+
+            addContractAddress(addressContract);
 
             let uniqueKey = self.getUniqueContractKey(emitter, addressContract);
 
@@ -74,7 +76,8 @@ class TokenBalanceChangeEvents {
 
             if (Address.isValid(addresses[i], config.NETWORK)) {
 
-                addContractAddress(contract_address);
+                validAddresses.push(addresses[i]);
+
                 addAddress(contract_address, addresses[i]);
 
                 logger.info('addAddress', contract_address, addresses[i]);
@@ -86,24 +89,6 @@ class TokenBalanceChangeEvents {
         }
 
         return this.notifyTokenBalanceChange(contract_address, emitter);
-    };
-
-    getBalance(contractAddress, address, cb) {
-
-        try {
-
-            let hexAddress = new Buffer(bs58.decode(address)).toString('hex'),
-                onlyAddress = '0x' + hexAddress.slice(2, -8),
-                solidityParam = this.contractsInfoService.createParam('balanceOf', [onlyAddress]);
-
-            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, [solidityParam], (err, result) => {
-                return cb(err, result);
-            });
-
-        } catch (e) {
-            return cb(e.message);
-        }
-
     }
 
     notifyTokenBalanceChange(contractAddress, emitter) {
@@ -114,7 +99,7 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.getBalance(contractAddress, address, (err, data) => {
+            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
 
                 let balance;
 
@@ -274,7 +259,7 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.getBalance(contractAddress, address, (err, data) => {
+            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
 
                 if (err || !data) {
                     balances[address] = 0;
