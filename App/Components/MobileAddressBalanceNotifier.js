@@ -165,16 +165,27 @@ class MobileAddressBalanceNotifier {
     /**
      *
      * @param {String} tokenId
+     * @param {String} prevTokenId
      * @param {Array.<String>} addresses
      * @returns {*}
      */
-    subscribeAddress(tokenId, addresses) {
+    subscribeAddress(tokenId, prevTokenId, addresses) {
 
         if (!_.isArray(addresses)) {
             return false;
         }
 
-        return async.waterfall([(callback) => {
+        return async.waterfall([(callback)=> {
+
+            if (prevTokenId) {
+                return MobileAddressBalanceRepository.deleteToken(prevTokenId, null, (err) => {
+                    return callback(err);
+                });
+            } else {
+                return callback();
+            }
+
+        }, (callback) => {
             return MobileAddressBalanceRepository.fetchById(tokenId, (err, token) => {
                 return callback(err, token);
             });
@@ -259,7 +270,7 @@ class MobileAddressBalanceNotifier {
                 return false;
             }
 
-            logger.info('Subscribe Mobile:', 'balance_change', tokenId);
+            return logger.info('Subscribe Mobile:', 'balance_change', tokenId);
 
         });
 
@@ -273,7 +284,7 @@ class MobileAddressBalanceNotifier {
      */
     unsubscribeAddress(tokenId, addresses) {
         return MobileAddressBalanceRepository.deleteToken(tokenId, addresses, () => {
-            logger.info('unsubscribe:', 'balance_subscribe', tokenId, addresses);
+            return logger.info('unsubscribe:', 'balance_subscribe', tokenId, addresses);
         });
     };
 

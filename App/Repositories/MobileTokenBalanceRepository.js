@@ -67,7 +67,7 @@ class MobileTokenBalanceRepository {
                     return callback();
                 }
 
-                return MobileTokenBalanceRepository.updateToken(tokenId, contractAddress, newAddresses, (err, key) => {
+                return MobileTokenBalanceRepository.updateTokenAddresses(tokenId, contractAddress, newAddresses, (err, key) => {
                     return callback(err, key);
                 });
 
@@ -180,7 +180,7 @@ class MobileTokenBalanceRepository {
      * @param {Function} next
      * @returns {*}
      */
-    static updateToken(tokenId, contractAddress, addresses, next) {
+    static updateTokenAddresses(tokenId, contractAddress, addresses, next) {
 
         return MobileTokenBalance.update(
             {token_id: tokenId, contract_address: contractAddress},
@@ -191,6 +191,24 @@ class MobileTokenBalanceRepository {
         );
 
     }
+
+    /**
+     *
+     * @param {String} prevToken
+     * @param {String} nextToken
+     * @param {Function} next
+     * @returns {*}
+     */
+    static updateTokenId(prevToken, nextToken, next) {
+        return MobileTokenBalance.update(
+            {token_id: prevToken},
+            {token_id: nextToken},
+            (err, key) => {
+                return next(err, key);
+            }
+        );
+    }
+
 
 }
 

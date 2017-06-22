@@ -1,6 +1,6 @@
 let InsightApiRepository = require("../Repositories/InsightApiRepository"),
     HistoryService = require("../Services/HistoryService"),
-    MobileTokenBalanceNotifier = require("../Components/MobileTokenBalanceNotifier"),
+    MobileContractBalanceNotifier = require("../Components/MobileContractBalanceNotifier"),
     MobileAddressBalanceNotifier = require("../Components/MobileAddressBalanceNotifier"),
     logger = require('log4js').getLogger('Socket Controller'),
     config = require('../../config/main.json'),
@@ -27,7 +27,7 @@ class SocketController {
     init(server) {
 
         this.contractBalanceComponent = new ContractBalance();
-        this.mobileBalanceNotifier = new MobileTokenBalanceNotifier(this.contractBalanceComponent);
+        this.mobileContractBalanceNotifier = new MobileContractBalanceNotifier(this.contractBalanceComponent);
 
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
@@ -57,9 +57,9 @@ class SocketController {
 
         logger.info('a user connected', remoteAddress);
 
-        socket.on('subscribe', (name, params, tokenId) => {
+        socket.on('subscribe', (name, params, nextToken, prevTokenId) => {
 
-            logger.info(remoteAddress, 'Web socket subscribe:', name, params);
+            logger.info(remoteAddress, 'Web socket subscribe:', name, params, nextToken, prevTokenId);
 
             switch (name) {
                 case 'balance_subscribe':
@@ -70,8 +70,8 @@ class SocketController {
 
                     this.events.qtumRoomEvents.subscribeAddress(socket, params);
 
-                    if (tokenId) {
-                        this.mobileAddressBalanceNotifier.subscribeAddress(tokenId, params);
+                    if (nextToken) {
+                        this.mobileAddressBalanceNotifier.subscribeAddress(nextToken, prevTokenId, params);
                     }
 
                     break;
@@ -101,8 +101,8 @@ class SocketController {
 
                     this.events.tokenBalanceEvents.subscribeAddress(socket, params);
 
-                    if (tokenId && validAddresses.length) {
-                        this.mobileBalanceNotifier.subscribeMobileTokenBalance(tokenId, contractAddress, validAddresses);
+                    if (nextToken && validAddresses.length) {
+                        this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(nextToken, prevTokenId, contractAddress, validAddresses);
                     }
 
                     break;
@@ -116,6 +116,7 @@ class SocketController {
 
             switch (name) {
                 case 'balance_subscribe':
+
                     this.events.qtumRoomEvents.unsubscribeAddress(socket, params);
 
                     if (tokenId) {
@@ -128,7 +129,7 @@ class SocketController {
                     this.events.tokenBalanceEvents.unsubscribeAddress(socket, params);
 
                     if (_.isObject(params) && tokenId) {
-                        this.mobileBalanceNotifier.unsubscribeMobileTokenBalance(tokenId, params.contract_address, params.addresses, () => {});
+                        this.mobileContractBalanceNotifier.unsubscribeMobileTokenBalance(tokenId, params.contract_address, params.addresses, () => {});
                     }
 
                     break;
@@ -150,6 +151,7 @@ class SocketController {
     _getRemoteAddress(socket) {
         return socket.client.request.headers['cf-connecting-ip'] || socket.conn.remoteAddress;
     };
+
 }
 
 Controllers.socket = new SocketController();

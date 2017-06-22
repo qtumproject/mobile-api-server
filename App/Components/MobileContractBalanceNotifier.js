@@ -1,12 +1,12 @@
 const async = require('async');
 const gcm = require('node-gcm');
-const logger = require('log4js').getLogger('MobileTokenBalanceNotifier');
+const logger = require('log4js').getLogger('MobileContractBalanceNotifier');
 const MobileTokenBalanceRepository = require('../Repositories/MobileTokenBalanceRepository');
 const MobileTokenBalance = require('../Models/MobileTokenBalance');
 const config = require('../../config/main.json');
 const BALANCE_CHECKER_TIMER_MS = 60000;
 
-class MobileTokenBalanceNotifier {
+class MobileContractBalanceNotifier {
 
     constructor(contractBalanceComponent) {
 
@@ -22,16 +22,29 @@ class MobileTokenBalanceNotifier {
     /**
      *
      * @param {String} tokenId
+     * @param {String} prevTokenId
      * @param {String} contractAddress
      * @param {Array.<String>} addresses
      * @returns {*}
      */
-    subscribeMobileTokenBalance(tokenId, contractAddress, addresses) {
+    subscribeMobileTokenBalance(tokenId, prevTokenId, contractAddress, addresses) {
 
         return async.waterfall([(callback) => {
+
+            if (prevTokenId) {
+                return MobileTokenBalanceRepository.deleteToken(prevTokenId, null, null, (err) => {
+                    return callback(err);
+                });
+            }
+
+            return callback();
+
+        }, (callback) => {
+
             return MobileTokenBalanceRepository.fetchByTokenAndContract(tokenId, contractAddress, (err, token) => {
                 return callback(err, token);
             });
+
         }, (token, callback) => {
 
             let newAddresses = [];
@@ -318,8 +331,6 @@ class MobileTokenBalanceNotifier {
         );
     }
 
-
-
 }
 
-module.exports = MobileTokenBalanceNotifier;
+module.exports = MobileContractBalanceNotifier;
