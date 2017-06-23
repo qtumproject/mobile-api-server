@@ -76,7 +76,7 @@ class MobileAddressBalanceNotifier {
         message.addNotification('body', 'Balance changed!');
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
-        message.addNotification('color', '#a57eec');
+        message.addNotification('color', '#2e9ad0');
 
         return message;
 

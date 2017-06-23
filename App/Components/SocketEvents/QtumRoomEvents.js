@@ -161,6 +161,10 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Array} emitters - Socket emitters array
+     */
     notifyBalanceChangedEmitters(emitters) {
 
         emitters.forEach((emitter) => {
@@ -169,14 +173,23 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {Object} data
+     */
     notifyNewTransactionEmitter(emitter, data) {
         emitter.emit('new_transaction', data);
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     */
     notifyBalanceChangedEmitter(emitter) {
 
         if (this.subscriptions.emitterAddress[emitter.id]) {
-            InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
+            return InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 
                 if (err) {
                     return false;
@@ -189,6 +202,11 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Array} addresses
+     * @returns {Array}
+     */
     getEmittersByAddresses(addresses) {
 
         let emitters = [];
@@ -211,60 +229,62 @@ class QtumRoomEvents {
         this.socketClient.emit('subscribe', 'qtum');
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {Array.<String>} addresses
+     * @returns {boolean}
+     */
     subscribeAddress(emitter, addresses) {
 
         if (!_.isArray(addresses)) {
             return false;
         }
 
-        let self = this;
-
-        function addAddress(addressStr) {
-
-            if(self.subscriptions.address[addressStr]) {
-
-                let emitters = self.subscriptions.address[addressStr],
-                    index = emitters.indexOf(emitter);
-
-                if (index === -1) {
-                    self.subscriptions.address[addressStr].push(emitter);
-                }
-
-            } else {
-                self.subscriptions.address[addressStr] = [emitter];
-            }
-
-            if (self.subscriptions.emitterAddress[emitter.id]) {
-
-                let addrs = self.subscriptions.emitterAddress[emitter.id],
-                    index = addrs.indexOf(addressStr);
-
-                if (index === -1) {
-                    self.subscriptions.emitterAddress[emitter.id].push(addressStr);
-                }
-
-            } else {
-                self.subscriptions.emitterAddress[emitter.id] = [addressStr]
-            }
-
-        }
-
         let addressAdded = false;
 
         for(let i = 0; i < addresses.length; i++) {
 
+            let addressStr = addresses[i];
+
             if (Address.isValid(addresses[i], config.NETWORK)) {
 
                 addressAdded = true;
-                addAddress(addresses[i]);
-                logger.info('addAddress', addresses[i]);
+
+                if(this.subscriptions.address[addressStr]) {
+
+                    let emitters = this.subscriptions.address[addressStr],
+                        index = emitters.indexOf(emitter);
+
+                    if (index === -1) {
+                        this.subscriptions.address[addressStr].push(emitter);
+                    }
+
+                } else {
+                    this.subscriptions.address[addressStr] = [emitter];
+                }
+
+                if (this.subscriptions.emitterAddress[emitter.id]) {
+
+                    let addrs = this.subscriptions.emitterAddress[emitter.id],
+                        index = addrs.indexOf(addressStr);
+
+                    if (index === -1) {
+                        this.subscriptions.emitterAddress[emitter.id].push(addressStr);
+                    }
+
+                } else {
+                    this.subscriptions.emitterAddress[emitter.id] = [addressStr]
+                }
+
+                logger.info('addAddress', addressStr);
 
             }
 
         }
 
         if (addressAdded) {
-            this.notifyBalanceChanged(this.subscriptions.emitterAddress[emitter.id]);
+            this.notifyBalanceChangedEmitter(emitter);
             logger.info('subscribe:', 'Subscribed. balance_subscribe', 'total:', _.size(this.subscriptions.address));
         } else {
             logger.info('subscribe:', 'Not subscribed. Invalid addresses.', 'total:', _.size(this.subscriptions.address));
@@ -272,46 +292,56 @@ class QtumRoomEvents {
 
     };
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {Array.<String>} addresses
+     * @returns {boolean}
+     */
     unsubscribeAddress(emitter, addresses) {
 
         if(!addresses) {
             return this.unsubscribeAddressAll(emitter);
         }
 
-        let self = this;
-
-        function removeAddress(addressStr) {
-            let emitters = self.subscriptions.address[addressStr],
-                index = emitters.indexOf(emitter);
-
-            if(index > -1) {
-                emitters.splice(index, 1);
-                if (emitters.length === 0) {
-                    delete self.subscriptions.address[addressStr];
-                }
-            }
-
-            let addrs = self.subscriptions.emitterAddress[emitter.id],
-                addrIndex = addrs.indexOf(addressStr);
-
-            if(addrIndex > -1) {
-                addrs.splice(addrIndex, 1);
-                if (addrs.length === 0) {
-                    delete self.subscriptions.emitterAddress[emitter.id];
-                }
-            }
-        }
-
         for(let i = 0; i < addresses.length; i++) {
-            if(this.subscriptions.address[addresses[i]]) {
-                removeAddress(addresses[i]);
+
+            let addressStr = addresses[i];
+
+            if(this.subscriptions.address[addressStr]) {
+
+                let emitters = this.subscriptions.address[addressStr],
+                    index = emitters.indexOf(emitter);
+
+                if(index > -1) {
+                    emitters.splice(index, 1);
+                    if (emitters.length === 0) {
+                        delete this.subscriptions.address[addressStr];
+                    }
+                }
+
+                let addrs = this.subscriptions.emitterAddress[emitter.id],
+                    addrIndex = addrs.indexOf(addressStr);
+
+                if(addrIndex > -1) {
+                    addrs.splice(addrIndex, 1);
+                    if (addrs.length === 0) {
+                        delete this.subscriptions.emitterAddress[emitter.id];
+                    }
+                }
+
             }
+
         }
 
         logger.info('unsubscribe:', 'balance_subscribe', 'total:', _.size(this.subscriptions.address));
 
     };
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     */
     unsubscribeAddressAll(emitter) {
 
         for(let hashHex in this.subscriptions.address) {

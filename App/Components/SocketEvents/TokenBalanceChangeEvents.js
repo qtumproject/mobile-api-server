@@ -29,48 +29,9 @@ class TokenBalanceChangeEvents {
             return false;
         }
 
-        let self = this,
-            contract_address = data.contract_address,
+        let contract_address = data.contract_address,
             addresses = data.addresses,
             validAddresses = [];
-
-        function addContractAddress(addressStr) {
-            if(self.subscriptions.contract_address[addressStr]) {
-
-                let emitters = self.subscriptions.contract_address[addressStr],
-                    index = emitters.indexOf(emitter);
-
-                if (index === -1) {
-                    self.subscriptions.contract_address[addressStr].push(emitter);
-                }
-
-            } else {
-                self.subscriptions.contract_address[addressStr] = [emitter];
-            }
-        }
-
-        function addAddress(addressContract, addr) {
-
-            addContractAddress(addressContract);
-
-            let uniqueKey = self.getUniqueContractKey(emitter, addressContract);
-
-            if (self.subscriptions.emitterAddresses[uniqueKey]) {
-
-                let addrs = self.subscriptions.emitterAddresses[uniqueKey],
-                    index = addrs.indexOf(addr);
-
-                if (index === -1) {
-                    self.subscriptions.emitterAddresses[uniqueKey].push(addr);
-                }
-
-            } else {
-                self.subscriptions.emitterAddresses[uniqueKey] = [addr]
-            }
-
-            self.setEmitterAddressesBalance(emitter, addr, 0, false);
-
-        }
 
         for(let i = 0; i < addresses.length; i++) {
 
@@ -78,7 +39,8 @@ class TokenBalanceChangeEvents {
 
                 validAddresses.push(addresses[i]);
 
-                addAddress(contract_address, addresses[i]);
+                this.addContractAddress(emitter, contract_address);
+                this.addAddress(emitter, contract_address, addresses[i]);
 
                 logger.info('addAddress', contract_address, addresses[i]);
 
@@ -89,6 +51,43 @@ class TokenBalanceChangeEvents {
         }
 
         return this.notifyTokenBalanceChange(contract_address, emitter);
+    }
+
+    addAddress(emitter, addressContract, addr) {
+
+        let uniqueKey = this.getUniqueContractKey(emitter, addressContract);
+
+        if (this.subscriptions.emitterAddresses[uniqueKey]) {
+
+            let addrs = this.subscriptions.emitterAddresses[uniqueKey],
+                index = addrs.indexOf(addr);
+
+            if (index === -1) {
+                this.subscriptions.emitterAddresses[uniqueKey].push(addr);
+            }
+
+        } else {
+            this.subscriptions.emitterAddresses[uniqueKey] = [addr]
+        }
+
+        this.setEmitterAddressesBalance(emitter, addr, 0, false);
+    }
+
+    addContractAddress(emitter, addressStr) {
+
+        if(this.subscriptions.contract_address[addressStr]) {
+
+            let emitters = this.subscriptions.contract_address[addressStr],
+                index = emitters.indexOf(emitter);
+
+            if (index === -1) {
+                this.subscriptions.contract_address[addressStr].push(emitter);
+            }
+
+        } else {
+            this.subscriptions.contract_address[addressStr] = [emitter];
+        }
+
     }
 
     notifyTokenBalanceChange(contractAddress, emitter) {
@@ -146,40 +145,8 @@ class TokenBalanceChangeEvents {
             return false;
         }
 
-        let self = this,
-            contract_address = data.contract_address,
+        let contract_address = data.contract_address,
             addresses = data.addresses;
-
-        function removeAddress(addressContract, addr) {
-
-            let uniqueKey = self.getUniqueContractKey(emitter, addressContract),
-                addrs = self.subscriptions.emitterAddresses[uniqueKey],
-                addrIndex = addrs.indexOf(addr);
-
-            if(addrIndex > -1) {
-                addrs.splice(addrIndex, 1);
-
-                delete self.subscriptions.emitterAddressesBalance[self.getUniqueAddressKey(emitter, addr)];
-
-                if (addrs.length === 0) {
-
-                    delete self.subscriptions.emitterAddresses[uniqueKey];
-
-                    if (self.subscriptions.contract_address[addressContract]) {
-
-                        let emitterIndex = self.subscriptions.contract_address[addressContract].indexOf(emitter);
-                        self.subscriptions.contract_address[addressContract].splice(emitterIndex, 1);
-
-                        if (self.subscriptions.contract_address[addressContract].length === 0) {
-                            delete self.subscriptions.contract_address[addressContract];
-                        }
-
-                    }
-
-                }
-
-            }
-        }
 
         if (!addresses) {
 
@@ -195,7 +162,9 @@ class TokenBalanceChangeEvents {
 
             for(let i = 0; i < addresses.length; i++) {
                 if(this.subscriptions.contract_address[contract_address] && Address.isValid(addresses[i], config.NETWORK)) {
-                    removeAddress(contract_address, addresses[i]);
+
+                    this.removeAddress(contract_address, addresses[i]);
+
                 }
             }
 
@@ -204,6 +173,37 @@ class TokenBalanceChangeEvents {
         logger.info('unsubscribe:', 'token_balance_change', 'total:', _.size(this.subscriptions.contract_address));
 
     };
+
+    removeAddress(addressContract, addr) {
+
+        let uniqueKey = this.getUniqueContractKey(emitter, addressContract),
+            addrs = this.subscriptions.emitterAddresses[uniqueKey],
+            addrIndex = addrs.indexOf(addr);
+
+        if(addrIndex > -1) {
+            addrs.splice(addrIndex, 1);
+
+            delete this.subscriptions.emitterAddressesBalance[this.getUniqueAddressKey(emitter, addr)];
+
+            if (addrs.length === 0) {
+
+                delete this.subscriptions.emitterAddresses[uniqueKey];
+
+                if (this.subscriptions.contract_address[addressContract]) {
+
+                    let emitterIndex = this.subscriptions.contract_address[addressContract].indexOf(emitter);
+                    this.subscriptions.contract_address[addressContract].splice(emitterIndex, 1);
+
+                    if (this.subscriptions.contract_address[addressContract].length === 0) {
+                        delete this.subscriptions.contract_address[addressContract];
+                    }
+
+                }
+
+            }
+
+        }
+    }
 
     unsubscribeAddressAll(emitter) {
 
@@ -315,19 +315,18 @@ class TokenBalanceChangeEvents {
 
     }
 
+    runBalanceCheckerByTimeout() {
+        setTimeout(() => {
+            this.runBalanceChecker();
+        }, BALANCE_CHECKER_TIMER_MS);
+    }
+
     runBalanceChecker() {
 
-        let contracts = Object.keys(this.subscriptions.contract_address),
-            self = this;
-
-        function runChecker() {
-            setTimeout(() => {
-                self.runBalanceChecker();
-            }, BALANCE_CHECKER_TIMER_MS);
-        }
+        let contracts = Object.keys(this.subscriptions.contract_address);
 
         if (!contracts.length) {
-            return runChecker();
+            return this.runBalanceCheckerByTimeout();
         }
 
         return async.eachSeries(contracts, (contractAddress, callback) => {
@@ -367,7 +366,7 @@ class TokenBalanceChangeEvents {
             }
 
         }, () => {
-            return runChecker();
+            return this.runBalanceCheckerByTimeout();
         });
 
     }

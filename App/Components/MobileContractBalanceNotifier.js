@@ -156,7 +156,7 @@ class MobileContractBalanceNotifier {
         message.addNotification('body', 'Balance Token changed!');
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
-        message.addNotification('color', '#a57eec');
+        message.addNotification('color', '#2e9ad0');
 
         message.addData('contract_address', contractAddress);
         message.addData('balances', balances);

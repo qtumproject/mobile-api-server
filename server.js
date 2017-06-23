@@ -7,8 +7,10 @@ let async = require('async'),
 	log4js = require('log4js'),
 	logger = log4js.getLogger('Server js'),
 	dir = require('node-dir'),
-	moment = require('moment'),
-    DB = require('./App/Components/DB');
+	moment = require('moment');
+
+const mongoose = require('mongoose');
+const bluebird = require('bluebird');
 
 let Raven = null;
 if(!config.disableRaven) {
@@ -33,10 +35,10 @@ let Server = {
 
         let configDB = config.DB,
             userUrl = (configDB['USER']) ? (configDB['USER'] + ':' + configDB['PASSWORD'] + '@') : '',
-            url = 'mongodb://' + userUrl + configDB['HOST'] + ':' + configDB['PORT'] + '/' + configDB['DATABASE'],
-            db = new DB(url);
+            url = 'mongodb://' + userUrl + configDB['HOST'] + ':' + configDB['PORT'] + '/' + configDB['DATABASE'];
 
-        db.connect((err) => {
+        mongoose.Promise = bluebird;
+        mongoose.connect(url, (err) => {
 
             if (err) {
                 return cb(err);

@@ -62,48 +62,15 @@ class SocketController {
             logger.info(remoteAddress, 'Web socket subscribe:', name, params, nextToken, prevTokenId);
 
             switch (name) {
+                case 'balance':
                 case 'balance_subscribe':
 
-                    if (!_.isArray(params) || !params.length) {
-                        return false;
-                    }
-
-                    this.events.qtumRoomEvents.subscribeAddress(socket, params);
-
-                    if (nextToken) {
-                        this.mobileAddressBalanceNotifier.subscribeAddress(nextToken, prevTokenId, params);
-                    }
+                    this.subscribe_balance_change(params, nextToken, prevTokenId);
 
                     break;
                 case 'token_balance_change':
 
-                    if (!_.isObject(params) || !params.contract_address || !_.isString(params.contract_address) || !params.addresses || !_.isArray(params.addresses) || !params.addresses.length) {
-                        return false;
-                    }
-
-                    let validAddresses = [],
-                        addresses = params.addresses,
-                        contractAddress = params.contract_address;
-
-                    for(let i = 0; i < addresses.length; i++) {
-
-                        if (Address.isValid(addresses[i], config.NETWORK)) {
-                            validAddresses.push(addresses[i]);
-                        } else {
-                            logger.info('not valid address', contractAddress, addresses[i]);
-                        }
-
-                    }
-
-                    if (!validAddresses.length) {
-                        return false;
-                    }
-
-                    this.events.tokenBalanceEvents.subscribeAddress(socket, params);
-
-                    if (nextToken && validAddresses.length) {
-                        this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(nextToken, prevTokenId, contractAddress, validAddresses);
-                    }
+                    this.subscribe_token_balance_change(params, nextToken, prevTokenId);
 
                     break;
             }
@@ -115,22 +82,15 @@ class SocketController {
             logger.info(remoteAddress, 'Web socket unsubscribe:', name);
 
             switch (name) {
+                case 'balance':
                 case 'balance_subscribe':
 
-                    this.events.qtumRoomEvents.unsubscribeAddress(socket, params);
-
-                    if (tokenId) {
-                        this.mobileAddressBalanceNotifier.unsubscribeAddress(tokenId, params);
-                    }
+                    this.unsubscribe_balance(params, tokenId);
 
                     break;
                 case 'token_balance_change':
 
-                    this.events.tokenBalanceEvents.unsubscribeAddress(socket, params);
-
-                    if (_.isObject(params) && tokenId) {
-                        this.mobileContractBalanceNotifier.unsubscribeMobileTokenBalance(tokenId, params.contract_address, params.addresses, () => {});
-                    }
+                    this.unsubscribe_token_balance(params, tokenId);
 
                     break;
             }
@@ -148,10 +108,68 @@ class SocketController {
 
     }
 
+    subscribe_balance_change(params, nextToken, prevTokenId) {
+        if (!_.isArray(params) || !params.length) {
+            return false;
+        }
+
+        this.events.qtumRoomEvents.subscribeAddress(socket, params);
+
+        if (nextToken) {
+            this.mobileAddressBalanceNotifier.subscribeAddress(nextToken, prevTokenId, params);
+        }
+    }
+
+    subscribe_token_balance_change(params, nextToken, prevTokenId) {
+
+        if (!_.isObject(params) || !params.contract_address || !_.isString(params.contract_address) || !params.addresses || !_.isArray(params.addresses) || !params.addresses.length) {
+            return false;
+        }
+
+        let validAddresses = [],
+            addresses = params.addresses,
+            contractAddress = params.contract_address;
+
+        for(let i = 0; i < addresses.length; i++) {
+
+            if (Address.isValid(addresses[i], config.NETWORK)) {
+                validAddresses.push(addresses[i]);
+            } else {
+                logger.info('not valid address', contractAddress, addresses[i]);
+            }
+
+        }
+
+        if (!validAddresses.length) {
+            return false;
+        }
+
+        this.events.tokenBalanceEvents.subscribeAddress(socket, params);
+
+        if (nextToken && validAddresses.length) {
+            this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(nextToken, prevTokenId, contractAddress, validAddresses);
+        }
+    }
+
+    unsubscribe_balance(params, tokenId) {
+        this.events.qtumRoomEvents.unsubscribeAddress(socket, params);
+
+        if (tokenId) {
+            this.mobileAddressBalanceNotifier.unsubscribeAddress(tokenId, params);
+        }
+    }
+
+    unsubscribe_token_balance(params, tokenId) {
+        this.events.tokenBalanceEvents.unsubscribeAddress(socket, params);
+
+        if (_.isObject(params) && tokenId) {
+            this.mobileContractBalanceNotifier.unsubscribeMobileTokenBalance(tokenId, params.contract_address, params.addresses, () => {});
+        }
+    }
+
     _getRemoteAddress(socket) {
         return socket.client.request.headers['cf-connecting-ip'] || socket.conn.remoteAddress;
     };
-
 }
 
 Controllers.socket = new SocketController();

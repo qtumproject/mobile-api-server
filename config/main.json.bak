@@ -1,4 +1,5 @@
 {
+    "ENVIRONMENT": "DEV",
 	"INSIGHT_API_SOCKET_SERVER": "http://localhost:3001",
 	"INSIGHT_API_URL": "http://localhost:3001/insight-api",
 	"NETWORK": "testnet",
