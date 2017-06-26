@@ -115,6 +115,12 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Array} addresses
+     * @param {String} txid
+     * @param {Object} options
+     */
     notifyNewTransaction(addresses, txid, options) {
 
         if (!addresses || !addresses.length) {
@@ -129,6 +135,10 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     */
     notifyBalanceChanged(addresses) {
 
         if (!addresses || !addresses.length) {
@@ -143,6 +153,12 @@ class QtumRoomEvents {
 
     }
 
+    /**
+     *
+     * @param {Array.<Object>} emitters - Socket emitters
+     * @param {String} txid
+     * @param {{withHeight: Boolean}} options
+     */
     notifyNewTransactionEmitters(emitters, txid, options) {
 
         let withHeight = options.withHeight;

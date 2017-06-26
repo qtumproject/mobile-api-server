@@ -6,12 +6,69 @@ class MobileAddressBalanceRepository {
 
     /**
      *
+     * @param {String} address
+     * @param {Function} next
+     * @returns {*}
+     */
+    static fetchByAddress(address, next) {
+        return MobileAddressBalance.findOne({address: address}, (err, address) => {
+            return next(err, address);
+        });
+    }
+
+    /**
+     *
+     * @param {String} address
+     * @param {String} tokenId
+     * @param {String} language
+     * @param {Function} next
+     * @returns {*}
+     */
+    static addTokenToAddress(address, tokenId, language, next) {
+
+        return MobileAddressBalance.update(
+            {address: address},
+            {$push: {tokens: {
+                token: tokenId,
+                language: language
+            }}},
+            (err, key) => {
+                return next(err, key);
+            }
+        );
+
+    }
+
+    /**
+     *
+     * @param {String} address
+     * @param {String} tokenId
+     * @param {String} language
+     * @param {Function} next
+     * @returns {*}
+     */
+    static createAddressWithToken(address, tokenId, language, next) {
+
+        return MobileAddressBalance.create({
+            address: address,
+            tokens: [{
+                token: tokenId,
+                language: language
+            }]
+        }, (err, key) => {
+            return next(err, key);
+        });
+
+    }
+
+    /**
+     *
      * @param {Array.<String>} addresses
      * @param {Function} next
      * @returns {*}
      */
     static fetchByAddresses(addresses, next) {
-        return MobileAddressBalance.find({'addresses.address': {$in: addresses}}, (err, tokens) => {
+        return MobileAddressBalance.find({address: addresses}, (err, tokens) => {
             return next(err, tokens);
         });
     }
@@ -19,65 +76,86 @@ class MobileAddressBalanceRepository {
     /**
      *
      * @param {String} tokenId
+     * @param {Array.<String>|null} addresses
      * @param {Function} next
      * @returns {*}
      */
-    static fetchById(tokenId, next) {
-        return MobileAddressBalance.findOne({token_id: tokenId}, (err, token) => {
-            return next(err, token);
+    static fetchAddresses(tokenId, addresses, next) {
+
+        if (addresses) {
+            return MobileAddressBalance.find({'tokens.token': {$in: [tokenId]}, address: {$in: addresses}}, (err, addressObjects) => {
+                return next(err, addressObjects);
+            });
+        }
+
+        return MobileAddressBalance.find({'tokens.token': {$in: [tokenId]}}, (err, addressObjects) => {
+            return next(err, addressObjects);
         });
     }
 
     /**
      *
      * @param {String} tokenId
-     * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {Array.<String>} addresses
+     * @param {String} language
      * @param {Function} next
      * @returns {*}
      */
-    static createOrUpdateToken(tokenId, addresses, next) {
+    static createOrUpdateAddresses(tokenId, addresses, language, next) {
 
         return async.waterfall([(callback) => {
-            return MobileAddressBalanceRepository.fetchById(tokenId, (err, token) => {
-                return callback(err, token);
+            return MobileAddressBalanceRepository.fetchAddresses(tokenId, null, (err, savedAddresses) => {
+                return callback(err, savedAddresses);
             });
-        }, (token, callback) => {
+        }, (savedAddresses, callback) => {
 
             let newAddresses = [];
 
-            if (token) {
+            if (savedAddresses.length) {
 
                 let addressHash = {};
 
-                token.addresses.forEach((addressObject) => {
+                savedAddresses.forEach((addressObject) => {
                     addressHash[addressObject.address] = addressObject
                 });
 
-                addresses.forEach((addressObject) => {
-                    if (!addressHash[addressObject.address]) {
-                        newAddresses.push(addressObject);
+                addresses.forEach((address) => {
+                    if (!addressHash[address]) {
+                        newAddresses.push(address);
                     }
                 });
 
-                if (!newAddresses.length) {
-                    return callback();
-                }
-
-                return MobileAddressBalanceRepository.updateTokenAddresses(tokenId, newAddresses, (err, key) => {
-                    return callback(err, key);
-                });
-
             } else {
-
-                addresses.forEach((addressObject) => {
-                    newAddresses.push(addressObject);
-                });
-
-                return MobileAddressBalanceRepository.createToken(tokenId, newAddresses, (err, key) => {
-                    return callback(err, key);
-                });
-
+                newAddresses = addresses;
             }
+
+            if (!newAddresses.length) {
+                return callback();
+            }
+
+            return async.each(newAddresses, (address, callback) => {
+
+                return async.waterfall([(callback) => {
+                    return MobileAddressBalanceRepository.fetchByAddress(address, (err, addressObject) => {
+                        return callback(err, addressObject);
+                    });
+                }, (addressObject, callback) => {
+
+                    if (addressObject) {
+                        return MobileAddressBalanceRepository.addTokenToAddress(address, tokenId, language, (err) => {
+                            return callback(err);
+                        });
+                    }
+
+                    return MobileAddressBalanceRepository.createAddressWithToken(address, tokenId, language, (err) => {
+                        return callback(err);
+                    });
+
+                }], (err) => {
+                    return callback(err);
+                });
+
+            });
 
         }], (err) => {
             return next(err);
@@ -94,104 +172,40 @@ class MobileAddressBalanceRepository {
      */
     static deleteToken(tokenId, addresses, next) {
 
-        if (!addresses) {
-
-            return MobileAddressBalance.remove({token_id: tokenId}, (err, token) => {
-                return next(err, token);
-            });
-
-        }
-
         return async.waterfall([(callback) => {
-            return MobileAddressBalance.findOne({token_id: tokenId}, (err, token) => {
-                return callback(err, token)
+            return MobileAddressBalanceRepository.fetchAddresses(tokenId, addresses, (err, addresses) => {
+                return callback(err, addresses);
             });
-        }, (token, callback) => {
+        }, (addresses, callback) => {
 
-            if (!token) {
+            if (!addresses.length) {
                 return callback(null);
             }
 
-            let currentAddresses = token.addresses.map((addressObject) => {
-                return addressObject.address;
-            });
+            return async.each(addresses, (addressObject, callback) => {
 
-            let newArray = _.difference(currentAddresses, addresses);
+                let tokens = _.uniqBy(addressObject.tokens, 'token');
 
-            if (newArray.length) {
-
-                return MobileAddressBalance.update({token_id: tokenId}, {$pull: { addresses: {address: {$in: addresses}} }}, (err, token) => {
-                    if (err) {
+                if (tokens.length === 1) {
+                    return MobileAddressBalance.remove({address: addressObject.address}, (err, token) => {
                         return callback(err, token);
-                    }
-                });
+                    });
+                } else {
+                    return MobileAddressBalance.update({address: addressObject.address}, {$pull: {tokens: {token: {$in: [tokenId]}}}}, (err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                    });
+                }
 
-            } else {
-
-                return MobileAddressBalance.remove({token_id: tokenId}, (err, token) => {
-                    return callback(err, token);
-                });
-
-            }
+            }, (err) => {
+                return callback(err);
+            });
 
         }], (err) => {
             return next(err);
         });
 
-    }
-
-    /**
-     *
-     * @param {String} tokenId
-     * @param {Array.<{address: String, balance: Number}>} addresses
-     * @param {Function} next
-     * @returns {*}
-     */
-    static createToken(tokenId, addresses, next) {
-
-        return MobileAddressBalance.create({
-            token_id: tokenId,
-            addresses: addresses
-        }, (err, key) => {
-            return next(err, key);
-        });
-
-    }
-
-    /**
-     *
-     * @param {String} tokenId
-     * @param {Array.<{address: String, balance: Number}>} addresses
-     * @param {Function} next
-     * @returns {*}
-     */
-    static updateTokenAddresses(tokenId, addresses, next) {
-
-        return MobileAddressBalance.update(
-            {token_id: tokenId},
-            {$push: {addresses: {$each: addresses}}},
-            (err, key) => {
-                return next(err, key);
-            }
-        );
-
-    }
-
-    /**
-     *
-     * @param {String} prevToken
-     * @param {String} nextToken
-     * @param {Function} next
-     * @returns {*}
-     */
-    static updateTokenId(prevToken, nextToken, next) {
-        return MobileAddressBalance.update(
-            {token_id: prevToken},
-            {token_id: nextToken},
-            (err, key) => {
-                return next(err, key);
-            }
-        );
     }
 
 }

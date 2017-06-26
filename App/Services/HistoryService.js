@@ -6,6 +6,14 @@ let async = require('async');
 
 class HistoryService {
 
+    /**
+     *
+     * @param {Object} history
+     * @param {Array.<Object>} history.items
+     * @param {Number} history.totalItems
+     * @param next
+     * @returns {*}
+     */
     static formatHistory(history, next) {
 
         if (!history || !history.items || !history.items.length) {
@@ -38,10 +46,16 @@ class HistoryService {
 
     }
 
+    /**
+     *
+     * @param {Object} item
+     * @param {Function} cb
+     * @returns {*}
+     */
     static formatHistoryItem(item, cb) {
         let vout = [],
             vin = [],
-            addressString;
+            addressString = null;
 
         if (item.vin) {
             item.vin.forEach((vIn) => {
@@ -119,6 +133,7 @@ class HistoryService {
         });
 
     }
+
 }
 
 module.exports = HistoryService;

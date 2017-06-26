@@ -4,6 +4,12 @@ const InsightApiRepository = require('../Repositories/InsightApiRepository');
 
 class TransactionService {
 
+    /**
+     *
+     * @param {String} txId
+     * @param {Function} next
+     * @returns {*}
+     */
     static getTransaction(txId, next) {
 
         return async.waterfall([
@@ -28,6 +34,7 @@ class TransactionService {
         });
 
     }
+
 }
 
 module.exports = TransactionService;

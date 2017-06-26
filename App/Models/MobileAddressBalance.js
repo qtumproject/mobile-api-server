@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
 const mobileAddressBalanceSchema = new mongoose.Schema({
-    token_id: {
+    address: {
         type: String,
-        required: true
+        required: true,
+        index: {unique: true}
     },
-    addresses: {
-        type: [{address: String, balance: Number}],
+    tokens: {
+        type: [{token: String, language: String}],
         required: true
     }
 }, {
@@ -15,8 +16,6 @@ const mobileAddressBalanceSchema = new mongoose.Schema({
         updatedAt: 'updated_at'
     }
 });
-
-mobileAddressBalanceSchema.index({ token_id: 1}, { unique: true });
 
 const MobileAddressBalance = mongoose.model('MobileAddressBalance', mobileAddressBalanceSchema);
 

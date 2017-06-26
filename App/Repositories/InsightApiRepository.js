@@ -4,6 +4,11 @@ let request = require('request'),
 
 class InsightApiRepository {
 
+    /**
+     *
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getInfo(cb) {
         return request.get({
             url: config.INSIGHT_API_URL + '/status?q=getInfo',
@@ -13,6 +18,12 @@ class InsightApiRepository {
             });
     }
 
+    /**
+     *
+     * @param {String} txid
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getTrx(txid, cb) {
         return request.get({
             url: config.INSIGHT_API_URL + `/tx/${txid}`,
@@ -28,6 +39,13 @@ class InsightApiRepository {
         });
     }
 
+    /**
+     *
+     * @param {String} rawtx
+     * @param {Boolean} allowAbsurdFees
+     * @param {Function} cb
+     * @returns {*}
+     */
     static sendRawTransaction(rawtx, allowAbsurdFees, cb) {
         return request.post({
                 url: config.INSIGHT_API_URL + '/tx/send',
@@ -56,6 +74,12 @@ class InsightApiRepository {
 
     }
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getUnspentAddresses(addresses, cb) {
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/utxo`,
@@ -65,6 +89,15 @@ class InsightApiRepository {
             });
     }
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     * @param {Object} options
+     * @param {Number} options.from
+     * @param {Number} options.to
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getAddressesHistory(addresses, options, cb) {
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/txs?from=${options.from}&to=${options.to}`,
@@ -79,6 +112,12 @@ class InsightApiRepository {
         });
     }
 
+    /**
+     *
+     * @param {Array.<String>} addresses
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getAddressesBalance(addresses, cb) {
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/balance`,
@@ -88,6 +127,13 @@ class InsightApiRepository {
         });
     }
 
+    /**
+     *
+     * @param {String} address
+     * @param {String} hash
+     * @param {Function} cb
+     * @returns {*}
+     */
     static callContract(address, hash, cb) {
 
         return request.get({
@@ -104,6 +150,12 @@ class InsightApiRepository {
         });
     }
 
+    /**
+     *
+     * @param {String} address
+     * @param {Function} cb
+     * @returns {*}
+     */
     static getAccountInfo(address, cb) {
 
         return request.get({
@@ -119,6 +171,7 @@ class InsightApiRepository {
 
         });
     }
+
 }
 
 module.exports = InsightApiRepository;

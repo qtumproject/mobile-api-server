@@ -1,0 +1,6 @@
+{
+  "notification": {
+    "title": "QTUM",
+    "body": "Payment received: {{amount}} QTUM"
+  }
+}

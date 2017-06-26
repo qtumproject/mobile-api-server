@@ -5,6 +5,8 @@ const MobileAddressBalanceRepository = require("../Repositories/MobileAddressBal
 const async = require('async');
 const config = require('../../config/main.json');
 const gcm = require('node-gcm');
+const BigNumber = require('bignumber.js');
+const i18n = require("i18n");
 
 class MobileAddressBalanceNotifier {
 
@@ -40,28 +42,48 @@ class MobileAddressBalanceNotifier {
 
             if (data && data.transactions) {
 
-                let addresses = {};
+                let addressesHash = {};
 
                 data.transactions.forEach((transaction) => {
 
-                    if (transaction.vout) {
-                        transaction.vout.forEach((vOut) => {
-                            if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
-                                addresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
-                            }
-                        });
-                    }
+                    let vinAddresses = {};
 
                     if (transaction.vin) {
                         transaction.vin.forEach((vIn) => {
                             if (vIn.addr) {
-                                addresses[vIn.addr] = vIn.addr;
+                                vinAddresses[vIn.addr] = vIn.addr;
                             }
                         });
                     }
+
+                    if (transaction.vout) {
+                        transaction.vout.forEach((vOut) => {
+                            if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
+
+                                if (!vinAddresses[vOut.scriptPubKey.addresses[0]]) {
+
+                                    if (!addressesHash[vOut.scriptPubKey.addresses[0]]) {
+                                        addressesHash[vOut.scriptPubKey.addresses[0]] = {
+                                            amount: new BigNumber(vOut.value),
+                                            transactions: []
+                                        };
+                                    } else {
+                                        addressesHash[vOut.scriptPubKey.addresses[0]].amount = addressesHash[vOut.scriptPubKey.addresses[0]].amount.plus(new BigNumber(vOut.value));
+                                    }
+
+                                    if (addressesHash[vOut.scriptPubKey.addresses[0]].transactions.indexOf(transaction.txid) === -1) {
+                                        addressesHash[vOut.scriptPubKey.addresses[0]].transactions.push(transaction.txid);
+                                    }
+
+                                }
+
+                            }
+                        });
+                    }
+
                 });
 
-                return this.notifyBalanceChanged(Object.keys(addresses));
+                return this.notifyBalanceChanged(addressesHash);
 
             }
 
@@ -69,14 +91,25 @@ class MobileAddressBalanceNotifier {
 
     }
 
-    getMessage() {
+    /**
+     *
+     * @param {Object} data
+     * @param {BigNumber} data.amount
+     * @param {Array.<String>} data.transactions
+     * @param {String} language
+     * @returns {*}
+     */
+    getMessage(data, language) {
         let message = new gcm.Message();
 
-        message.addNotification('title', 'QTUM');
-        message.addNotification('body', 'Balance changed!');
+        message.addNotification('title', i18n.__({phrase: 'notification.title', locale: language}));
+        message.addNotification('body', i18n.__({phrase: 'notification.body', locale: language}, {amount: data.amount.toString(10)}));
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
         message.addNotification('color', '#2e9ad0');
+
+        message.addData('type', 'balance');
+        message.addData('transactions', data.transactions);
 
         return message;
 
@@ -84,58 +117,83 @@ class MobileAddressBalanceNotifier {
 
     /**
      *
-     * @param {Array.<String>} addresses
+     * @param {Object.<String, {amount: BigNumber, transactions: Array.<String>}>} addressesHash
      * @returns {*}
      */
-    notifyBalanceChanged(addresses) {
+    notifyBalanceChanged(addressesHash) {
+
+        let addresses = Object.keys(addressesHash);
 
         if (!addresses || !addresses.length) {
             return;
         }
 
         return async.waterfall([(callback) => {
-            return MobileAddressBalanceRepository.fetchByAddresses(addresses, (err, tokens) => {
-                return callback(err, tokens)
+            return MobileAddressBalanceRepository.fetchByAddresses(addresses, (err, addresses) => {
+                return callback(err, addresses);
             });
-        }, (tokens, callback) => {
+        }, (addresses, callback) => {
 
-            if (!tokens.length) {
+            if (!addresses.length) {
                 return callback();
             }
 
-            return async.waterfall([(callback) => {
+            return async.each(addresses, (addressObject, callback) => {
 
-                let message = this.getMessage(),
-                    notifyTokens = [];
+                let languageHash = {};
 
-                tokens.forEach((tokenObject) => {
-                    notifyTokens.push(tokenObject.token_id);
-                });
+                addressObject.tokens.forEach((tokenObject) => {
 
-                return this.notifier.send(message, { registrationTokens: notifyTokens}, (err, response) => {
-                    return callback(err, response, notifyTokens);
-                });
-
-            }, (response, notifyTokens, callback) => {
-
-                logger.info(response);
-
-                if (!response.failure) {
-                    logger.info('Done', notifyTokens);
-                    return callback();
-                }
-
-                return async.eachOfSeries(response.results, (res, idx, callback) => {
-
-                    let tokenId = notifyTokens[idx];
-
-                    if (!res.error) {
-                        return callback();
+                    if (!languageHash[tokenObject.language]) {
+                        languageHash[tokenObject.language] = [];
                     }
 
-                    logger.info('Failure. Delete token..', tokenId);
+                    languageHash[tokenObject.language].push(tokenObject.token);
 
-                    return MobileAddressBalanceRepository.deleteToken(tokenId, null, (err) => {
+                });
+
+                let languageKeys = Object.keys(languageHash);
+
+                return async.each(languageKeys, (languageKey, callback) => {
+
+                    let notifyTokens = languageHash[languageKey];
+
+                    return async.waterfall([(callback) => {
+
+                        let message = this.getMessage(addressesHash[addressObject.address], languageKey);
+
+                        return this.notifier.send(message, { registrationTokens: notifyTokens}, (err, response) => {
+                            return callback(err, response, notifyTokens);
+                        });
+
+                    }, (response, notifyTokens, callback) => {
+
+                        logger.info(response);
+
+                        if (!response.failure) {
+                            logger.info('Done', notifyTokens);
+                            return callback();
+                        }
+
+                        return async.eachOfSeries(response.results, (res, idx, callback) => {
+
+                            let notificationToken = notifyTokens[idx];
+
+                            if (!res.error) {
+                                return callback();
+                            }
+
+                            logger.info('Failure. Delete token..', notificationToken);
+
+                            return MobileAddressBalanceRepository.deleteToken(notificationToken, null, (err) => {
+                                return callback(err);
+                            });
+
+                        }, (err) => {
+                            return callback(err);
+                        });
+
+                    }], (err) => {
                         return callback(err);
                     });
 
@@ -143,7 +201,7 @@ class MobileAddressBalanceNotifier {
                     return callback(err);
                 });
 
-            }], (err) => {
+            }, (err) => {
                 return callback(err);
             });
 
@@ -164,21 +222,27 @@ class MobileAddressBalanceNotifier {
 
     /**
      *
-     * @param {String} tokenId
-     * @param {String} prevTokenId
      * @param {Array.<String>} addresses
+     * @param {Object} options
+     * @param {String|null} options.notificationToken
+     * @param {String|null} options.prevToken
+     * @param {String|null} options.language
      * @returns {*}
      */
-    subscribeAddress(tokenId, prevTokenId, addresses) {
+    subscribeAddress(addresses, options) {
+
+        let notificationToken = options.notificationToken,
+            prevToken = options.prevToken,
+            language = options.language;
 
         if (!_.isArray(addresses)) {
             return false;
         }
 
-        return async.waterfall([(callback)=> {
+        return async.waterfall([(callback) => {
 
-            if (prevTokenId) {
-                return MobileAddressBalanceRepository.deleteToken(prevTokenId, null, (err) => {
+            if (prevToken) {
+                return MobileAddressBalanceRepository.deleteToken(prevToken, null, (err) => {
                     return callback(err);
                 });
             } else {
@@ -186,82 +250,14 @@ class MobileAddressBalanceNotifier {
             }
 
         }, (callback) => {
-            return MobileAddressBalanceRepository.fetchById(tokenId, (err, token) => {
-                return callback(err, token);
-            });
-        }, (token, callback) => {
 
-            let newAddresses = [],
-                newAddressesObjects = [];
-
-            if (token) {
-
-                let addressHash = {};
-
-                token.addresses.forEach((addressObject) => {
-                    addressHash[addressObject.address] = addressObject
-                });
-
-                addresses.forEach((address) => {
-                    if (!addressHash[address]) {
-                        newAddresses.push(address);
-                    }
-                });
-
-            } else {
-
-                addresses.forEach((address) => {
-                    newAddresses.push(address);
-                });
-
-            }
-
-            if (!newAddresses.length) {
-                return callback();
-            }
-
-            return async.eachSeries(newAddresses, (address, callback) => {
-
-                return InsightApiRepository.getAddressesBalance([address], (err, data) => {
-
-                    if (err) {
-                        return false;
-                    }
-
-                    let balance;
-
-                    if (err || !data) {
-                        balance = {
-                            address: address,
-                            balance: 0
-                        };
-                    } else {
-                        balance = {
-                            address: address,
-                            balance: data.balance
-                        };
-                    }
-
-                    newAddressesObjects.push(balance);
-
-                    return callback(err);
-
-                });
-
-            }, (err) => {
-
-                if (err) {
+            return MobileAddressBalanceRepository.createOrUpdateAddresses(notificationToken,
+                addresses,
+                language,
+                (err) => {
                     return callback(err);
                 }
-
-                return MobileAddressBalanceRepository.createOrUpdateToken(tokenId,
-                    newAddressesObjects,
-                    (err) => {
-                        return callback(err);
-                    }
-                );
-
-            });
+            );
 
         }], (err) => {
 
@@ -270,7 +266,7 @@ class MobileAddressBalanceNotifier {
                 return false;
             }
 
-            return logger.info('Subscribe Mobile:', 'balance_change', tokenId);
+            return logger.info('Subscribe Mobile:', 'balance_change', notificationToken);
 
         });
 
@@ -278,13 +274,13 @@ class MobileAddressBalanceNotifier {
 
     /**
      *
-     * @param {String} tokenId
+     * @param {String} notificationToken
      * @param {Array.<String>|null} addresses
      * @returns {*}
      */
-    unsubscribeAddress(tokenId, addresses) {
-        return MobileAddressBalanceRepository.deleteToken(tokenId, addresses, () => {
-            return logger.info('unsubscribe:', 'balance_subscribe', tokenId, addresses);
+    unsubscribeAddress(notificationToken, addresses) {
+        return MobileAddressBalanceRepository.deleteToken(notificationToken, addresses, () => {
+            return logger.info('unsubscribe:', 'balance_subscribe', notificationToken, addresses);
         });
     };
 

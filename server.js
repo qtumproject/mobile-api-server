@@ -11,6 +11,7 @@ let async = require('async'),
 
 const mongoose = require('mongoose');
 const bluebird = require('bluebird');
+const i18n = require("i18n");
 
 let Raven = null;
 if(!config.disableRaven) {
@@ -23,6 +24,7 @@ let Server = {
 	controllers: {},
 	init: function() {
 		async.waterfall([
+			this.setLocale,
             this.connectToDB,
 			this.runControllers,
 			this.bindDefault,
@@ -30,6 +32,15 @@ let Server = {
 		], function() {
 			logger.info('Server runned');
 		});
+	},
+	setLocale(cb) {
+        i18n.configure({
+            locales:['en', 'es', 'de', 'cn'],
+            directory: __dirname + '/locales',
+            objectNotation: true
+        });
+
+        return cb();
 	},
     connectToDB(cb) {
 

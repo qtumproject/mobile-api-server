@@ -5,6 +5,11 @@ const crypto = require('crypto');
 
 class ContractsHelper {
 
+    /**
+     *
+     * @param {String} str
+     * @returns {boolean}
+     */
     static isContractVOutHex(str) {
 
        try {
@@ -20,6 +25,11 @@ class ContractsHelper {
 
     }
 
+    /**
+     *
+     * @param {String} txid
+     * @param {Number} num
+     */
     static getContractAddress(txid, num) {
 
         let reverseTxId = txid.match(/.{2}/g).reverse().join(""),

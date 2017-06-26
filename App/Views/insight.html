@@ -3,9 +3,8 @@
 <script src="http://localhost:3001/socket.io/socket.io.js"></script>
 <script>
 
-    room = 'inv'
-
     var socket = io("http://localhost:3001/");
+
     socket.on('connect', function() {
         // Join the room.
         socket.emit('subscribe', 'qtum');
@@ -13,11 +12,12 @@
 
     socket.on('qtum/tx', function(data) {
         console.log("New transaction received: ", data)
-    })
+    });
 
     socket.on('qtum/block', function(data) {
         console.log("Block received: ", data)
-    })
+    });
+
 </script>
 </body>
 </html>

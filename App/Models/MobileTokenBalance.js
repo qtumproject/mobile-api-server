@@ -12,6 +12,11 @@ const mobileTokenSchema = new mongoose.Schema({
     addresses: {
         type: [{address: String, balance: Number}],
         required: true
+    },
+    language: {
+        type: String,
+        required: true,
+        default: 'en'
     }
 }, {
     timestamps: {

@@ -5,6 +5,7 @@ const MobileTokenBalanceRepository = require('../Repositories/MobileTokenBalance
 const MobileTokenBalance = require('../Models/MobileTokenBalance');
 const config = require('../../config/main.json');
 const BALANCE_CHECKER_TIMER_MS = 60000;
+const i18n = require("i18n");
 
 class MobileContractBalanceNotifier {
 
@@ -21,13 +22,19 @@ class MobileContractBalanceNotifier {
 
     /**
      *
-     * @param {String} tokenId
-     * @param {String} prevTokenId
-     * @param {String} contractAddress
      * @param {Array.<String>} addresses
+     * @param {String} contractAddress
+     * @param {Object} options
+     * @param {String|null} options.notificationToken
+     * @param {String|null} options.prevToken
+     * @param {String|null} options.language
      * @returns {*}
      */
-    subscribeMobileTokenBalance(tokenId, prevTokenId, contractAddress, addresses) {
+    subscribeMobileTokenBalance(contractAddress, addresses, options) {
+
+        let notificationToken = options.notificationToken,
+            prevTokenId = options.prevToken,
+            language = options.language;
 
         return async.waterfall([(callback) => {
 
@@ -41,7 +48,7 @@ class MobileContractBalanceNotifier {
 
         }, (callback) => {
 
-            return MobileTokenBalanceRepository.fetchByTokenAndContract(tokenId, contractAddress, (err, token) => {
+            return MobileTokenBalanceRepository.fetchByTokenAndContract(notificationToken, contractAddress, (err, token) => {
                 return callback(err, token);
             });
 
@@ -106,16 +113,17 @@ class MobileContractBalanceNotifier {
                     return callback(err);
                 }
 
-                return MobileTokenBalanceRepository.createOrUpdateToken(tokenId,
+                return MobileTokenBalanceRepository.createOrUpdateToken(notificationToken,
                     contractAddress,
                     newAddressesObjects,
+                    language,
                     (err) => {
                         if (err) {
                             logger.error('Subscribe Mobile Error:', 'token_balance_change', err);
                             return err;
                         }
 
-                        logger.info('Subscribe Mobile:', 'token_balance_change', tokenId, contractAddress);
+                        logger.info('Subscribe Mobile:', 'token_balance_change', notificationToken, contractAddress);
 
                     }
                 );
@@ -130,14 +138,14 @@ class MobileContractBalanceNotifier {
 
     /**
      *
-     * @param {String} tokenId
-     * @param {String} contractAddress
+     * @param {String} notificationToken
+     * @param {String|null} contractAddress
      * @param {Array.<String>|null} addresses
      * @param {Function} next
      * @returns {*}
      */
-    unsubscribeMobileTokenBalance(tokenId, contractAddress, addresses, next) {
-        return MobileTokenBalanceRepository.deleteToken(tokenId, contractAddress, addresses, (err, key) => {
+    unsubscribeMobileTokenBalance(notificationToken, contractAddress, addresses, next) {
+        return MobileTokenBalanceRepository.deleteToken(notificationToken, contractAddress, addresses, (err, key) => {
             return next(err, key);
         })
     }
@@ -145,21 +153,22 @@ class MobileContractBalanceNotifier {
     /**
      *
      * @param {String} contractAddress
-     * @param {Array.<{address: String, balance: Number}>} balances
+     * @param {Number} amount
+     * @param {String} language
      * @returns {*}
      */
-    getMessage(contractAddress, balances) {
+    getMessage(contractAddress, amount, language) {
 
         let message = new gcm.Message();
 
-        message.addNotification('title', 'QTUM');
-        message.addNotification('body', 'Balance Token changed!');
+        message.addNotification('title', i18n.__({phrase: 'notification.title', locale: language}));
+        message.addNotification('body', i18n.__({phrase: 'notification.body', locale: language}, {amount: amount}));
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
         message.addNotification('color', '#2e9ad0');
 
+        message.addData('type', 'token_balance');
         message.addData('contract_address', contractAddress);
-        message.addData('balances', balances);
 
         return message;
 
@@ -167,16 +176,17 @@ class MobileContractBalanceNotifier {
 
     /**
      *
-     * @param {String} tokenId
+     * @param {String} notificationToken
      * @param {String} contractAddress
-     * @param {Array.<{address: String, balance: Number}>} balances
+     * @param {Number} amount
+     * @param {String} language
      * @param {Function} next
      */
-    notifyToken(tokenId, contractAddress, balances, next) {
+    notifyToken(notificationToken, contractAddress, amount, language, next) {
 
-        let message = this.getMessage(contractAddress, balances);
+        let message = this.getMessage(contractAddress, amount, language);
 
-        return this.notifier.send(message, { registrationTokens: [tokenId]}, (err, response) => {
+        return this.notifier.send(message, { registrationTokens: [notificationToken]}, (err, response) => {
 
             if (err) {
                 return next(err);
@@ -186,9 +196,9 @@ class MobileContractBalanceNotifier {
 
             if (response.failure) {
 
-                logger.info('Failure. Delete token..', tokenId);
+                logger.info('Failure. Delete token..', notificationToken);
 
-                return MobileTokenBalanceRepository.deleteToken(tokenId, null, null, (err) => {
+                return MobileTokenBalanceRepository.deleteToken(notificationToken, null, null, (err) => {
                     return next(err);
                 });
 
@@ -204,9 +214,8 @@ class MobileContractBalanceNotifier {
     /**
      *
      * @param {Object} diffBalances
-     * @param {Object.<String>} diffBalances.token
-     * @param {Object.<String>} diffBalances.token.contract
-     * @param {String} diffBalances.token.contract.address
+     * @param {Object.<String, Object>} diffBalances.token
+     * @param {{amount: Number, language: String}} diffBalances.token.contract
      * @param {Function} next
      * @returns {*}
      */
@@ -221,18 +230,8 @@ class MobileContractBalanceNotifier {
                 let contracts = Object.keys(diffBalances[token]);
 
                 return async.eachSeries(contracts, (contract, callback) => {
-                    let balances = [];
 
-                    for(let address in diffBalances[token][contract]) {
-                        if (diffBalances[token][contract].hasOwnProperty(address)) {
-                            balances.push({
-                                address: address,
-                                balance: diffBalances[token][contract][address]
-                            });
-                        }
-                    }
-
-                    return this.notifyToken(token, contract, balances, () => {
+                    return this.notifyToken(token, contract, diffBalances[token][contract].amount, diffBalances[token][contract].language, () => {
                         return callback();
                     });
 
@@ -265,8 +264,9 @@ class MobileContractBalanceNotifier {
             },
             (callback) => {
 
-                let tokenId = document.token_id,
-                    contractAddress = document.contract_address;
+                let notificationToken = document.token_id,
+                    contractAddress = document.contract_address,
+                    language = document.language;
 
                 return async.eachSeries(document.addresses, (addressObject, callback) => {
 
@@ -283,21 +283,29 @@ class MobileContractBalanceNotifier {
 
                             if (previousBalance !== currentBalance) {
 
-                                return MobileTokenBalanceRepository.updateTokenAddressBalance(tokenId, addressObject.id, currentBalance, (err) => {
+                                return MobileTokenBalanceRepository.updateTokenAddressBalance(notificationToken, addressObject.id, currentBalance, (err) => {
 
                                     if (err) {
                                         return callback(err);
                                     }
 
-                                    if (!diffBalances[tokenId]) {
-                                        diffBalances[tokenId] = {};
+                                    if (previousBalance < currentBalance) {
+
+                                        if (!diffBalances[notificationToken]) {
+                                            diffBalances[notificationToken] = {};
+                                        }
+
+                                        if (!diffBalances[notificationToken][contractAddress]) {
+                                            diffBalances[notificationToken][contractAddress] = {
+                                                language: language,
+                                                amount: 0
+                                            };
+                                        }
+
+                                        diffBalances[notificationToken][contractAddress].amount += (currentBalance - previousBalance);
+
                                     }
 
-                                    if (!diffBalances[tokenId][contractAddress]) {
-                                        diffBalances[tokenId][contractAddress] = {};
-                                    }
-
-                                    diffBalances[tokenId][contractAddress][address] = currentBalance;
 
                                     return callback();
 

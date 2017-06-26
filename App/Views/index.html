@@ -6,25 +6,27 @@
 Here
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io();
+    var socket = io(),
+        sum = 0;
 
-    var sum = 0;
     socket.on('token_balance_change', function(data) {
+
         data.balances.forEach(function (obj) {
             sum += obj.balance;
         });
+
         console.log(sum);
         console.log(data);
     });
 
     socket.on('balance_changed', function(data) {
-        console.log(data);
+        console.log('balance_changed', data);
     });
-
 
     /*
     * balance_subscribe
     * */
+
     socket.emit('subscribe', 'balance_subscribe', ["qLBVfrc8pjebdcmv5SYhcsjgrMCDzQT3dQ",
         "qXNPmajTB9dp3JeY7GZAE5DNyWhgtYjmB9",
         "qdQyWrN8kmgaL2ptZSoX1LKjRs1fXLmyAi",
@@ -125,8 +127,12 @@ Here
         "qQsuMEQZafj7RFfnvD5wt12m1dbhMb3mvp",
         "qMQKjqYJDFahjTiWu7syEMc6HnNjJgpXra",
         "qNo17WdKRKBAGuPw7YSpUSD95x4PmyvwFM"],
-        'eoD3HV8RYcU:APA91bEZbKQz816S-cCUAmAARBh8h_Fqk7XncwSVNeqzWaMS9yLFsNXeLWHM70hQmwSmBPfYczvavZAeYrCRiOxG3VZVmV3SVvB3JArdnZTzA-RDIXJCtwQ0fgWZD6iymx-Se4sYjQEA',
-        'f3Cp5-28K44:APA91bEbPdtjL9xA8rGaWM1-E3STzPrmwwz-S5ee2izX-shra_TD4_0YM194tnK7JKDUHlTZQzA_kf4mv5VC5qsGp5PoKzyF1HJtrJzyjQklJphKMbBsfmiKc4BBHVICpp9jyPgRJiiJ')
+         {
+//             notificationToken:'e7iYthP6DM4:APA91bHY15YneLDcAhgTEt-_Pxv2g9dooOxfuiRc0zAoYMZbZWSRQeGL3Mec0dyedFncVsmUfiS4ickDcbZKV9YqMw1ZeGc9MIbsv7Z2OJTEY7CjcWHYG8orkD3ps-dWkCwaH0afF1TV',
+             notificationToken: 'eoD3HV8RYcU:APA91bEZbKQz816S-cCUAmAARBh8h_Fqk7XncwSVNeqzWaMS9yLFsNXeLWHM70hQmwSmBPfYczvavZAeYrCRiOxG3VZVmV3SVvB3JArdnZTzA-RDIXJCtwQ0fgWZD6iymx-Se4sYjQEA',
+             language: 'es'
+         }
+    );
 
 
     /**
@@ -234,9 +240,13 @@ Here
         "qQsuMEQZafj7RFfnvD5wt12m1dbhMb3mvp",
         "qMQKjqYJDFahjTiWu7syEMc6HnNjJgpXra",
         "qNo17WdKRKBAGuPw7YSpUSD95x4PmyvwFM"]},
-        'eoD3HV8RYcU:APA91bEZbKQz816S-cCUAmAARBh8h_Fqk7XncwSVNeqzWaMS9yLFsNXeLWHM70hQmwSmBPfYczvavZAeYrCRiOxG3VZVmV3SVvB3JArdnZTzA-RDIXJCtwQ0fgWZD6iymx-Se4sYjQEA',
-        'f3Cp5-28K44:APA91bEbPdtjL9xA8rGaWM1-E3STzPrmwwz-S5ee2izX-shra_TD4_0YM194tnK7JKDUHlTZQzA_kf4mv5VC5qsGp5PoKzyF1HJtrJzyjQklJphKMbBsfmiKc4BBHVICpp9jyPgRJiiJ'
+        {
+            notificationToken:'e7iYthP6DM4:APA91bHY15YneLDcAhgTEt-_Pxv2g9dooOxfuiRc0zAoYMZbZWSRQeGL3Mec0dyedFncVsmUfiS4ickDcbZKV9YqMw1ZeGc9MIbsv7Z2OJTEY7CjcWHYG8orkD3ps-dWkCwaH0afF1TV',
+            prevToken: 'eoD3HV8RYcU:APA91bEZbKQz816S-cCUAmAARBh8h_Fqk7XncwSVNeqzWaMS9yLFsNXeLWHM70hQmwSmBPfYczvavZAeYrCRiOxG3VZVmV3SVvB3JArdnZTzA-RDIXJCtwQ0fgWZD6iymx-Se4sYjQEA',
+            language: 'en'
+        }
     );
+
 
 </script>
 </body>

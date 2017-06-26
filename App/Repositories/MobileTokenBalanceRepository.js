@@ -36,10 +36,11 @@ class MobileTokenBalanceRepository {
      * @param {String} tokenId
      * @param {String} contractAddress
      * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {String} language
      * @param {Function} next
      * @returns {*}
      */
-    static createOrUpdateToken(tokenId, contractAddress, addresses, next) {
+    static createOrUpdateToken(tokenId, contractAddress, addresses, language, next) {
 
         return async.waterfall([(callback) => {
             return MobileTokenBalanceRepository.fetchByTokenAndContract(tokenId, contractAddress, (err, token) => {
@@ -67,7 +68,7 @@ class MobileTokenBalanceRepository {
                     return callback();
                 }
 
-                return MobileTokenBalanceRepository.updateTokenAddresses(tokenId, contractAddress, newAddresses, (err, key) => {
+                return MobileTokenBalanceRepository.updateTokenAddresses(tokenId, contractAddress, newAddresses, language, (err, key) => {
                     return callback(err, key);
                 });
 
@@ -77,7 +78,7 @@ class MobileTokenBalanceRepository {
                     newAddresses.push(addressObject);
                 });
 
-                return MobileTokenBalanceRepository.createToken(tokenId, contractAddress, newAddresses, (err, key) => {
+                return MobileTokenBalanceRepository.createToken(tokenId, contractAddress, newAddresses, language, (err, key) => {
                     return callback(err, key);
                 });
 
@@ -132,6 +133,7 @@ class MobileTokenBalanceRepository {
             let newArray = _.difference(currentAddresses, addresses);
 
             if (newArray.length) {
+
                 return MobileTokenBalance.update({token_id: tokenId, contract_address: contractAddress}, {$pull: { addresses: {address: {$in: addresses}} }}, (err, token) => {
                     if (err) {
                         return callback(err, token);
@@ -157,15 +159,17 @@ class MobileTokenBalanceRepository {
      * @param {String} tokenId
      * @param {String} contractAddress
      * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {String} language
      * @param {Function} next
      * @returns {*}
      */
-    static createToken(tokenId, contractAddress, addresses, next) {
+    static createToken(tokenId, contractAddress, addresses, language, next) {
 
         return MobileTokenBalance.create({
             token_id: tokenId,
             contract_address: contractAddress,
-            addresses: addresses
+            addresses: addresses,
+            language: language
         }, (err, key) => {
             return next(err, key);
         });
@@ -177,38 +181,20 @@ class MobileTokenBalanceRepository {
      * @param {String} tokenId
      * @param {String} contractAddress
      * @param {Array.<{address: String, balance: Number}>} addresses
+     * @param {String} language
      * @param {Function} next
      * @returns {*}
      */
-    static updateTokenAddresses(tokenId, contractAddress, addresses, next) {
-
+    static updateTokenAddresses(tokenId, contractAddress, addresses, language, next) {
         return MobileTokenBalance.update(
             {token_id: tokenId, contract_address: contractAddress},
-            {$push: {addresses: {$each: addresses}}},
+            {$push: {addresses: {$each: addresses}}, language: language},
             (err, key) => {
                 return next(err, key);
             }
         );
 
     }
-
-    /**
-     *
-     * @param {String} prevToken
-     * @param {String} nextToken
-     * @param {Function} next
-     * @returns {*}
-     */
-    static updateTokenId(prevToken, nextToken, next) {
-        return MobileTokenBalance.update(
-            {token_id: prevToken},
-            {token_id: nextToken},
-            (err, key) => {
-                return next(err, key);
-            }
-        );
-    }
-
 
 }
 

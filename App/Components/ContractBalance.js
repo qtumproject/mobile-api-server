@@ -8,7 +8,14 @@ class ContractBalance {
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
     }
 
-    getBalance(contractAddress, address, cb) {
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {String} address
+     * @param {Function} next
+     * @returns {*}
+     */
+    getBalance(contractAddress, address, next) {
 
         try {
 
@@ -17,11 +24,11 @@ class ContractBalance {
                 solidityParam = this.contractsInfoService.createParam('balanceOf', [onlyAddress]);
 
             return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, [solidityParam], (err, result) => {
-                return cb(err, result);
+                return next(err, result);
             });
 
         } catch (e) {
-            return cb(e.message);
+            return next(e.message);
         }
 
     }
