@@ -122,10 +122,16 @@ class SocketController {
             options = {};
         }
 
+        let language = 'en';
+
+        if (['es', 'en', 'cn', 'de'].indexOf(options.language) !== -1) {
+            language = options.language;
+        }
+
         return {
             notificationToken: options.notificationToken || null,
             prevToken: options.prevToken || null,
-            language: options.language || 'en'
+            language: language
         };
     }
 
