@@ -1,5 +1,5 @@
 let logger = require('log4js').getLogger('History Controller'),
-    InsightApi = require("../Repositories/InsightApi"),
+    InsightApiRepository = require("../Repositories/InsightApiRepository"),
     HistoryService = require("../Services/HistoryService"),
     async = require('async');
 
@@ -21,12 +21,12 @@ class HistoryController {
 
             async.waterfall([
                 (callback) => {
-                    InsightApi.getAddressesHistory(addresses, options, (error, body) => {
+                    return InsightApiRepository.getAddressesHistory(addresses, options, (error, body) => {
                        return callback(error, body);
                     });
                 },
                 (body, callback) => {
-                    this._formatHistory(body, (err, result) => {
+                    return this._formatHistory(body, (err, result) => {
                         return callback(err, result);
                     });
                 }
@@ -35,7 +35,7 @@ class HistoryController {
             });
 
         } else {
-            this._formatHistory(null, (err, result) => {
+            return this._formatHistory(null, (err, result) => {
                 return cb(err, result);
             });
         }
@@ -48,12 +48,12 @@ class HistoryController {
 
         async.waterfall([
             (callback) => {
-                InsightApi.getAddressesHistory([data._get.address], options, (error, body) => {
+                return InsightApiRepository.getAddressesHistory([data._get.address], options, (error, body) => {
                     return callback(error, body);
                 });
         },
             (body, callback) => {
-                this._formatHistory(body, (err, result) => {
+                return this._formatHistory(body, (err, result) => {
                     return callback(err, result);
                 });
             }

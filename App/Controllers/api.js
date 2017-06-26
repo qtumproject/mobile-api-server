@@ -11,7 +11,8 @@ let async = require('async'),
 	cors = require('cors'),
 	multer = require('multer'),
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	config = require('../../config/main.json');
 
 let Controllers = getControllers();
 
@@ -55,13 +56,18 @@ let APIController = {
 
 		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
 
-        APIController.app.get('/test', (req, res) => {
-            res.sendFile(path.resolve('App/Views/index.html'));
-        });
+		if (config.ENVIRONMENT === 'DEV') {
 
-        APIController.app.get('/insight', (req, res) => {
-            res.sendFile(path.resolve('App/Views/insight.html'));
-        });
+            APIController.app.get('/test', (req, res) => {
+                res.sendFile(path.resolve('App/Views/index.html'));
+            });
+
+            APIController.app.get('/insight', (req, res) => {
+                res.sendFile(path.resolve('App/Views/insight.html'));
+            });
+
+		}
+
 
 	},
 	server: null,

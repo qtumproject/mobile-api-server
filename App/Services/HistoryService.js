@@ -1,11 +1,19 @@
 let BigNumber = require('bignumber.js');
 let ContractsHelper = require('../Helpers/ContractsHelper');
-let InsightApi = require('../Repositories/InsightApi');
+let InsightApiRepository = require('../Repositories/InsightApiRepository');
 let async = require('async');
 
 
 class HistoryService {
 
+    /**
+     *
+     * @param {Object} history
+     * @param {Array.<Object>} history.items
+     * @param {Number} history.totalItems
+     * @param next
+     * @returns {*}
+     */
     static formatHistory(history, next) {
 
         if (!history || !history.items || !history.items.length) {
@@ -17,11 +25,11 @@ class HistoryService {
 
         let items = new Array(history.items.length);
 
-        async.each(history.items, (item, callback) => {
+        return async.each(history.items, (item, callback) => {
 
             let idx = history.items.indexOf(item);
 
-            HistoryService.formatHistoryItem(item, (err, result) => {
+            return HistoryService.formatHistoryItem(item, (err, result) => {
 
                 items[idx] = result;
 
@@ -38,10 +46,16 @@ class HistoryService {
 
     }
 
+    /**
+     *
+     * @param {Object} item
+     * @param {Function} cb
+     * @returns {*}
+     */
     static formatHistoryItem(item, cb) {
         let vout = [],
             vin = [],
-            addressString;
+            addressString = null;
 
         if (item.vin) {
             item.vin.forEach((vIn) => {
@@ -104,7 +118,7 @@ class HistoryService {
             return cb(null, result);
         }
 
-        InsightApi.getAccountInfo(addressString, (err, res) => {
+        return InsightApiRepository.getAccountInfo(addressString, (err, res) => {
 
             if (err) {
                 return cb(err)
@@ -119,6 +133,7 @@ class HistoryService {
         });
 
     }
+
 }
 
 module.exports = HistoryService;

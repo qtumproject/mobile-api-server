@@ -9,6 +9,10 @@ let async = require('async'),
 	dir = require('node-dir'),
 	moment = require('moment');
 
+const mongoose = require('mongoose');
+const bluebird = require('bluebird');
+const i18n = require("i18n");
+
 let Raven = null;
 if(!config.disableRaven) {
 	Raven = require('raven');
@@ -20,7 +24,8 @@ let Server = {
 	controllers: {},
 	init: function() {
 		async.waterfall([
-			// this.runModels,
+			this.setLocale,
+            this.connectToDB,
 			this.runControllers,
 			this.bindDefault,
 			this.run
@@ -28,6 +33,33 @@ let Server = {
 			logger.info('Server runned');
 		});
 	},
+	setLocale(cb) {
+        i18n.configure({
+            locales:['en', 'es', 'de', 'cn'],
+            directory: __dirname + '/locales',
+            objectNotation: true
+        });
+
+        return cb();
+	},
+    connectToDB(cb) {
+
+        let configDB = config.DB,
+            userUrl = (configDB['USER']) ? (configDB['USER'] + ':' + configDB['PASSWORD'] + '@') : '',
+            url = 'mongodb://' + userUrl + configDB['HOST'] + ':' + configDB['PORT'] + '/' + configDB['DATABASE'];
+
+        mongoose.Promise = bluebird;
+        mongoose.connect(url, (err) => {
+
+            if (err) {
+                return cb(err);
+            }
+
+            return cb();
+
+        });
+
+    },
 	runControllers: (cb) => {
 		dir.files(__dirname + '/App/Controllers', function(err, files) {
 			if(err) throw err;

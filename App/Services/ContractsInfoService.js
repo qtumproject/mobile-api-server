@@ -1,4 +1,4 @@
-const InsightApi = require("../Repositories/InsightApi");
+const InsightApiRepository = require("../Repositories/InsightApiRepository");
 const SolidityCoder = require('../Components/Solidity/SolidityCoder');
 const async = require('async');
 const _ = require('lodash');
@@ -17,9 +17,9 @@ class ContractsInfoService {
     fetchInfoBySolidityParams(contractAddress, args, cb) {
         let result = {};
 
-        async.each(args, (param, callback) => {
+        return async.each(args, (param, callback) => {
 
-            this.call(contractAddress, param, (err, data) => {
+            return this.call(contractAddress, param, (err, data) => {
 
                 if (err) {
                     return callback(err);
@@ -27,7 +27,7 @@ class ContractsInfoService {
 
                 result[param.paramName] = data;
 
-                callback();
+                return callback();
             });
         }, (err) => {
 
@@ -45,7 +45,7 @@ class ContractsInfoService {
 
         let result;
 
-        InsightApi.callContract(contractAddress, param.hash, (err, data) => {
+        return InsightApiRepository.callContract(contractAddress, param.hash, (err, data) => {
 
             try {
 
@@ -100,7 +100,7 @@ class ContractsInfoService {
 
         return async.each(paramHashes, (paramHash, callback) => {
 
-            return InsightApi.callContract(contractAddress, paramHash, (err, data) => {
+            return InsightApiRepository.callContract(contractAddress, paramHash, (err, data) => {
 
                 if (err) {
                     return callback(err);

@@ -1,5 +1,14 @@
 {
-    "INSIGHT_API_SOCKET_SERVER": "http://localhost:3001",
-    "INSIGHT_API_URL": "http://localhost:3001/insight-api",
-    "NETWORK": "testnet"
+    "ENVIRONMENT": "DEV",
+	"INSIGHT_API_SOCKET_SERVER": "http://localhost:3001",
+	"INSIGHT_API_URL": "http://localhost:3001/insight-api",
+	"NETWORK": "testnet",
+	"DB": {
+		"HOST": "127.0.0.1",
+		"PORT": "27017",
+		"DATABASE": "server",
+		"USER": "",
+		"PASSWORD": ""
+	},
+	"FIREBASE_SERVER_TOKEN": "AAAAO8o-bCo:APA91bEc_77sI0UvagwL_j8a7-jFhA9pVzkulEtvOVnS7szQkpB8oX_Wo4oMLeeFk7Hik7t8cUQFVNDR4VgACKwyaBl7f2rP8dM94KLsbu3dg73YklYl-w6dbW5H9vGNi2lgvYzK5nqC"
 }

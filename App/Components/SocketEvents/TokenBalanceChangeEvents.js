@@ -1,8 +1,6 @@
 const _ = require('lodash');
 const async = require('async');
 const logger = require('log4js').getLogger('TokenBalanceChange Socket Events');
-const TokenInterface = require('../ContractData/TokenInterface');
-const ContractsInfoService = require('../../Services/ContractsInfoService');
 const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 const bs58 = require('bs58');
@@ -10,72 +8,45 @@ const BALANCE_CHECKER_TIMER_MS = 30000;
 
 class TokenBalanceChangeEvents {
 
-    constructor(socket) {
+    constructor(socket, contractBalanceComponent) {
         logger.info('Init');
 
         this.socket = socket;
+        this.contractBalanceComponent = contractBalanceComponent;
+
         this.subscriptions = {};
         this.subscriptions.contract_address = {};
         this.subscriptions.emitterAddresses = {};
         this.subscriptions.emitterAddressesBalance = {};
-        this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
 
         this.runBalanceChecker();
 
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {Object} data
+     * @returns {*}
+     */
     subscribeAddress(emitter, data) {
 
-        if (!_.isObject(data) || !data.contract_address || !data.addresses || !data.addresses.length) {
+        if (!_.isObject(data) || !data.contract_address || !_.isString(data.contract_address) || !data.addresses || !_.isArray(data.addresses) || !data.addresses.length) {
             return false;
         }
 
-        let self = this,
-            contract_address = data.contract_address,
-            addresses = data.addresses;
-
-        function addContractAddress(addressStr) {
-            if(self.subscriptions.contract_address[addressStr]) {
-
-                let emitters = self.subscriptions.contract_address[addressStr],
-                    index = emitters.indexOf(emitter);
-
-                if (index === -1) {
-                    self.subscriptions.contract_address[addressStr].push(emitter);
-                }
-
-            } else {
-                self.subscriptions.contract_address[addressStr] = [emitter];
-            }
-        }
-
-        function addAddress(addressContract, addr) {
-
-            let uniqueKey = self.getUniqueContractKey(emitter, addressContract);
-
-            if (self.subscriptions.emitterAddresses[uniqueKey]) {
-
-                let addrs = self.subscriptions.emitterAddresses[uniqueKey],
-                    index = addrs.indexOf(addr);
-
-                if (index === -1) {
-                    self.subscriptions.emitterAddresses[uniqueKey].push(addr);
-                }
-
-            } else {
-                self.subscriptions.emitterAddresses[uniqueKey] = [addr]
-            }
-
-            self.setEmitterAddressesBalance(emitter, addr, 0, false);
-
-        }
+        let contract_address = data.contract_address,
+            addresses = data.addresses,
+            validAddresses = [];
 
         for(let i = 0; i < addresses.length; i++) {
 
             if (Address.isValid(addresses[i], config.NETWORK)) {
 
-                addContractAddress(contract_address);
-                addAddress(contract_address, addresses[i]);
+                validAddresses.push(addresses[i]);
+
+                this.addContractAddress(emitter, contract_address);
+                this.addAddress(emitter, contract_address, addresses[i]);
 
                 logger.info('addAddress', contract_address, addresses[i]);
 
@@ -86,26 +57,62 @@ class TokenBalanceChangeEvents {
         }
 
         return this.notifyTokenBalanceChange(contract_address, emitter);
-    };
+    }
 
-    getBalance(contractAddress, address, cb) {
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} addressContract
+     * @param {String} addr
+     */
+    addAddress(emitter, addressContract, addr) {
 
-        try {
+        let uniqueKey = this.getUniqueContractKey(emitter, addressContract);
 
-            let hexAddress = new Buffer(bs58.decode(address)).toString('hex'),
-                onlyAddress = '0x' + hexAddress.slice(2, -8),
-                solidityParam = this.contractsInfoService.createParam('balanceOf', [onlyAddress]);
+        if (this.subscriptions.emitterAddresses[uniqueKey]) {
 
-            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, [solidityParam], (err, result) => {
-                return cb(err, result);
-            });
+            let addrs = this.subscriptions.emitterAddresses[uniqueKey],
+                index = addrs.indexOf(addr);
 
-        } catch (e) {
-            return cb(e.message);
+            if (index === -1) {
+                this.subscriptions.emitterAddresses[uniqueKey].push(addr);
+            }
+
+        } else {
+            this.subscriptions.emitterAddresses[uniqueKey] = [addr]
+        }
+
+        this.setEmitterAddressesBalance(emitter, addr, 0, false);
+    }
+
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} addressStr
+     */
+    addContractAddress(emitter, addressStr) {
+
+        if(this.subscriptions.contract_address[addressStr]) {
+
+            let emitters = this.subscriptions.contract_address[addressStr],
+                index = emitters.indexOf(emitter);
+
+            if (index === -1) {
+                this.subscriptions.contract_address[addressStr].push(emitter);
+            }
+
+        } else {
+            this.subscriptions.contract_address[addressStr] = [emitter];
         }
 
     }
 
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {Object} emitter - Socket emitter
+     * @returns {*}
+     */
     notifyTokenBalanceChange(contractAddress, emitter) {
 
         let uniqueKey = this.getUniqueContractKey(emitter, contractAddress),
@@ -114,7 +121,7 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.getBalance(contractAddress, address, (err, data) => {
+            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
 
                 let balance;
 
@@ -151,6 +158,12 @@ class TokenBalanceChangeEvents {
 
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {Object.<{contract_address: String, addresses: Array.<String>}>} data
+     * @returns {*}
+     */
     unsubscribeAddress(emitter, data) {
 
         if(!data) {
@@ -161,40 +174,8 @@ class TokenBalanceChangeEvents {
             return false;
         }
 
-        let self = this,
-            contract_address = data.contract_address,
+        let contract_address = data.contract_address,
             addresses = data.addresses;
-
-        function removeAddress(addressContract, addr) {
-
-            let uniqueKey = self.getUniqueContractKey(emitter, addressContract),
-                addrs = self.subscriptions.emitterAddresses[uniqueKey],
-                addrIndex = addrs.indexOf(addr);
-
-            if(addrIndex > -1) {
-                addrs.splice(addrIndex, 1);
-
-                delete self.subscriptions.emitterAddressesBalance[self.getUniqueAddressKey(emitter, addr)];
-
-                if (addrs.length === 0) {
-
-                    delete self.subscriptions.emitterAddresses[uniqueKey];
-
-                    if (self.subscriptions.contract_address[addressContract]) {
-
-                        let emitterIndex = self.subscriptions.contract_address[addressContract].indexOf(emitter);
-                        self.subscriptions.contract_address[addressContract].splice(emitterIndex, 1);
-
-                        if (self.subscriptions.contract_address[addressContract].length === 0) {
-                            delete self.subscriptions.contract_address[addressContract];
-                        }
-
-                    }
-
-                }
-
-            }
-        }
 
         if (!addresses) {
 
@@ -210,7 +191,9 @@ class TokenBalanceChangeEvents {
 
             for(let i = 0; i < addresses.length; i++) {
                 if(this.subscriptions.contract_address[contract_address] && Address.isValid(addresses[i], config.NETWORK)) {
-                    removeAddress(contract_address, addresses[i]);
+
+                    this.removeAddress(emitter, contract_address, addresses[i]);
+
                 }
             }
 
@@ -220,9 +203,54 @@ class TokenBalanceChangeEvents {
 
     };
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} addressContract
+     * @param {String} addr
+     */
+    removeAddress(emitter, addressContract, addr) {
+
+        let uniqueKey = this.getUniqueContractKey(emitter, addressContract),
+            addrs = this.subscriptions.emitterAddresses[uniqueKey],
+            addrIndex = addrs.indexOf(addr);
+
+        if(addrIndex > -1) {
+            addrs.splice(addrIndex, 1);
+
+            delete this.subscriptions.emitterAddressesBalance[this.getUniqueAddressKey(emitter, addr)];
+
+            if (addrs.length === 0) {
+
+                delete this.subscriptions.emitterAddresses[uniqueKey];
+
+                if (this.subscriptions.contract_address[addressContract]) {
+
+                    let emitterIndex = this.subscriptions.contract_address[addressContract].indexOf(emitter);
+                    this.subscriptions.contract_address[addressContract].splice(emitterIndex, 1);
+
+                    if (this.subscriptions.contract_address[addressContract].length === 0) {
+                        delete this.subscriptions.contract_address[addressContract];
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     *
+     * @param emitter - Socket emitter
+     */
     unsubscribeAddressAll(emitter) {
 
         for(let addressContract in this.subscriptions.contract_address) {
+
+            if (!this.subscriptions.contract_address.hasOwnProperty(addressContract)) {
+                continue;
+            }
 
             let emitters = this.subscriptions.contract_address[addressContract],
                 index = emitters.indexOf(emitter);
@@ -244,16 +272,22 @@ class TokenBalanceChangeEvents {
 
                 addressesForDelete.forEach((address) => {
                     delete this.subscriptions.emitterAddressesBalance[this.getUniqueAddressKey(emitter, address)];
-                })
-
+                });
 
             }
         }
 
-        logger.info('unsubscribe:', 'token_balance_change', 'total:', _.size(this.subscriptions.address));
+        logger.info('unsubscribe:', 'token_balance', 'total:', _.size(this.subscriptions.address));
 
     };
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} address
+     * @param {Number} balance
+     * @param {Boolean} ifExists
+     */
     setEmitterAddressesBalance(emitter, address, balance, ifExists) {
 
         let uniqueKey = this.getUniqueAddressKey(emitter, address);
@@ -268,13 +302,20 @@ class TokenBalanceChangeEvents {
 
     }
 
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {Array.<String>} addresses
+     * @param {Function} next
+     * @returns {*}
+     */
     checkAddressesBalances(contractAddress, addresses, next) {
 
         let balances = {};
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.getBalance(contractAddress, address, (err, data) => {
+            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
 
                 if (err || !data) {
                     balances[address] = 0;
@@ -335,19 +376,18 @@ class TokenBalanceChangeEvents {
 
     }
 
+    runBalanceCheckerByTimeout() {
+        setTimeout(() => {
+            this.runBalanceChecker();
+        }, BALANCE_CHECKER_TIMER_MS);
+    }
+
     runBalanceChecker() {
 
-        let contracts = Object.keys(this.subscriptions.contract_address),
-            self = this;
-
-        function runChecker() {
-            setTimeout(() => {
-                self.runBalanceChecker();
-            }, BALANCE_CHECKER_TIMER_MS);
-        }
+        let contracts = Object.keys(this.subscriptions.contract_address);
 
         if (!contracts.length) {
-            return runChecker();
+            return this.runBalanceCheckerByTimeout();
         }
 
         return async.eachSeries(contracts, (contractAddress, callback) => {
@@ -378,7 +418,7 @@ class TokenBalanceChangeEvents {
 
             if (allContractAddressesKeys.length) {
 
-                return this.checkAddressesBalances(contractAddress, allContractAddresses, () => {
+                return this.checkAddressesBalances(contractAddress, allContractAddressesKeys, () => {
                     return callback();
                 });
 
@@ -387,15 +427,27 @@ class TokenBalanceChangeEvents {
             }
 
         }, () => {
-            return runChecker();
+            return this.runBalanceCheckerByTimeout();
         });
 
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} addressContract
+     * @returns {String}
+     */
     getUniqueContractKey(emitter, addressContract) {
         return `${emitter.id}_${addressContract}`;
     }
 
+    /**
+     *
+     * @param {Object} emitter - Socket emitter
+     * @param {String} address
+     * @returns {String}
+     */
     getUniqueAddressKey(emitter, address) {
         return `${emitter.id}_${address}`;
     }

@@ -361,7 +361,14 @@ The web socket API is served using [socket.io](http://socket.io).
 Subscribe:
 
 ```
-    socket.emit('subscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak", "mzXrAjgbFca8yGo8wxkzLuZJAsAhMvHfJx"]})
+    socket.emit('subscribe', 'token_balance_change', {
+            contract_address: '804ca5244b5ba927565398f861adcc17363d617e', 
+            addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak", "mzXrAjgbFca8yGo8wxkzLuZJAsAhMvHfJx"]
+        }, {
+          notificationToken: ?NotificationToken<String>, 
+          prevToken: ?PreviousNotificationToken<String>,
+          language: ?'en'
+      })
 ```
 
 > After subscribe will emit ``token_balance_change``
@@ -369,21 +376,41 @@ Subscribe:
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e', addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"]})
+    socket.emit('unsubscribe', 'token_balance_change', {
+            contract_address: '804ca5244b5ba927565398f861adcc17363d617e', 
+            addresses: ["mg2zzpBoWQJsfmGgcytS6eVzW8sgZpDcak"]
+        }, {
+           notificationToken: ?NotificationToken<String> 
+      });
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change', {contract_address: '804ca5244b5ba927565398f861adcc17363d617e'})
+    socket.emit('unsubscribe', 'token_balance_change', {
+            contract_address: '804ca5244b5ba927565398f861adcc17363d617e'
+        }, {
+           notificationToken: ?NotificationToken<String> 
+       })
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'token_balance_change');
+    socket.emit('unsubscribe', 'token_balance_change', null, {
+             notificationToken: ?NotificationToken<String> 
+        });
 ```
 
+
+### Event ``token_balance_change``
+
+Listen:
+```
+    socket.on('token_balance_change', function(data) {
+         // Sample output
+    });
+```
 
 Sample output:
 
@@ -406,7 +433,11 @@ Sample output:
 Subscribe:
 
 ```
-    socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('subscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"], {
+        notificationToken: ?NotificationToken<String>, 
+        prevToken: ?PreviousNotificationToken<String>,
+        language: ?'en'
+    });
 ```
 
 > After subscribe will emit ``balance_changed``
@@ -414,13 +445,17 @@ Subscribe:
 Unsubscribe:
 
 ```
-    socket.emit('unsubscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"]);
+    socket.emit('unsubscribe', 'balance_subscribe', ["mt8WVPpaThMykC6cMrParAbykRBYWLDkPR"], {
+        notificationToken: ?NotificationToken<String> 
+    });
 ```
 
 or
 
 ```
-    socket.emit('unsubscribe', 'balance_subscribe');
+    socket.emit('unsubscribe', 'balance_subscribe', null, {
+        notificationToken: ?NotificationToken<String> 
+    });
 ```
 
 ### Event ``balance_changed``
