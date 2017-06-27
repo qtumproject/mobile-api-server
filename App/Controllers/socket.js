@@ -68,12 +68,12 @@ class SocketController {
             switch (name) {
                 case 'balance_subscribe':
 
-                    this.subscribe_balance_change(payload, this.getMergedBaseConfig(options));
+                    this.subscribe_balance_change(socket, payload, this.getMergedBaseConfig(options));
 
                     break;
                 case 'token_balance_change':
 
-                    this.subscribe_token_balance_change(payload, this.getMergedBaseConfig(options));
+                    this.subscribe_token_balance_change(socket, payload, this.getMergedBaseConfig(options));
 
                     break;
             }
@@ -87,13 +87,13 @@ class SocketController {
             switch (name) {
                 case 'balance_subscribe':
 
-                    this.unsubscribe_balance(payload, this.getMergedBaseConfig(options));
+                    this.unsubscribe_balance(socket, payload, this.getMergedBaseConfig(options));
 
                     break;
 
                 case 'token_balance_change':
 
-                    this.unsubscribe_token_balance(payload, this.getMergedBaseConfig(options));
+                    this.unsubscribe_token_balance(socket, payload, this.getMergedBaseConfig(options));
 
                     break;
             }
@@ -136,18 +136,18 @@ class SocketController {
     }
 
     /**
-     *
+     * @param {Object} socket - Socket emitter
      * @param {Array} addresses
      * @param {Object} options
      * @returns {boolean}
      */
-    subscribe_balance_change(addresses, options) {
+    subscribe_balance_change(socket, addresses, options) {
 
         if (!this.addressesIsValid(addresses)) {
             return false;
         }
 
-        this.events.qtumRoomEvents.subscribeAddress(this.socket, addresses);
+        this.events.qtumRoomEvents.subscribeAddress(socket, addresses);
 
         if (options.notificationToken) {
             this.mobileAddressBalanceNotifier.subscribeAddress(addresses, options);
@@ -155,12 +155,12 @@ class SocketController {
     }
 
     /**
-     *
+     * @param {Object} socket - Socket emitter
      * @param {Object} payload
      * @param {Object} options
      * @returns {boolean}
      */
-    subscribe_token_balance_change(payload, options) {
+    subscribe_token_balance_change(socket, payload, options) {
 
         if (!_.isObject(payload) || !payload.contract_address || !_.isString(payload.contract_address) || !payload.addresses) {
             return false;
@@ -173,7 +173,7 @@ class SocketController {
             return false;
         }
 
-        this.events.tokenBalanceEvents.subscribeAddress(this.socket, payload);
+        this.events.tokenBalanceEvents.subscribeAddress(socket, payload);
 
         if (options.notificationToken && addresses.length) {
             this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(contractAddress, addresses, options);
@@ -182,19 +182,19 @@ class SocketController {
     }
 
     /**
-     *
+     * @param {Object} socket - Socket emitter
      * @param {Array|null} addresses
      * @param {Object|null} options
      * @param {String} options.notificationToken
      * @returns {boolean}
      */
-    unsubscribe_balance(addresses, options) {
+    unsubscribe_balance(socket, addresses, options) {
 
         if (!_.isNull(addresses) && !this.addressesIsValid(addresses)) {
             return false;
         }
 
-        this.events.qtumRoomEvents.unsubscribeAddress(this.socket, addresses);
+        this.events.qtumRoomEvents.unsubscribeAddress(socket, addresses);
 
         if (options.notificationToken) {
             this.mobileAddressBalanceNotifier.unsubscribeAddress(options.notificationToken, addresses);
@@ -203,12 +203,12 @@ class SocketController {
     }
 
     /**
-     *
+     * @param {Object} socket - Socket emitter
      * @param {*} payload
      * @param options
      */
-    unsubscribe_token_balance(payload, options) {
-        this.events.tokenBalanceEvents.unsubscribeAddress(this.socket, payload);
+    unsubscribe_token_balance(socket, payload, options) {
+        this.events.tokenBalanceEvents.unsubscribeAddress(socket, payload);
 
         if (options.notificationToken) {
             this.mobileContractBalanceNotifier.unsubscribeMobileTokenBalance(options.notificationToken, payload && payload.contract_address ? payload.contract_address : null, payload && payload.addresses ? payload.addresses : null, () => {});
