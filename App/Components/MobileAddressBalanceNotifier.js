@@ -163,6 +163,11 @@ class MobileAddressBalanceNotifier {
                         let message = this.getMessage(addressesHash[addressObject.address], languageKey);
 
                         return this.notifier.send(message, { registrationTokens: notifyTokens}, (err, response) => {
+
+                            if (err) {
+                                logger.error('notifier.send', err);
+                            }
+
                             return callback(err, response, notifyTokens);
                         });
 
