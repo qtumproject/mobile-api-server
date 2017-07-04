@@ -33,10 +33,9 @@ class ContractsHelper {
     static getContractAddress(txid, num) {
 
         let reverseTxId = txid.match(/.{2}/g).reverse().join(""),
-            buf = new Buffer(1);
+            buf = new Buffer(4);
 
-        buf.writeUInt8(num, 0);
-
+        buf.writeUInt32LE(num, 0);
         let nHex = buf.toString('hex'),
             addr = reverseTxId + nHex,
             sha256 = crypto.createHash('sha256').update(addr, 'hex').digest(),
