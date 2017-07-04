@@ -138,7 +138,7 @@ class MobileAddressBalanceNotifier {
                 return callback();
             }
 
-            return async.each(addresses, (addressObject, callback) => {
+            return async.eachSeries(addresses, (addressObject, callback) => {
 
                 let languageHash = {};
 
@@ -154,7 +154,7 @@ class MobileAddressBalanceNotifier {
 
                 let languageKeys = Object.keys(languageHash);
 
-                return async.each(languageKeys, (languageKey, callback) => {
+                return async.eachSeries(languageKeys, (languageKey, callback) => {
 
                     let notifyTokens = languageHash[languageKey];
 
