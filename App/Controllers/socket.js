@@ -173,11 +173,20 @@ class SocketController {
             return false;
         }
 
-        this.events.tokenBalanceEvents.subscribeAddress(socket, payload);
+        return InsightApiRepository.getAccountInfo(contractAddress, (err, res) => {
 
-        if (options.notificationToken && addresses.length) {
-            this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(contractAddress, addresses, options);
-        }
+            if (err || !res) {
+                logger.error('Bad contract address', contractAddress, err, res);
+                return false;
+            }
+
+            this.events.tokenBalanceEvents.subscribeAddress(socket, payload);
+
+            if (options.notificationToken && addresses.length) {
+                this.mobileContractBalanceNotifier.subscribeMobileTokenBalance(contractAddress, addresses, options);
+            }
+
+        });
 
     }
 
