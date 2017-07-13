@@ -212,8 +212,13 @@ class TokenBalanceChangeEvents {
     removeAddress(emitter, addressContract, addr) {
 
         let uniqueKey = this.getUniqueContractKey(emitter, addressContract),
-            addrs = this.subscriptions.emitterAddresses[uniqueKey],
-            addrIndex = addrs.indexOf(addr);
+            addrs = this.subscriptions.emitterAddresses[uniqueKey];
+
+        if (!addrs) {
+            return false;
+        }
+
+        let addrIndex = addrs.indexOf(addr);
 
         if(addrIndex > -1) {
             addrs.splice(addrIndex, 1);

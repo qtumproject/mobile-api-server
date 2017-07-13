@@ -47,6 +47,7 @@ class InsightApiRepository {
      * @returns {*}
      */
     static sendRawTransaction(rawtx, allowAbsurdFees, cb) {
+        console.log(rawtx, allowAbsurdFees, 2);
         return request.post({
                 url: config.INSIGHT_API_URL + '/tx/send',
                 form: {
@@ -54,7 +55,7 @@ class InsightApiRepository {
                     allowAbsurdFees: allowAbsurdFees
                 }
             }, (error, response, body) => {
-
+            console.log(error, response, body, 3);
                 try {
 
                     let json = JSON.parse(body);
