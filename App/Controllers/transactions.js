@@ -13,7 +13,7 @@ class TransactionsController {
     sendRawTransaction(cb, data) {
 
         let allowAbsurdFees = parseInt(data._post.allowHighFee) === 1;
-        console.log(data, 1);
+
         if (!data._post.data) {
             return cb('Bad Request', 400);
         }
