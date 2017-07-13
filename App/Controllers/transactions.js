@@ -26,6 +26,10 @@ class TransactionsController {
 
     getTransaction(cb, data) {
 
+        if (!data.req.params.txhash) {
+            return cb('Bad Request', 400);
+        }
+
         return TransactionService.getTransaction(data.req.params.txhash, (err, result) => {
             return cb(err, result);
         });
