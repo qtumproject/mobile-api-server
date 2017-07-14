@@ -50,6 +50,7 @@ class OutputsControllers {
                     amount: address.amount,
                     block_height: address.height ? address.height : -1,
                     pubkey_hash: bytes.slice(1, 21).toString('hex'),
+                    is_stake: address.isStake,
                     confirmations: address.confirmations
                 });
 

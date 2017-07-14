@@ -277,6 +277,7 @@ response
     amount: 1, //qtum
     block_height: 100000000|-1,
     pubkey_hash: String,
+    is_stake: Boolean,
     confirmations: Int
 }]
 ```
@@ -299,6 +300,7 @@ response
     amount: 1, //qtum
     block_height: 100000000|-1,
     pubkey_hash: String,
+    is_stake: Boolean,
     confirmations: Int
 }]
 ```
