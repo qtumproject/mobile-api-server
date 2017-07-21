@@ -1,4 +1,4 @@
-const coreLib = require('bitcore-lib');
+const coreLib = require('qtumcore-lib');
 
 class Address {
 

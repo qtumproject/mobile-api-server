@@ -257,7 +257,7 @@ class MobileContractBalanceNotifier {
 
         return async.during(
             (callback) => {
-                return cursor.next(function(error, doc) {
+                return cursor.next((error, doc) => {
                     document = doc;
                     return callback(null, document);
                 });

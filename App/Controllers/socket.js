@@ -12,6 +12,8 @@ const _ = require('lodash');
 const TokenBalanceChangeEvents = require('../Components/SocketEvents/TokenBalanceChangeEvents');
 const QtumRoomEvents = require('../Components/SocketEvents/QtumRoomEvents');
 const ContractBalance = require('../Components/ContractBalance');
+const ContractPurchaseEvents = require('../Components/SocketEvents/ContractPurchaseEvents');
+const contractPurchaseWatcherInstance = require("../Components/ContractPurchaseWatcherInstance");
 
 let Controllers = getControllers();
 
@@ -49,6 +51,7 @@ class SocketController {
     initSocketEvents() {
         this.events.tokenBalanceEvents = new TokenBalanceChangeEvents(this.socket, this.contractBalanceComponent);
         this.events.qtumRoomEvents = new QtumRoomEvents(this.socket, this.socketClient);
+        this.events.contractPurchaseEvents = new ContractPurchaseEvents(contractPurchaseWatcherInstance);
     }
 
     /**
@@ -76,6 +79,11 @@ class SocketController {
                     this.subscribe_token_balance_change(socket, payload, this.getMergedBaseConfig(options));
 
                     break;
+                case 'contract_purchase':
+
+                    this.subscribe_contract_purchase(socket, payload);
+
+                    break;
             }
 
         });
@@ -94,6 +102,11 @@ class SocketController {
                 case 'token_balance_change':
 
                     this.unsubscribe_token_balance(socket, payload, this.getMergedBaseConfig(options));
+
+                    break;
+                case 'contract_purchase':
+
+                    this.unsubscribe_contract_purchase(socket, payload);
 
                     break;
             }
@@ -152,6 +165,7 @@ class SocketController {
         if (options.notificationToken) {
             this.mobileAddressBalanceNotifier.subscribeAddress(addresses, options);
         }
+
     }
 
     /**
@@ -191,6 +205,21 @@ class SocketController {
     }
 
     /**
+     *
+     * @param {Object} socket - Socket emitter
+     * @param {String} requestId
+     */
+    subscribe_contract_purchase(socket, requestId) {
+
+        if (!requestId || !requestId.trim()) {
+            return false;
+        }
+
+        this.events.contractPurchaseEvents.subscribe(socket, requestId);
+
+    }
+
+    /**
      * @param {Object} socket - Socket emitter
      * @param {Array|null} addresses
      * @param {Object|null} options
@@ -218,10 +247,20 @@ class SocketController {
      */
     unsubscribe_token_balance(socket, payload, options) {
         this.events.tokenBalanceEvents.unsubscribeAddress(socket, payload);
-
+        
         if (options.notificationToken) {
             this.mobileContractBalanceNotifier.unsubscribeMobileTokenBalance(options.notificationToken, payload && payload.contract_address ? payload.contract_address : null, payload && payload.addresses ? payload.addresses : null, () => {});
         }
+    }
+
+    /**
+     * @param {Object} socket - Socket emitter
+     * @param {*} payload
+     */
+    unsubscribe_contract_purchase(socket, payload) {
+
+        this.events.contractPurchaseEvents.unsubscribe(socket, payload);
+
     }
 
     /**

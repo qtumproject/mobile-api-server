@@ -19,7 +19,7 @@ class HistoryController {
 
         if (addresses.length) {
 
-            async.waterfall([
+            return async.waterfall([
                 (callback) => {
                     return InsightApiRepository.getAddressesHistory(addresses, options, (error, body) => {
                        return callback(error, body);

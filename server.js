@@ -12,6 +12,7 @@ let async = require('async'),
 const mongoose = require('mongoose');
 const bluebird = require('bluebird');
 const i18n = require("i18n");
+const contractPurchaseWatcherInstance = require("./App/Components/ContractPurchaseWatcherInstance");
 
 let Raven = null;
 if(!config.disableRaven) {
@@ -76,6 +77,9 @@ let Server = {
 	run: function() {
     	Server.controllers.api.init(config.PORT || 5931);
     	Server.controllers.socket.init(Server.controllers.api.server);
+
+    	contractPurchaseWatcherInstance.start();
+
 	}
 };
 

@@ -119,10 +119,12 @@ class InsightApiRepository {
      * @returns {*}
      */
     static getAddressesBalance(addresses, cb) {
+        console.log('addresses', addresses);
         return request.get({
             url: config.INSIGHT_API_URL + `/addrs/${addresses.join(',')}/balance`,
             json: true
         }, (error, response, body) => {
+            console.log('response', response.statusCode);
             return cb(error, body);
         });
     }
