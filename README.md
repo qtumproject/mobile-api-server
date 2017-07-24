@@ -1,4 +1,7 @@
+## Table of Contents
 
+* [API](#api)
+* [QStore API](#qstore-api)
 
 # API
 
@@ -544,4 +547,204 @@ html
   </script>
 </body>
 </html>
+```
+
+
+# QStore API
+
+##Trending now
+
+`GET`
+
+/contracts/trending-now 
+
+Response: 
+
+```
+[{
+    "id": "8a9d8f98as989s8dfak9a9k",
+    "name": "Contract name",
+    "type": "token", // token || crowdsale || other
+    "price": "4.3432344", // cost in QTUM
+    "count_buy": 3,
+    "count_downloads": 323,
+    "created_at": "2015-12-12T10:00:00"
+}, ...]
+```
+
+
+## Last added
+
+`GET`
+
+/contracts/last-added
+ 
+Response: 
+ 
+```
+[{
+    "id": "8a9d8f98as989s8dfak9a9k",
+    "name": "Contract name",
+    "type": "token", // token || crowdsale || other
+    "price": "4.3432344", // cost in QTUM
+    "count_buy": 3,
+    "count_downloads": 323,
+    "created_at": "2015-12-12T10:00:00"
+}, ...]
+```
+
+## Contract search
+
+`GET`
+
+/contracts/{count}/{offset}?type={type_name}&tags[]={tag}
+
+Response: 
+
+```
+[{
+    "id": "8a9d8f98as989s8dfak9a9k",
+    "name": "Contract name",
+    "type": "token", // token || crowdsale || other
+    "price": "4.3432344", // cost in QTUM
+    "count_buy": 3,
+    "count_downloads": 323,
+    "created_at": "2015-12-12T10:00:00",
+    "tags": [
+        "tag3",
+        "tag4"
+     ]
+}, ...]
+```
+
+## Contract
+
+`GET`
+
+/contracts/{contract_id}
+
+Response: 
+
+```
+{
+    "id": "8a9d8f98as989s8dfak9a9k",
+    "name": "Contract name",
+    "description": "Contract description",
+    "tags": ["crowdsale", "contract", "some_token"]
+    "size": 14.3, // size in bytes
+    "completed_on": "1.0.5",
+    "with_sourse_code": true,
+    "publisher_address": "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ",    
+    "type": "token", // token || crowdsale || other
+    "price": "4.3432344", // cost in QTUM
+    "count_buy": 3,
+    "count_downloads": 323,
+    "created_at": "2015-12-12T10:00:00"
+}
+```
+
+## Contract ABI
+
+`GET`
+
+/contracts/{contract_id}/abi
+
+Response: 
+
+```
+{
+    ":test": {
+        "test": "test"
+    }
+}
+```
+
+## Buy Request
+
+`POST`
+
+/contracts/{contract_id}/buy-request
+
+Response: 
+
+```
+{
+    "address": "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ",
+    "amount": "3.33",
+    "access_token": "a989as0dfhfhshwwr37fh56sdfsi909kja0f9kas0dfas0ja0djfas9ias09k3414auyjjh09aks-a=sdfasdf-@",
+    "request_id": "jk47fa8=-d0fi0i0i323"
+}
+```
+
+## Is Paid
+
+`GET`
+
+/contracts/{contract_id}/is-paid/by-request-id?request_id=<request_id>
+/contracts/{contract_id}/is-paid/by-address?addresses[]=<check_address>
+
+Response: 
+
+```
+{
+    "contract_id": "8a9d8f98as989s8dfak9a9k",
+    "request_id": "jk47fa8=-d0fi0i0i323",
+    "amount": "3.33",
+    "payed_at": "2015-12-12T10:00:00",
+    "from_addresses": [
+        "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ"
+    ]
+}
+```
+
+## Source code
+
+`POST`
+
+/contracts/{contract_id}/source-code
+
+Request: 
+
+```
+{
+    "request_id": "jk47fa8=-d0fi0i0i323",
+    "access_token": "a989as0dfhfhshwwr37fh56sdfsi909kja0f9kas0dfas0ja0djfas9ias09k3414auyjjh09aks-a=sdfasdf-@"
+}
+```
+
+
+Response: 
+
+```
+    {
+        "bytecode": String
+    }
+```
+
+## Bytecode
+
+`POST`
+
+/contracts/{contract_id}/bytecode
+
+Request: 
+
+```
+{
+    "buyer_addresses": [
+        "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ"
+    ],
+    "nonce": 1498736970,
+    "signs": [
+        "0320390741d655389f20904a41d655389e2540ff092f4542312f4144362f2f4254432e544f502f4e59412ffabe6d6d82d4592133163f9a904a326a4d57dfa19748074f0b7a69fd0c164593481e60a3010000000000000009392bffdb25924800000000"
+    ]
+}
+```
+
+Response: 
+
+```
+    {
+        "source_code": String
+    }
 ```
