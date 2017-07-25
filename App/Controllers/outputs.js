@@ -25,7 +25,7 @@ class OutputsControllers {
                 cb(error, this._formatAddresses(body));
         	});
 		} else {
-            cb(error, []);
+            cb(null, []);
 		}
 
 	}
