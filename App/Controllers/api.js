@@ -36,11 +36,22 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
-        APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);
+		APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);
         APIController.addHandler('post', '/contracts/:contractAddress/call', Controllers.contracts.fetchEncodedParams);
 
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
         APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams);
+
+        APIController.addHandler('post', '/contracts/:contractId/source-code', Controllers.contractsStore.getSourceCode.bind(Controllers.contractsStore));
+        APIController.addHandler('post', '/contracts/:contractId/bytecode', Controllers.contractsStore.getBytecode.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/trending-now', Controllers.contractsStore.fetchTrendingNow.bind(Controllers.contractsStore));
+        APIController.addHandler('post', '/contracts/:contractId/buy-request', Controllers.contractsStore.buyContract.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/:contractId/is-paid/by-request-id', Controllers.contractsStore.getPaidInfoByRequestId.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/:contractId/is-paid/by-address', Controllers.contractsStore.getPaidInfoByAddresses.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/:contractId/abi', Controllers.contractsStore.fetchAbi.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/last-added', Controllers.contractsStore.fetchLastAdded.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/:limit/:offset', Controllers.contractsStore.fetchContracts.bind(Controllers.contractsStore));
+        APIController.addHandler('get', '/contracts/:contractId', Controllers.contractsStore.fetchContract.bind(Controllers.contractsStore));
 
         APIController.addHandler('post', '/send-raw-transaction', Controllers.transactions.sendRawTransaction);
 

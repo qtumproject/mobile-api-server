@@ -124,6 +124,7 @@ class ContractsController {
 
     }
 
+
 }
 
 Controllers.contracts = new ContractsController();

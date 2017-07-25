@@ -1,4 +1,4 @@
-const bitcore = require('bitcore-lib');
+const bitcore = require('qtumcore-lib');
 const OP_CALL = 194;
 const OP_CREATE = 193;
 const crypto = require('crypto');
