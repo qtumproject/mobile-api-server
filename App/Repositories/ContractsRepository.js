@@ -65,7 +65,9 @@ class ContractsRepository {
         }
 
         if (options.tags) {
-            query.tags = {'$in': options.tags};
+            query.tags = {'$in': options.tags.map((tag) => {
+                return new RegExp('^' + tag + '$', 'i');
+            })};
         }
 
         return Contract.find(query, [
