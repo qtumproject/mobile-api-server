@@ -749,3 +749,26 @@ Response:
         "source_code": String
     }
 ```
+
+# Web Socket QStore API
+
+### Event ``contract_purchase``
+
+Subscribe:
+
+```
+    socket.emit('subscribe', 'contract_purchase', requestId<String>);
+```
+
+
+Unsubscribe:
+
+```
+    socket.emit('unsubscribe', 'contract_purchase', requestId<String>);
+```
+
+or 
+
+```
+    socket.emit('unsubscribe', 'contract_purchase');
+```
