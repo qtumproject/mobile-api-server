@@ -211,7 +211,7 @@ class SocketController {
      */
     subscribe_contract_purchase(socket, requestId) {
 
-        if (!requestId || !requestId.trim()) {
+        if (!requestId || !_.isString(requestId) || !requestId.trim()) {
             return false;
         }
 
