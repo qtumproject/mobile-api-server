@@ -42,7 +42,7 @@ class ContractPurchaseEvents {
                     from_addresses: data.from_addresses,
                     payed_at: data.payed_at,
                     created_at: data.created_at,
-                    amount: data.created_at
+                    amount: data.amount
                 });
             });
 

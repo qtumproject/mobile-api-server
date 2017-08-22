@@ -45,6 +45,7 @@ class ContractPurchaseRepository {
                 request_id: result.request_id,
                 amount: result.amount,
                 payed_at: result.payed_at,
+                created_at: result.created_at,
                 from_addresses: result.from_addresses
             });
 
@@ -76,6 +77,7 @@ class ContractPurchaseRepository {
                     request_id: result.request_id,
                     amount: result.amount,
                     payed_at: result.payed_at,
+                    created_at: result.created_at,
                     from_addresses: result.from_addresses
                 }
             );

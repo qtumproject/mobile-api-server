@@ -692,6 +692,7 @@ Response:
     "request_id": "5976f5c7cfa1624c2909ab4d",
     "amount": "3.33",
     "payed_at": "2017-07-25T08:00:16.000Z",
+    "created_at": "2017-07-25T08:00:16.000Z",
     "from_addresses": [
         "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ"
     ]
@@ -771,4 +772,26 @@ or
 
 ```
     socket.emit('unsubscribe', 'contract_purchase');
+```
+
+Listen:
+```
+    socket.on('contract_purchase', function(data) {
+         //Sample output
+    });
+```
+
+Sample output:
+
+```
+{
+    "contract_id": "8a9d8f98as989s8dfak9a9k",
+    "request_id": "5976f5c7cfa1624c2909ab4d",
+    "amount": "3.33",
+    "payed_at": "2017-07-25T08:00:16.000Z",
+    "created_at": "2017-07-25T08:00:16.000Z",
+    "from_addresses": [
+        "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ"
+    ]
+}
 ```
