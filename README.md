@@ -553,6 +553,7 @@ html
 
 # QStore API
 
+
 ##Trending now
 
 `GET`
@@ -681,8 +682,11 @@ Response:
 
 `GET`
 
-/contracts/{contract_id}/is-paid/by-request-id?request_id=<request_id>
-/contracts/{contract_id}/is-paid/by-address?addresses[]=<check_address>
+/contracts/{contract_id}/is-paid/by-request-id?request_id={request_id}
+
+`GET`
+
+/contracts/{contract_id}/is-paid/by-address?addresses[]={check_address}
 
 Response: 
 
