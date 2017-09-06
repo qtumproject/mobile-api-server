@@ -52,6 +52,7 @@ class ContractsRepository {
      * @param {Number} options.limit
      * @param {Number} options.offset
      * @param {String} options.type
+     * @param {String} options.name
      * @param {Array} options.tags
      * @param {Function} next
      * @return {*}
@@ -61,12 +62,16 @@ class ContractsRepository {
         let query = {};
 
         if (options.type) {
-            query.type = options.type;
+            query.type = new RegExp(options.type, 'i');
+        }
+
+        if (options.name) {
+            query.name = new RegExp(options.name, 'i');
         }
 
         if (options.tags) {
             query.tags = {'$in': options.tags.map((tag) => {
-                return new RegExp('^' + tag + '$', 'i');
+                return new RegExp(tag, 'i');
             })};
         }
 

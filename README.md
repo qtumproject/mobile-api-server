@@ -599,7 +599,7 @@ Response:
 
 `GET`
 
-/contracts/{count}/{offset}?type={type_name}&tags[]={tag}
+/contracts/{count}/{offset}?type={type_name}&tags[]={tag}&name={name}
 
 Response: 
 

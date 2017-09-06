@@ -70,14 +70,15 @@ class ContractsStoreController {
      * @param {Object} data.req.params
      * @param {Number} data.req.params.limit
      * @param {Number} data.req.params.offset
-     * @param {Number} data.req.query.type
+     * @param {String} data.req.query.type
+     * @param {String} data.req.query.name
      * @param {Array} data.req.query.tags
      * @return {*}
      */
     fetchContracts(cb, data) {
 
         let req = data.req,
-            options = this._formatOptions(req.params.limit, req.params.offset, req.query.type, req.query.tags);
+            options = this._formatOptions(req.params.limit, req.params.offset, req.query.type, req.query.name, req.query.tags);
 
         return ContractsRepository.fetchContracts(options, (err, contract) => {
             return cb(err, contract);
@@ -273,10 +274,10 @@ class ContractsStoreController {
      * @param offset
      * @param type
      * @param tags
-     * @return {{offset: Number, limit: Number, tags: Array, type: *}}
+     * @return {{offset: Number, limit: Number, tags: Array, type: *, name: *}}
      * @private
      */
-    _formatOptions(limit, offset, type, tags) {
+    _formatOptions(limit, offset, type, name, tags) {
 
         const MAX_LIMIT = 20;
 
@@ -306,7 +307,8 @@ class ContractsStoreController {
             offset: offset,
             limit: limit,
             tags: tags,
-            type: type
+            type: type && _.isString(type) ? type : null,
+            name: name && _.isString(name) ? name : null
         };
 
     }
