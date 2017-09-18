@@ -41,6 +41,7 @@ let APIController = {
 
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
         APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams);
+        APIController.addHandler('get', '/estimate-fee-per-kb', Controllers.blockchain.getFeePerKb);
 
         APIController.addHandler('post', '/contracts/:contractId/source-code', Controllers.contractsStore.getSourceCode.bind(Controllers.contractsStore));
         APIController.addHandler('post', '/contracts/:contractId/bytecode', Controllers.contractsStore.getBytecode.bind(Controllers.contractsStore));

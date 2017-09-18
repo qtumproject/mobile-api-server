@@ -755,6 +755,20 @@ Response:
     }
 ```
 
+## Estimate Fee Per Kb
+
+`GET`
+
+/estimate-fee-per-kb[?nBlocks=2]
+
+Response: 
+
+```
+   {
+       fee_per_kb: 0.00001
+   }
+```
+
 # Web Socket QStore API
 
 ### Event ``contract_purchase``

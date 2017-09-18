@@ -154,6 +154,28 @@ class InsightApiRepository {
 
     /**
      *
+     * @param {Number} nBlocks
+     * @param {Function} cb
+     * @returns {*}
+     */
+    static minEstimateFee(nBlocks, cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/utils/minestimatefee?nBlocks=${nBlocks}`,
+            json: true
+        }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                return cb(body);
+            }
+
+            return cb(error, body);
+
+        });
+    }
+
+    /**
+     *
      * @param {String} address
      * @param {Function} cb
      * @returns {*}
