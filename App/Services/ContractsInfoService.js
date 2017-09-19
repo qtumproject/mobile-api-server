@@ -56,7 +56,8 @@ class ContractsInfoService {
                 switch (param.type) {
                     case "uint8":
                     case "uint256":
-                        result = parseInt(result);
+                        result = result.toString(10);
+
                 }
 
             } catch (e) {
@@ -108,7 +109,9 @@ class ContractsInfoService {
 
                 result.push({
                     hash: paramHash,
-                    output: data.executionResult.output
+                    output: data.executionResult.output,
+                    gas_used: data.executionResult.gasUsed,
+                    excepted: data.executionResult.excepted
                 });
 
                 return callback(err, data);

@@ -24,7 +24,9 @@ Response
     "outputs": [
           {
              "hash": String,
-             "output": String
+             "output": String,
+             "gas_used": Integer
+             "excepted": String
            },
            ...
      ]
@@ -115,7 +117,7 @@ response: Object | null
 ```
 {
 	"symbol": String,
-	"decimals": Integer,
+	"decimals": String,
 	"name": String,
 	"totalSupply": String
 }
