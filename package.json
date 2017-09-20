@@ -1,7 +1,7 @@
 {
-  "name": "qtum_server",
+  "name": "qtum-mobile-api-server",
   "version": "0.0.1",
-  "description": "Node.JS server for Quantum application",
+  "description": "Node.JS mobile server for QTUM application",
   "dependencies": {
     "async": "^2.1.4",
     "bignumber.js": "^4.0.0",
