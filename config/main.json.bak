@@ -10,5 +10,11 @@
 		"USER": "",
 		"PASSWORD": ""
 	},
-	"FIREBASE_SERVER_TOKEN": "AAAAO8o-bCo:APA91bEc_77sI0UvagwL_j8a7-jFhA9pVzkulEtvOVnS7szQkpB8oX_Wo4oMLeeFk7Hik7t8cUQFVNDR4VgACKwyaBl7f2rP8dM94KLsbu3dg73YklYl-w6dbW5H9vGNi2lgvYzK5nqC"
+	"FIREBASE_SERVER_TOKEN": "AAAAO8o-bCo:APA91bEc_77sI0UvagwL_j8a7-jFhA9pVzkulEtvOVnS7szQkpB8oX_Wo4oMLeeFk7Hik7t8cUQFVNDR4VgACKwyaBl7f2rP8dM94KLsbu3dg73YklYl-w6dbW5H9vGNi2lgvYzK5nqC",
+	"disableRaven": "1",
+    "RECEIVE_API": {
+        "URL": "http://localhost:5555",
+        "PRIVATE_KEY": "..RECEIVE_API_PRIVATE_KEY..",
+        "PUBLIC_KEY": "..RECEIVE_API_PUBLIC_KEY.."
+    }
 }

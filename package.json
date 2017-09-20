@@ -1,5 +1,6 @@
 {
-  "name": "quantum_server",
+  "name": "qtum_server",
+  "version": "0.0.1",
   "description": "Node.JS server for Quantum application",
   "dependencies": {
     "async": "^2.1.4",
@@ -29,7 +30,7 @@
     "node-dir": "^0.1.16",
     "node-gcm": "^0.14.6",
     "npm": "^4.1.1",
-    "qtumcore-lib": "git+ssh://git@gitlab.pixelplex.by:593_qtum/qtumcore-lib.git",
+    "qtumcore-lib": "git+ssh://git@github.com:qtumproject/qtumcore-lib.git",
     "raven": "^1.1.1",
     "request": "^2.79.0",
     "sequelize": "^3.30.0",
