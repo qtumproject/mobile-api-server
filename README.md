@@ -568,7 +568,7 @@ Response:
 [{
     "id": "8a9d8f98as989s8dfak9a9k",
     "name": "Contract name",
-    "type": "token", // token || crowdsale || other
+    "type": "Crowdsale", // QRC20 Token || Crowdsale || Smart Contract
     "price": "4.3432344", // cost in QTUM
     "count_buy": 3,
     "count_downloads": 323,
@@ -589,7 +589,7 @@ Response:
 [{
     "id": "8a9d8f98as989s8dfak9a9k",
     "name": "Contract name",
-    "type": "token", // token || crowdsale || other
+    "type": "Crowdsale", // QRC20 Token || Crowdsale || Smart Contract
     "price": "4.3432344", // cost in QTUM
     "count_buy": 3,
     "count_downloads": 323,
@@ -609,7 +609,7 @@ Response:
 [{
     "id": "8a9d8f98as989s8dfak9a9k",
     "name": "Contract name",
-    "type": "token", // token || crowdsale || other
+    "type": "Crowdsale", // QRC20 Token || Crowdsale || Smart Contract
     "price": "4.3432344", // cost in QTUM
     "count_buy": 3,
     "count_downloads": 323,
@@ -639,7 +639,7 @@ Response:
     "completed_on": "1.0.5",
     "with_sourse_code": true,
     "publisher_address": "1Hz96kJKF2HLPGY15JWLB5m9qGNxvt8tHJ",    
-    "type": "token", // token || crowdsale || other
+    "type": "Crowdsale", // QRC20 Token || Crowdsale || Smart Contract
     "price": "4.3432344", // cost in QTUM
     "count_buy": 3,
     "count_downloads": 323,
