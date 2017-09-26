@@ -3,6 +3,8 @@ const logger = require('log4js').getLogger('Contracts Controller');
 const _ = require('lodash');
 const TokenInterface = require('../Components/ContractData/TokenInterface');
 const ContractsInfoService = require('../Services/ContractsInfoService');
+const ContractsTypesService = require('../Services/ContractsTypesService');
+const CacheRepository = require('../Repositories/CacheRepository');
 
 let Controllers = getControllers();
 
@@ -15,6 +17,8 @@ class ContractsController {
         this.fetchContractParams = this.fetchContractParams.bind(this);
         this.encodeContract = this.encodeContract.bind(this);
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
+        this.contractsTypesService = new ContractsTypesService(new CacheRepository());
+
     }
 
     encodeContract(cb, data) {
@@ -124,6 +128,11 @@ class ContractsController {
 
     }
 
+    fetchContractTypes(cb) {
+        this.contractsTypesService.getTypes((err, result) => {
+            return cb(err, result);
+        })
+    }
 
 }
 

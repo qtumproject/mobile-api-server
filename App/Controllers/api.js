@@ -36,11 +36,14 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
+        APIController.addHandler('get', '/contracts/types', Controllers.contracts.fetchContractTypes.bind(Controllers.contracts));
+
 		APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);
         APIController.addHandler('post', '/contracts/:contractAddress/call', Controllers.contracts.fetchEncodedParams);
 
         APIController.addHandler('post', '/contracts/generate-token-bytecode', Controllers.contracts.generateTokenBytecode);
         APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams);
+
         APIController.addHandler('get', '/estimate-fee-per-kb', Controllers.blockchain.getFeePerKb);
 
         APIController.addHandler('post', '/contracts/:contractId/source-code', Controllers.contractsStore.getSourceCode.bind(Controllers.contractsStore));

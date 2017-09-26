@@ -757,6 +757,24 @@ Response:
     }
 ```
 
+## Types (Categories)
+
+`GET`
+
+/contracts/types
+
+Response: 
+
+```
+[
+    {
+        _id: "Crowdsale",
+        type: "Crowdsale"
+    },
+    ...
+]
+```
+
 ## Estimate Fee Per Kb
 
 `GET`

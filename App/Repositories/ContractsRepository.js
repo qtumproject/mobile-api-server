@@ -223,7 +223,27 @@ class ContractsRepository {
         });
     }
 
-}
+    /**
+     *
+     * @param {Function} next
+     */
+    static fetchTypes(next) {
+        return Contract.aggregate([
+            {
+                $group: {
+                    _id: "$type"
+                }
+            },
+            {
+                "$project": {
+                    "type": "$_id"
+                }
+            }
+        ]).exec((err, results) => {
+            return next(err, results);
+        });
+    }
 
+}
 
 module.exports = ContractsRepository;
