@@ -231,12 +231,14 @@ class ContractsRepository {
         return Contract.aggregate([
             {
                 $group: {
-                    _id: "$type"
+                    _id: "$type",
+                    count: { $sum: 1 }
                 }
             },
             {
                 "$project": {
-                    "type": "$_id"
+                    type: "$_id",
+                    count: 1
                 }
             }
         ]).exec((err, results) => {
