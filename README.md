@@ -769,7 +769,8 @@ Response:
 [
     {
         _id: "Crowdsale",
-        type: "Crowdsale"
+        type: "Crowdsale",
+        count: 1
     },
     ...
 ]
