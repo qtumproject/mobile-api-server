@@ -360,6 +360,23 @@ response
 }
 ```
 
+## Get dgp info
+
+`GET`
+
+/blockchain/dgpinfo
+
+[http://163.172.68.103:5931/blockchain/dgpinfo](http://163.172.68.103:5931/blockchain/dgpinfo)
+
+response
+```
+{
+    maxblocksize: 2000000,
+    blockgaslimit: 40,
+    mingasprice: 40000000
+}
+```
+
 # Web Socket API
 
 The web socket API is served using [socket.io](http://socket.io).

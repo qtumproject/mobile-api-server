@@ -195,6 +195,26 @@ class InsightApiRepository {
 
         });
     }
+    /**
+     *
+     * @param {Function} cb
+     * @returns {*}
+     */
+    static getDgpinfo(cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/dgpinfo`,
+            json: true
+        }, (error, response, body) => {
+
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+                body = null;
+            }
+
+            return cb(error, body);
+
+        });
+    }
 
 }
 

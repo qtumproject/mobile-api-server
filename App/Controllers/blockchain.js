@@ -30,6 +30,11 @@ class BlockchainController {
 		});
 	}
 
+    fetchDgpInfo(cb) {
+        return InsightApiRepository.getDgpinfo((error, body) => {
+            return cb(error, body);
+        });
+    }
 
 
 }

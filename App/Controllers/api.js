@@ -36,6 +36,8 @@ let APIController = {
 		APIController.app.use(bodyParser.json());
 		APIController.app.options('*', cors());
 
+
+
         APIController.addHandler('get', '/contracts/types', Controllers.contracts.fetchContractTypes.bind(Controllers.contracts));
 
 		APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);
@@ -70,6 +72,7 @@ let APIController = {
 		APIController.addHandler('get', '/news/:lang', Controllers.news.getNews);
 
 		APIController.addHandler('get', '/blockchain/info', Controllers.blockchain.getInfo);
+        APIController.addHandler('get', '/blockchain/dgpinfo', Controllers.blockchain.fetchDgpInfo.bind(Controllers.blockchain));
 
 		if (config.ENVIRONMENT === 'DEV') {
 
