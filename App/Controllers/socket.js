@@ -11,7 +11,7 @@ const Address = require('../Components/Address');
 const _ = require('lodash');
 const TokenBalanceChangeEvents = require('../Components/SocketEvents/TokenBalanceChangeEvents');
 const QtumRoomEvents = require('../Components/SocketEvents/QtumRoomEvents');
-const ContractBalance = require('../Components/ContractBalance');
+const TokenContract = require('../Components/TokenContract');
 const ContractPurchaseEvents = require('../Components/SocketEvents/ContractPurchaseEvents');
 const contractPurchaseWatcherInstance = require("../Components/ContractPurchaseWatcherInstance");
 
@@ -28,8 +28,9 @@ class SocketController {
 
     init(server) {
 
-        this.contractBalanceComponent = new ContractBalance();
-        this.mobileContractBalanceNotifier = new MobileContractBalanceNotifier(this.contractBalanceComponent);
+        this.tokenContract = new TokenContract();
+        this.mobileContractBalanceNotifier = new MobileContractBalanceNotifier(this.tokenContract);
+
 
         this.initSocket(server);
         this.initRemoteSocket(config.INSIGHT_API_SOCKET_SERVER);
@@ -49,7 +50,7 @@ class SocketController {
     }
 
     initSocketEvents() {
-        this.events.tokenBalanceEvents = new TokenBalanceChangeEvents(this.socket, this.contractBalanceComponent);
+        this.events.tokenBalanceEvents = new TokenBalanceChangeEvents(this.socket, this.tokenContract);
         this.events.qtumRoomEvents = new QtumRoomEvents(this.socket, this.socketClient);
         this.events.contractPurchaseEvents = new ContractPurchaseEvents(contractPurchaseWatcherInstance);
     }
@@ -193,6 +194,9 @@ class SocketController {
                 logger.error('Bad contract address', contractAddress, err, res);
                 return false;
             }
+
+            contractAddress = contractAddress.toLowerCase();
+            payload.contract_address = payload.contract_address.toLowerCase();
 
             this.events.tokenBalanceEvents.subscribeAddress(socket, payload);
 

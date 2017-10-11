@@ -8,11 +8,11 @@ const BALANCE_CHECKER_TIMER_MS = 30000;
 
 class TokenBalanceChangeEvents {
 
-    constructor(socket, contractBalanceComponent) {
+    constructor(socket, tokenContract) {
         logger.info('Init');
 
         this.socket = socket;
-        this.contractBalanceComponent = contractBalanceComponent;
+        this.tokenContract = tokenContract;
 
         this.subscriptions = {};
         this.subscriptions.contract_address = {};
@@ -121,7 +121,7 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
+            return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
 
                 let balance;
 
@@ -320,7 +320,7 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
+            return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
 
                 if (err || !data) {
                     balances[address] = 0;

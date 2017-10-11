@@ -3,18 +3,19 @@ const gcm = require('node-gcm');
 const logger = require('log4js').getLogger('MobileContractBalanceNotifier');
 const MobileTokenBalanceRepository = require('../Repositories/MobileTokenBalanceRepository');
 const MobileTokenBalance = require('../Models/MobileTokenBalance');
+const BigNumber = require('bignumber.js');
 const config = require('../../config/main.json');
 const BALANCE_CHECKER_TIMER_MS = 60000;
 const i18n = require("i18n");
 
 class MobileContractBalanceNotifier {
 
-    constructor(contractBalanceComponent) {
+    constructor(tokenContract) {
 
         logger.info('Init');
 
         this.notifier = new gcm.Sender(config.FIREBASE_SERVER_TOKEN);
-        this.contractBalanceComponent = contractBalanceComponent;
+        this.tokenContract = tokenContract;
 
         this.checkBalances();
 
@@ -85,7 +86,7 @@ class MobileContractBalanceNotifier {
 
             return async.eachSeries(newAddresses, (address, callback) => {
 
-                return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
+                return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
 
                     let balance;
 
@@ -179,10 +180,16 @@ class MobileContractBalanceNotifier {
      * @param {String} notificationToken
      * @param {String} contractAddress
      * @param {Number} amount
+     * @param {Number} decimals
      * @param {String} language
      * @param {Function} next
      */
-    notifyToken(notificationToken, contractAddress, amount, language, next) {
+    notifyToken(notificationToken, contractAddress, amount, decimals, language, next) {
+
+        if (decimals && decimals > 0) {
+            let amountBN = new BigNumber(amount);
+            amount = amountBN.dividedBy('1e' + decimals).toString(10);
+        }
 
         let message = this.getMessage(contractAddress, amount, language);
 
@@ -231,7 +238,7 @@ class MobileContractBalanceNotifier {
 
                 return async.eachSeries(contracts, (contract, callback) => {
 
-                    return this.notifyToken(token, contract, diffBalances[token][contract].amount, diffBalances[token][contract].language, () => {
+                    return this.notifyToken(token, contract, diffBalances[token][contract].amount, diffBalances[token][contract].decimals, diffBalances[token][contract].language, () => {
                         return callback();
                     });
 
@@ -249,10 +256,15 @@ class MobileContractBalanceNotifier {
 
     }
 
+    /**
+     *
+     * @return {*}
+     */
     checkBalances() {
 
         let cursor = MobileTokenBalance.find().cursor(),
             document = null,
+            contractsDecimals = {},
             diffBalances = {};
 
         return async.during(
@@ -273,7 +285,7 @@ class MobileContractBalanceNotifier {
                     let address = addressObject.address,
                         previousBalance = addressObject.balance;
 
-                    return this.contractBalanceComponent.getBalance(contractAddress, address, (err, data) => {
+                    return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
 
                         if (err || !data) {
                             return callback(err);
@@ -283,11 +295,19 @@ class MobileContractBalanceNotifier {
 
                             if (previousBalance !== currentBalance) {
 
-                                return MobileTokenBalanceRepository.updateTokenAddressBalance(notificationToken, addressObject.id, currentBalance, (err) => {
+                                return async.waterfall([(callback) => {
 
-                                    if (err) {
-                                        return callback(err);
-                                    }
+                                    return MobileTokenBalanceRepository.updateTokenAddressBalance(notificationToken, addressObject.id, currentBalance, (err) => {
+
+                                        if (err) {
+                                            return callback(err);
+                                        }
+
+                                        return callback();
+
+                                    });
+
+                                }, (callback) => {
 
                                     if (previousBalance < currentBalance) {
 
@@ -298,18 +318,41 @@ class MobileContractBalanceNotifier {
                                         if (!diffBalances[notificationToken][contractAddress]) {
                                             diffBalances[notificationToken][contractAddress] = {
                                                 language: language,
-                                                amount: 0
+                                                amount: 0,
+                                                decimals: 0
                                             };
                                         }
 
                                         diffBalances[notificationToken][contractAddress].amount += (currentBalance - previousBalance);
 
-                                    }
+                                        if (typeof contractsDecimals[contractAddress] !== "undefined") {
+                                            diffBalances[notificationToken][contractAddress].decimals = contractsDecimals[contractAddress];
+                                        } else {
 
+                                            return this.tokenContract.getDecimals(contractAddress, (err, result) => {
+
+                                                if (err) {
+                                                    return callback(err);
+                                                }
+
+                                                contractsDecimals[contractAddress] = result.decimals;
+
+                                                diffBalances[notificationToken][contractAddress].decimals = result.decimals;
+
+                                                return callback();
+
+                                            });
+
+                                        }
+
+                                    }
 
                                     return callback();
 
+                                }], (err) => {
+                                    return callback(err);
                                 });
+
                             } else {
                                 return callback();
                             }

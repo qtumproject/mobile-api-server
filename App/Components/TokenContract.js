@@ -2,7 +2,7 @@ const TokenInterface = require('./ContractData/TokenInterface');
 const ContractsInfoService = require('../Services/ContractsInfoService');
 const bs58 = require('bs58');
 
-class ContractBalance {
+class TokenContract {
 
     constructor() {
         this.contractsInfoService = new ContractsInfoService(TokenInterface.interface, TokenInterface.functionHashes);
@@ -33,6 +33,28 @@ class ContractBalance {
 
     }
 
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {Function} next
+     * @return {*}
+     */
+    getDecimals(contractAddress, next) {
+
+        try {
+
+            let solidityParams = [this.contractsInfoService.createParam('decimals')];
+
+            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, solidityParams, (err, result) => {
+                return next(err, result);
+            });
+
+        } catch (e) {
+            return next(null, {decimals: 0});
+        }
+
+    }
+
 }
 
-module.exports = ContractBalance;
+module.exports = TokenContract;
