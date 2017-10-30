@@ -82,7 +82,7 @@ class TokenBalanceChangeEvents {
             this.subscriptions.emitterAddresses[uniqueKey] = [addr]
         }
 
-        this.setEmitterAddressesBalance(emitter, addr, 0, false);
+        this.setEmitterAddressesBalance(emitter, addr, '0', false);
     }
 
     /**
@@ -128,7 +128,7 @@ class TokenBalanceChangeEvents {
                 if (err || !data) {
                     balance = {
                         address: address,
-                        balance: 0
+                        balance: '0'
                     };
                 } else {
                     balance = {
@@ -290,7 +290,7 @@ class TokenBalanceChangeEvents {
      *
      * @param {Object} emitter - Socket emitter
      * @param {String} address
-     * @param {Number} balance
+     * @param {String} balance
      * @param {Boolean} ifExists
      */
     setEmitterAddressesBalance(emitter, address, balance, ifExists) {
@@ -323,7 +323,7 @@ class TokenBalanceChangeEvents {
             return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
 
                 if (err || !data) {
-                    balances[address] = 0;
+                    balances[address] = '0';
                 } else {
                     balances[address] = data.balanceOf;
                 }
