@@ -93,7 +93,7 @@ class MobileContractBalanceNotifier {
                     if (err || !data) {
                         balance = {
                             address: address,
-                            balance: 0
+                            balance: '0'
                         };
                     } else {
                         balance = {
@@ -179,19 +179,18 @@ class MobileContractBalanceNotifier {
      *
      * @param {String} notificationToken
      * @param {String} contractAddress
-     * @param {Number} amount
+     * @param {BigNumber} amountBN
      * @param {Number} decimals
      * @param {String} language
      * @param {Function} next
      */
-    notifyToken(notificationToken, contractAddress, amount, decimals, language, next) {
+    notifyToken(notificationToken, contractAddress, amountBN, decimals, language, next) {
 
         if (decimals && decimals > 0) {
-            let amountBN = new BigNumber(amount);
-            amount = amountBN.dividedBy('1e' + decimals).toString(10);
+            amountBN = amountBN.dividedBy('1e' + decimals).toString(10);
         }
 
-        let message = this.getMessage(contractAddress, amount, language);
+        let message = this.getMessage(contractAddress, amountBN.toString(10), language);
 
         return this.notifier.send(message, { registrationTokens: [notificationToken]}, (err, response) => {
 
@@ -292,6 +291,8 @@ class MobileContractBalanceNotifier {
                         } else {
 
                             let currentBalance = data.balanceOf;
+                            let currentBalanceBN = new BigNumber(currentBalance);
+                            let previousBalanceBN = new BigNumber(previousBalance);
 
                             if (previousBalance !== currentBalance) {
 
@@ -309,7 +310,8 @@ class MobileContractBalanceNotifier {
 
                                 }, (callback) => {
 
-                                    if (previousBalance < currentBalance) {
+                                    // if (previousBalance < currentBalance) {
+                                    if (previousBalanceBN.lt(currentBalanceBN)) {
 
                                         if (!diffBalances[notificationToken]) {
                                             diffBalances[notificationToken] = {};
@@ -318,12 +320,13 @@ class MobileContractBalanceNotifier {
                                         if (!diffBalances[notificationToken][contractAddress]) {
                                             diffBalances[notificationToken][contractAddress] = {
                                                 language: language,
-                                                amount: 0,
+                                                amount: new BigNumber(0),
                                                 decimals: 0
                                             };
                                         }
 
-                                        diffBalances[notificationToken][contractAddress].amount += (currentBalance - previousBalance);
+                                        // diffBalances[notificationToken][contractAddress].amount += (currentBalance - previousBalance);
+                                        diffBalances[notificationToken][contractAddress].amount = diffBalances[notificationToken][contractAddress].amount.plus(currentBalanceBN.minus(previousBalanceBN));
 
                                         if (typeof contractsDecimals[contractAddress] !== "undefined") {
                                             diffBalances[notificationToken][contractAddress].decimals = contractsDecimals[contractAddress];

@@ -21,7 +21,7 @@ class MobileTokenBalanceRepository {
      *
      * @param {String} tokenId
      * @param {String} addressId
-     * @param {Number} balance
+     * @param {String} balance
      * @param {Function} next
      * @returns {*}
      */
