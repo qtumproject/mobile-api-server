@@ -42,7 +42,7 @@ class ContractsController {
 
         let req = data.req,
             contractAddress = req.params.contractAddress,
-            from = req.query.from,
+            from = req.body.from,
             hashes = req.body.hashes;
 
         if (!_.isArray(hashes) || !_.isString(contractAddress) || !contractAddress.trim()) {

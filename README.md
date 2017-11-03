@@ -14,7 +14,8 @@
 Request
 ```
 {
-	"hashes": [String, String, ...]
+	"hashes": [String, String, ...],
+	"from": ?String
 }
 ```
 
