@@ -136,7 +136,7 @@ class InsightApiRepository {
      * @returns {*}
      */
     static callContract(address, hash, from, cb) {
-        console.log('from11', from);
+        
         return request.get({
             url: config.INSIGHT_API_URL + `/contracts/${address}/hash/${hash}/call` + (from ? ('?from=' + from) : ''),
             json: true
