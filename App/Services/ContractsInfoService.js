@@ -45,7 +45,7 @@ class ContractsInfoService {
 
         let result;
 
-        return InsightApiRepository.callContract(contractAddress, param.hash, (err, data) => {
+        return InsightApiRepository.callContract(contractAddress, param.hash, null, (err, data) => {
 
             try {
 
@@ -88,12 +88,13 @@ class ContractsInfoService {
 
     /**
      *
-     * @param contractAddress String
-     * @param paramHashes Array
-     * @param next function
+     * @param {String} contractAddress
+     * @param {Array} paramHashes
+     * @param {String} from
+     * @param {Function} next
      * @returns {*}
      */
-    callEncodedParams(contractAddress, paramHashes, next) {
+    callEncodedParams(contractAddress, paramHashes, from, next) {
 
         let result = [];
 
@@ -101,7 +102,7 @@ class ContractsInfoService {
 
         return async.each(paramHashes, (paramHash, callback) => {
 
-            return InsightApiRepository.callContract(contractAddress, paramHash, (err, data) => {
+            return InsightApiRepository.callContract(contractAddress, paramHash, from, (err, data) => {
 
                 if (err) {
                     return callback(err);

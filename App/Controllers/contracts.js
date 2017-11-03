@@ -42,6 +42,7 @@ class ContractsController {
 
         let req = data.req,
             contractAddress = req.params.contractAddress,
+            from = req.query.from,
             hashes = req.body.hashes;
 
         if (!_.isArray(hashes) || !_.isString(contractAddress) || !contractAddress.trim()) {
@@ -56,7 +57,7 @@ class ContractsController {
             return cb("Bad Request", 400);
         }
 
-        return this.contractsInfoService.callEncodedParams(contractAddress, hashes, (err, data) => {
+        return this.contractsInfoService.callEncodedParams(contractAddress, hashes, from, (err, data) => {
 
             if (err) {
                 return cb("Not Found", 404);
