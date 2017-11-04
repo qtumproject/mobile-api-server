@@ -83,8 +83,6 @@ Response
 
 /contracts/generate-token-bytecode
 
-[http://163.172.68.103:5931/contracts/generate-token-bytecode](http://139.162.178.174/contracts/generate-token-bytecode)
-
 request
 
 ```
@@ -110,9 +108,6 @@ response
 
 /contracts/{address_contract}/params?keys=symbol,decimals,name,totalSupply
 
-[http://163.172.68.103:5931/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params?keys=symbol,decimals,name,totalSupply](http://139.162.178.174/contracts/6cf4916739f15e5aeaa45b246d0757f2062b1b8f/params?keys=symbol,decimals,name,totalSupply)
-
-
 response: Object | null
 
 ```
@@ -129,8 +124,6 @@ response: Object | null
 
 /send-raw-transaction
 
-[http://163.172.68.103:5931/send-raw-transaction](http://163.172.68.103:5931/send-raw-transaction)
-
 request parameters
 
 ```
@@ -145,8 +138,6 @@ request parameters
 `GET`
 
 /transactions/{tx_hash}
-
-[http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f](http://163.172.68.103:5931/transactions/25fb98d4849f837d71f331eec74f71e9286e6a0b85d27218f7236dc69d8c990f)
 
 response: Object | null
 
@@ -178,14 +169,47 @@ response: Object | null
 }
 ```
 
+## Get Transaction Receipt
+
+`GET`
+
+/transactions/:txhash/receipt
+
+response: Array
+
+```
+[
+    {
+        "blockHash": "0916253e64ca802cbe29329144a10d73179fd84f118b0ef5c68e4e43276e1827",
+        "blockNumber": 6964,
+        "transactionHash": "073edd4537fda626fb351b25324e1ad69446cf7d489ebfdb6161f86df1f77aec",
+        "transactionIndex": 2,
+        "from": "d9826270f3bee3b792455ff5d1d1cd4432e6a5fa",
+        "to": "588573c01ddcca8844aed7f762ab36b35cc6084e",
+        "cumulativeGasUsed": 51805,
+        "gasUsed": 51805,
+        "contractAddress": "588573c01ddcca8844aed7f762ab36b35cc6084e",
+        "log": [
+            {
+                "address": "588573c01ddcca8844aed7f762ab36b35cc6084e",
+                "topics": [
+                    "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                    "000000000000000000000000d9826270f3bee3b792455ff5d1d1cd4432e6a5fa",
+                    "00000000000000000000000004b13b89eae779f791d298a306a763230d283337"
+                ],
+                "data": "00000000000000000000000000000000000000000000000000000000000001f4"
+            }
+        ]
+    }
+]
+```
+
 ## Get History
 `GET`
 
 /history/{address}/{limit}/{offset}
 
 > `MAX_LIMIT = 50;`
-
-[http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0](http://163.172.68.103:5931/history/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3/2/0)
 
 response
 
@@ -229,8 +253,6 @@ response
 
 > `MAX_LIMIT = 50;`
 
-[http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/history/2/0?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
-
 response
 
 ```
@@ -271,8 +293,6 @@ response
 
 /outputs/unspent/{address}
 
-[http://163.172.68.103:5931/outputs/unspent/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/outputs/unspent/mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
-
 response
 
 ```
@@ -293,8 +313,6 @@ response
 `GET`
 
 /outputs/unspent?addresses[]={:address}&addresses[]={:address2}
-
-[http://163.172.68.103:5931/outputs/unspent?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3&addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3](http://163.172.68.103:5931/outputs/unspent?addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3&addresses[]=mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3)
 
 response
 
@@ -317,8 +335,6 @@ response
 
 /news/{lang}
 
-[http://163.172.68.103:5931/news/en](http://163.172.68.103:5931/news/en)
-
 response
 ```
 [{
@@ -337,8 +353,6 @@ response
 `GET`
 
 /blockchain/info
-
-[http://163.172.68.103:5931/blockchain/info](http://163.172.68.103:5931/blockchain/info)
 
 response
 ```
@@ -366,8 +380,6 @@ response
 `GET`
 
 /blockchain/dgpinfo
-
-[http://163.172.68.103:5931/blockchain/dgpinfo](http://163.172.68.103:5931/blockchain/dgpinfo)
 
 response
 ```

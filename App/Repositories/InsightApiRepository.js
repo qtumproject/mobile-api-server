@@ -164,8 +164,13 @@ class InsightApiRepository {
             json: true
         }, (error, response, body) => {
 
-            if (body && _.isString(body)) { //Fix "Not Found" api response
-                return cb(body);
+            if (error) {
+                return cb(error, body);
+            }
+
+            if (body && _.isString(body)) {
+                console.log('Error minEstimateFee: ', body);
+                return cb('Not Found')
             }
 
             return cb(error, body);
@@ -186,14 +191,20 @@ class InsightApiRepository {
             json: true
         }, (error, response, body) => {
 
-            if (body && _.isString(body)) { //Fix "Not Found" api response
-                body = null;
+            if (error) {
+                return cb(error, body);
+            }
+
+            if (body && _.isString(body)) {
+                console.log('Error getAccountInfo: ', body);
+                return cb('Not Found')
             }
 
             return cb(error, body);
 
         });
     }
+
     /**
      *
      * @param {Function} cb
@@ -206,8 +217,40 @@ class InsightApiRepository {
             json: true
         }, (error, response, body) => {
 
-            if (body && _.isString(body)) { //Fix "Not Found" api response
-                body = null;
+            if (error) {
+                return cb(error, body);
+            }
+
+            if (body && _.isString(body)) {
+                console.log('Error getDgpinfo: ', body);
+                return cb('Not Found')
+            }
+
+            return cb(error, body);
+
+        });
+    }
+
+    /**
+     *
+     * @param {String} txHash
+     * @param {Function} cb
+     * @returns {*}
+     */
+    static getTransactionReceipt(txHash, cb) {
+
+        return request.get({
+            url: config.INSIGHT_API_URL + `/txs/${txHash}/receipt`,
+            json: true
+        }, (error, response, body) => {
+
+            if (error) {
+                return cb(error, body);
+            }
+
+            if (body && _.isString(body)) {
+                console.log('Error getTransactionReceipt: ', body);
+                return cb('Not Found')
             }
 
             return cb(error, body);

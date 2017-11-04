@@ -36,6 +36,18 @@ class TransactionsController {
 
     }
 
+    getTransactionReceipt(cb, data) {
+
+        if (!data.req.params.txhash) {
+            return cb('Bad Request', 400);
+        }
+
+        return InsightApiRepository.getTransactionReceipt(data.req.params.txhash, (error, body) => {
+            cb(error, body);
+        });
+
+    }
+
 }
 
 Controllers.transactions = new TransactionsController();
