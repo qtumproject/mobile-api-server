@@ -195,9 +195,8 @@ class InsightApiRepository {
                 return cb(error, body);
             }
 
-            if (body && _.isString(body)) {
-                console.log('Error getAccountInfo: ', body);
-                return cb('Not Found')
+            if (body && _.isString(body)) { //Fix "Not Found" api response
+               body = null;
             }
 
             return cb(error, body);
