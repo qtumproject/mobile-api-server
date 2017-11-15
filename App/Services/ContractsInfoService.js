@@ -108,6 +108,16 @@ class ContractsInfoService {
                     return callback(err);
                 }
 
+
+                if (!data || !data.executionResult) {
+                    result.push({
+                        hash: paramHash,
+                        output: '',
+                        gas_used: 0,
+                        excepted: true
+                    });
+                }
+                
                 result.push({
                     hash: paramHash,
                     output: data.executionResult.output,
