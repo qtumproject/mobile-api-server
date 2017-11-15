@@ -116,14 +116,16 @@ class ContractsInfoService {
                         gas_used: 0,
                         excepted: true
                     });
+                } else {
+                    result.push({
+                        hash: paramHash,
+                        output: data.executionResult.output,
+                        gas_used: data.executionResult.gasUsed,
+                        excepted: data.executionResult.excepted
+                    });
                 }
-                
-                result.push({
-                    hash: paramHash,
-                    output: data.executionResult.output,
-                    gas_used: data.executionResult.gasUsed,
-                    excepted: data.executionResult.excepted
-                });
+
+
 
                 return callback(err, data);
 
