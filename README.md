@@ -684,7 +684,7 @@ html
 # QStore API
 
 
-##Trending now
+## Trending now
 
 `GET`
 
