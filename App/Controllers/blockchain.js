@@ -26,6 +26,15 @@ class BlockchainController {
         }
 
         return InsightApiRepository.minEstimateFee(nBlocks, (error, body) => {
+
+            if (error) {
+                return cb(error);
+            }
+
+            if (body && body.fee_per_kb < 0.004) {
+                body.fee_per_kb = 0.006;
+            }
+
             return cb(error, body);
 		});
 	}
