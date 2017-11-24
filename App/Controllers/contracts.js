@@ -5,6 +5,7 @@ const TokenInterface = require('../Components/ContractData/TokenInterface');
 const ContractsInfoService = require('../Services/ContractsInfoService');
 const ContractsTypesService = require('../Services/ContractsTypesService');
 const CacheRepository = require('../Repositories/CacheRepository');
+const InsightApiRepository = require('../Repositories/InsightApiRepository');
 
 let Controllers = getControllers();
 
@@ -135,6 +136,36 @@ class ContractsController {
         })
     }
 
+    /**
+     *
+     * @param {Function} cb
+     * @param {Object} data
+     * @param {Object} data.req
+     * @param {Object} data.req.params
+     * @param {String} data.req.params.contractAddress
+     * @return {*}
+     */
+    exists(cb, data) {
+
+        let req = data.req,
+            contractAddress = req.params.contractAddress;
+
+        if (!contractAddress || !_.isString(contractAddress) || !contractAddress.trim()) {
+            return cb("Bad Request", 400);
+        }
+
+        return InsightApiRepository.getAccountInfo(contractAddress, (err, res) => {
+
+            if (err || !res) {
+                logger.error('Bad contract address', contractAddress, err, res);
+                return cb(null, {exists: false});
+            }
+
+            return cb(null, {exists: true});
+
+        });
+
+    }
 }
 
 Controllers.contracts = new ContractsController();

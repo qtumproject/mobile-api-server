@@ -261,7 +261,7 @@ class InsightApiRepository {
     static fetchQrc20Transfers(contractAddress, options, cb) {
 
         let queryParamsString = queryString.stringify(options, {arrayFormat: 'bracket'});
-        console.log('queryParamsString', queryParamsString);
+
         return request.get({
             url: config.INSIGHT_API_URL + `/erc20/${contractAddress}/transfers` + (queryParamsString ? ('?' + queryParamsString) : ''),
             json: true

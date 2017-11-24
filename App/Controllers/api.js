@@ -39,6 +39,8 @@ let APIController = {
 
         APIController.addHandler('get', '/qrc20/:contractAddress/transfers', Controllers.qrc20.fetchTransfers.bind(Controllers.qrc20));
 
+        APIController.addHandler('get', '/contracts/:contractAddress/exists', Controllers.contracts.exists.bind(Controllers.contracts));
+
         APIController.addHandler('get', '/contracts/types', Controllers.contracts.fetchContractTypes.bind(Controllers.contracts));
 
 		APIController.addHandler('post', '/contracts/encoder', Controllers.contracts.encodeContract);

@@ -1,9 +1,40 @@
 ## Table of Contents
 
 * [API](#api)
+    * [Contracts / Call](#contracts-call)
+    * [Contracts / Encoder](#contracts-encoder)
+    * [Contracts / Generate token bytecode](#contracts-generate-token-bytecode)
+    * [Contracts / Params](#contracts-params)
+    * [Send Raw Transaction](#send-raw-transactions)
+    * [Get Transaction](#get-transaction)
+    * [Get Transaction Receipt](#get-transaction-receipt)
+    * [Get History](#get-history)
+    * [Get History for several addresses](#get-history-for-several-addresses)
+    * [Get unspent outputs](#get-unspent-outputs)
+    * [Get unspent outputs for several addresses](#get-unspent-outputs-for-several-addresses)
+    * [Get news](#get-news)
+    * [Get blockchain info](#get-blockchain-info)
+    * [Get dgp info](#get-dgp-info)
+    * [Estimate Fee Per Kb](#estimate-fee-per-kb)
     * [QRC20 Transfers](#qrc20-transfers)
+    * [Does Contract exist?](#does-contract-exist)
+    
+* [Web Socket API](#web-socket-api)
 
 * [QStore API](#qstore-api)
+    * [Trending now](#trending-now)
+    * [Last added](#last-added)
+    * [Contract search](#contract-search)
+    * [Contract](#contract)
+    * [Contract ABI](#contract-abi)
+    * [Buy Request](#buy-request)
+    * [Is Paid](#is-paid)
+    * [Source code](#source-code)
+    * [Bytecode](#bytecode)
+    * [Types (Categories)](#types-categories)
+    
+    
+* [Web Socket QStore API](#web-socket-qstore-api)
 
 # API
 
@@ -393,6 +424,21 @@ response
 ```
 
 
+## Estimate Fee Per Kb
+
+`GET`
+
+/estimate-fee-per-kb[?nBlocks=2]
+
+Response: 
+
+```
+   {
+       fee_per_kb: 0.00001
+   }
+```
+
+
 ## QRC20 Transfers
 
 `GET`
@@ -425,6 +471,21 @@ Response:
     ]
 }
 ```
+
+## Does Contract exist?
+
+`GET`
+
+/contracts/{:contractAddress}/exists
+
+Response:
+
+```
+    {
+        "exists": Boolean
+    }
+```
+
 
 
 # Web Socket API
@@ -841,20 +902,6 @@ Response:
     },
     ...
 ]
-```
-
-## Estimate Fee Per Kb
-
-`GET`
-
-/estimate-fee-per-kb[?nBlocks=2]
-
-Response: 
-
-```
-   {
-       fee_per_kb: 0.00001
-   }
 ```
 
 
