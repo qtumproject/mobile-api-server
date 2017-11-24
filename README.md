@@ -1,6 +1,8 @@
 ## Table of Contents
 
 * [API](#api)
+    * [QRC20 Transfers](#qrc20-transfers)
+
 * [QStore API](#qstore-api)
 
 # API
@@ -389,6 +391,41 @@ response
     mingasprice: 40000000
 }
 ```
+
+
+## QRC20 Transfers
+
+`GET`
+
+/qrc20/{:qrc20ContractAddress}/transfers?limit=20&offset=0&addresses[]=QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd
+
+Response:
+```
+{
+    "limit": 20,
+    "offset": 0,
+    "count": 2,
+    "items": [
+        {
+            "contract_address": "9d3d4cc1986d81f9109f2b091b7732e7d9bcf63b",
+            "from": "QcoAQPP93jDAYnfvUxabQvGNR8x6Hn6tKC",
+            "to": "QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd",
+            "amount": "1000000",
+            "tx_hash": "b6101753060d6e7dd40a23e84305dd6c9f25d3f1b8a9cd45edc69cddb8d7f75a",
+            "tx_time": 1511486352
+        },
+        {
+            "contract_address": "9d3d4cc1986d81f9109f2b091b7732e7d9bcf63b",
+            "from": "QQoU895WJ1NfCzHp6dEN8HEi9b8iuRvzQy",
+            "to": "QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd",
+            "amount": "1000000",
+            "tx_hash": "79a958c1c323ac249e6b56862bf7a836df23cc7532ea4c4551f5d11694d9533d",
+            "tx_time": 1511065856
+        }
+    ]
+}
+```
+
 
 # Web Socket API
 
@@ -819,6 +856,7 @@ Response:
        fee_per_kb: 0.00001
    }
 ```
+
 
 # Web Socket QStore API
 

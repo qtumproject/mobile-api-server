@@ -37,6 +37,7 @@ let APIController = {
 		APIController.app.options('*', cors());
 
 
+        APIController.addHandler('get', '/qrc20/:contractAddress/transfers', Controllers.qrc20.fetchTransfers.bind(Controllers.qrc20));
 
         APIController.addHandler('get', '/contracts/types', Controllers.contracts.fetchContractTypes.bind(Controllers.contracts));
 
@@ -47,6 +48,8 @@ let APIController = {
         APIController.addHandler('get', '/contracts/:contractAddress/params', Controllers.contracts.fetchContractParams);
 
         APIController.addHandler('get', '/estimate-fee-per-kb', Controllers.blockchain.getFeePerKb);
+
+
 
         APIController.addHandler('post', '/contracts/:contractId/source-code', Controllers.contractsStore.getSourceCode.bind(Controllers.contractsStore));
         APIController.addHandler('post', '/contracts/:contractId/bytecode', Controllers.contractsStore.getBytecode.bind(Controllers.contractsStore));

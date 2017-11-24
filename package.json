@@ -1,6 +1,6 @@
 {
   "name": "qtum-mobile-api-server",
-  "version": "0.0.2",
+  "version": "0.3.0",
   "description": "Node.JS mobile server for QTUM application",
   "dependencies": {
     "async": "^2.1.4",
@@ -31,6 +31,7 @@
     "node-gcm": "^0.14.6",
     "npm": "^4.1.1",
     "qtumcore-lib": "git+ssh://git@github.com:qtumproject/qtumcore-lib.git",
+    "query-string": "^5.0.1",
     "raven": "^1.1.1",
     "request": "^2.79.0",
     "sequelize": "^3.30.0",

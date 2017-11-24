@@ -1,6 +1,7 @@
-let request = require('request'),
-    _ = require('lodash'),
-    config = require('../../config/main.json');
+const request = require('request');
+const _ = require('lodash');
+const config = require('../../config/main.json');
+const queryString = require('query-string');
 
 class InsightApiRepository {
 
@@ -256,6 +257,30 @@ class InsightApiRepository {
 
         });
     }
+
+    static fetchQrc20Transfers(contractAddress, options, cb) {
+
+        let queryParamsString = queryString.stringify(options, {arrayFormat: 'bracket'});
+        console.log('queryParamsString', queryParamsString);
+        return request.get({
+            url: config.INSIGHT_API_URL + `/erc20/${contractAddress}/transfers` + (queryParamsString ? ('?' + queryParamsString) : ''),
+            json: true
+        }, (error, response, body) => {
+
+            if (error) {
+                return cb(error, body);
+            }
+
+            if (body && _.isString(body)) {
+                console.log('Error fetchQrc20Transfers: ', body);
+                return cb('Not Found')
+            }
+
+            return cb(error, body);
+
+        });
+    }
+
 
 }
 
