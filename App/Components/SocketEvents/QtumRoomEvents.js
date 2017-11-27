@@ -217,8 +217,8 @@ class QtumRoomEvents {
                     immatureBN = new BigNumber(data.immature ? data.immature : 0);
 
                 emitter.emit('balance_changed', {
-                    unconfirmedBalance: unconfirmedBalanceBN.plus(immatureBN).toString(10),
-                    balance: balanceBN.minus(immatureBN).toString(10)
+                    unconfirmedBalance: unconfirmedBalanceBN.plus(immatureBN).toNumber(),
+                    balance: balanceBN.minus(immatureBN).toNumber()
                 });
 
             });
