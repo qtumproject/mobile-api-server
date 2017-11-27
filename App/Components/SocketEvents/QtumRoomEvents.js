@@ -3,6 +3,7 @@ const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
 const InsightApiRepository = require("../../Repositories/InsightApiRepository");
 const TransactionService = require("../../Services/TransactionService");
 const async = require('async');
+const BigNumber = require('bignumber.js');
 const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 
@@ -207,11 +208,18 @@ class QtumRoomEvents {
         if (this.subscriptions.emitterAddress[emitter.id]) {
             return InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 
-                if (err) {
+                if (err || !data) {
                     return false;
                 }
 
-                emitter.emit('balance_changed', data);
+                let unconfirmedBalanceBN = new BigNumber(data.unconfirmedBalance),
+                    balanceBN = new BigNumber(data.balance),
+                    immatureBN = new BigNumber(data.immature ? data.immature : 0);
+
+                emitter.emit('balance_changed', {
+                    unconfirmedBalance: unconfirmedBalanceBN.plus(immatureBN).toString(10),
+                    balance: balanceBN.minus(immatureBN).toString(10)
+                });
 
             });
         }
