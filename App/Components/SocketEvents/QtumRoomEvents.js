@@ -208,7 +208,7 @@ class QtumRoomEvents {
         if (this.subscriptions.emitterAddress[emitter.id]) {
             return InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 
-                if (err || !data) {
+                if (err || !data || typeof data.unconfirmedBalance === "undefined" || typeof data.balance === "undefined") {
                     return false;
                 }
 
