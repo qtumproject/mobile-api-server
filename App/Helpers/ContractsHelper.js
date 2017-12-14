@@ -17,6 +17,25 @@ class ContractsHelper {
                fChunk = script.chunks.find((chunk) => {
                    return (chunk.opcodenum && [OP_CREATE, OP_CALL].indexOf(chunk.opcodenum) !== -1);
                });
+           return !!fChunk;
+        } catch (e) {
+           return false;
+        }
+
+    }
+
+    /**
+     *
+     * @param {String} str
+     * @returns {boolean}
+     */
+    static isContractCreateVOutHex(str) {
+
+       try {
+           let script = bitcore.Script.fromString(str),
+               fChunk = script.chunks.find((chunk) => {
+                   return (chunk.opcodenum && [OP_CREATE].indexOf(chunk.opcodenum) !== -1);
+               });
 
            return !!fChunk;
         } catch (e) {
@@ -25,6 +44,40 @@ class ContractsHelper {
 
     }
 
+    /**
+     *
+     * @param {String} str
+     * @returns {boolean}
+     */
+    static isContractCallVOutHex(str) {
+
+       try {
+           let script = bitcore.Script.fromString(str),
+               fChunk = script.chunks.find((chunk) => {
+                   return (chunk.opcodenum && [OP_CALL].indexOf(chunk.opcodenum) !== -1);
+               });
+
+           return !!fChunk;
+        } catch (e) {
+           return false;
+        }
+
+    }
+
+    /**
+     *
+     * @param {String} hex
+     * @return {null|String}
+     */
+    static getCallContractAddressFromVOutHex(hex) {
+
+        try {
+            let script = bitcore.Script.fromString(hex);
+            return script.chunks[script.chunks.length - 2]['buf'].toString('hex');
+        } catch (e) {
+            return null;
+        }
+    }
     /**
      *
      * @param {String} txid

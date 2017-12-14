@@ -3,7 +3,6 @@ let ContractsHelper = require('../Helpers/ContractsHelper');
 let InsightApiRepository = require('../Repositories/InsightApiRepository');
 let async = require('async');
 
-
 class HistoryService {
 
     /**
@@ -55,7 +54,8 @@ class HistoryService {
     static formatHistoryItem(item, cb) {
         let vout = [],
             vin = [],
-            addressString = null;
+            addressCallString = null,
+            addressCreateString = null;
 
         if (item.vin) {
             item.vin.forEach((vIn) => {
@@ -81,11 +81,16 @@ class HistoryService {
                 if (vOut.scriptPubKey) {
 
                     try {
-                        if (ContractsHelper.isContractVOutHex(vOut.scriptPubKey.hex)) {
-                            addressString = ContractsHelper.getContractAddress(item.txid, vOut.n);
+                        if (ContractsHelper.isContractCreateVOutHex(vOut.scriptPubKey.hex)) {
+                            addressCreateString = ContractsHelper.getContractAddress(item.txid, vOut.n);
                         }
-                    } catch (e) {
-                    }
+                    } catch (e) {}
+
+                    try {
+                        if (!addressCreateString && ContractsHelper.isContractCallVOutHex(vOut.scriptPubKey.hex)) {
+                            addressCallString = ContractsHelper.getCallContractAddressFromVOutHex(vOut.scriptPubKey.hex);
+                        }
+                    } catch (e) {}
 
                     if (vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length && typeof vOut.value !== 'undefined') {
 
@@ -114,18 +119,22 @@ class HistoryService {
             vin: vin
         };
 
-        if (!addressString) {
+        if (!addressCreateString && !addressCallString) {
             return cb(null, result);
         }
 
-        return InsightApiRepository.getAccountInfo(addressString, (err, res) => {
+        return InsightApiRepository.getAccountInfo(addressCreateString ? addressCreateString : addressCallString, (err, res) => {
 
             if (err) {
                 return cb(err)
             }
 
-            if (res) {
+            if (res && addressCreateString) {
                 result.contract_has_been_created = true;
+            }
+
+            if (!res && addressCallString) {
+                result.contract_has_been_deleted = true;
             }
 
             return cb(null, result);
