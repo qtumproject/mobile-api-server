@@ -261,11 +261,13 @@ response
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+                     "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
                  },
                  {
                      "value": "0.874", //qtum
-                     "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                     "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3",
+                     "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
                  }
              ],
              "vin": [
@@ -303,11 +305,13 @@ response
              "vout": [
                  {
                      "value": "1", //qtum
-                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+                     "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+                     "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
                  },
                  {
                      "value": "0.874", //qtum
-                     "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+                     "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3",
+                     "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
                  }
              ],
              "vin": [
@@ -637,16 +641,17 @@ Sample output:
     "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
     "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
     "amount": 1.875, //qtum
-    "contract_has_been_created": true, //optional
     "contract_has_been_deleted": true, //optional
     "vout": [
         {
             "value": "1", //qtum
-            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ"
+            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+            "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
         },
         {
             "value": "0.874", //qtum
-            "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+            "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3",
+            "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
         }
     ],
     "vin": [

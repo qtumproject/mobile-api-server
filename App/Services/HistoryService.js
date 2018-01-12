@@ -98,7 +98,8 @@ class HistoryService {
 
                         vout.push({
                             value: num.toString(10),
-                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null
+                            address: vOut.scriptPubKey.addresses[0] ? vOut.scriptPubKey.addresses[0] : null,
+                            scriptPubKey: vOut.scriptPubKey.asm
                         });
 
                     }
