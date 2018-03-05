@@ -204,7 +204,7 @@ class QtumRoomEvents {
      * @param {Object} emitter - Socket emitter
      */
     notifyBalanceChangedEmitter(emitter) {
-
+        
         if (this.subscriptions.emitterAddress[emitter.id]) {
             return InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 

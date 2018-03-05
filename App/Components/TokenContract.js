@@ -34,6 +34,46 @@ class TokenContract {
     }
 
     /**
+    *
+    * @param {String} contractAddress
+    * @param {Function} next
+    * @return {*}
+    */
+    getSymbol(contractAddress, next) {
+        try {
+
+            let solidityParams = [this.contractsInfoService.createParam('symbol')];
+
+            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, solidityParams, (err, result) => {
+                return next(err, result);
+            });
+
+        } catch (e) {
+            return next(null, { symbol: undefined });
+        }
+    }
+
+    /**
+    *
+    * @param {String} contractAddress
+    * @param {Function} next
+    * @return {*}
+    */
+    getName(contractAddress, next) {
+        try {
+
+            let solidityParams = [this.contractsInfoService.createParam('name')];
+
+            return this.contractsInfoService.fetchInfoBySolidityParams(contractAddress, solidityParams, (err, result) => {
+                return next(err, result);
+            });
+
+        } catch (e) {
+            return next(null, { name: undefined });
+        }
+    }
+
+    /**
      *
      * @param {String} contractAddress
      * @param {Function} next
@@ -50,7 +90,7 @@ class TokenContract {
             });
 
         } catch (e) {
-            return next(null, {decimals: 0});
+            return next(null, { decimals: 0 });
         }
 
     }

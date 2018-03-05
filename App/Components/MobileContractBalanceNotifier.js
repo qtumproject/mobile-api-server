@@ -5,7 +5,7 @@ const MobileTokenBalanceRepository = require('../Repositories/MobileTokenBalance
 const MobileTokenBalance = require('../Models/MobileTokenBalance');
 const BigNumber = require('bignumber.js');
 const config = require('../../config/main.json');
-const BALANCE_CHECKER_TIMER_MS = 60000;
+const BALANCE_CHECKER_TIMER_MS = 6000;
 const i18n = require("i18n");
 
 class MobileContractBalanceNotifier {
@@ -154,16 +154,18 @@ class MobileContractBalanceNotifier {
     /**
      *
      * @param {String} contractAddress
+     * @param {String} name
+     * @param {String} symbol
      * @param {Number} amount
      * @param {String} language
      * @returns {*}
      */
-    getMessage(contractAddress, amount, language) {
+    getMessage({ contractAddress, name, symbol, amount }, language) {
 
         let message = new gcm.Message();
 
-        message.addNotification('title', i18n.__({phrase: 'notification.title', locale: language}));
-        message.addNotification('body', i18n.__({phrase: 'notification.body', locale: language}, {amount: amount}));
+        message.addNotification('title', i18n.__({ phrase: 'notification.title', locale: language }, { name }));
+        message.addNotification('body', i18n.__({ phrase: 'notification.body', locale: language }, { amount, symbol }));
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
         message.addNotification('color', '#2e9ad0');
@@ -190,30 +192,50 @@ class MobileContractBalanceNotifier {
             amountBN = amountBN.dividedBy('1e' + decimals).toString(10);
         }
 
-        let message = this.getMessage(contractAddress, amountBN.toString(10), language);
 
-        return this.notifier.send(message, { registrationTokens: [notificationToken]}, (err, response) => {
+
+        return this.tokenContract.getName(contractAddress, (err, { name }) => {
 
             if (err) {
+                logger.error('MobileTokenBalanceNotifier', err);
                 return next(err);
             }
 
-            logger.info(err, response);
+            return this.tokenContract.getSymbol(contractAddress, (err, { symbol }) => {
 
-            if (response.failure) {
-
-                logger.info('Failure. Delete token..', notificationToken);
-
-                return MobileTokenBalanceRepository.deleteToken(notificationToken, null, null, (err) => {
+                if (err) {
+                    logger.error('MobileTokenBalanceNotifier', err);
                     return next(err);
+                }
+
+                let message = this.getMessage({ contractAddress, name, symbol, amount: amountBN.toString(10) }, language);
+
+                return this.notifier.send(message, { registrationTokens: [notificationToken] }, (err, response) => {
+
+                    if (err) {
+                        logger.error('MobileTokenBalanceNotifier', err);
+                        return next(err);
+                    }
+
+                    logger.info(err, response);
+
+                    if (response.failure) {
+
+                        logger.info('Failure. Delete token..', notificationToken);
+
+                        return MobileTokenBalanceRepository.deleteToken(notificationToken, null, null, (err) => {
+                            return next(err);
+                        });
+
+                    }
+
+                    return next();
+
                 });
 
-            }
-
-            return next();
+            });
 
         });
-
 
     }
 
@@ -293,9 +315,9 @@ class MobileContractBalanceNotifier {
                             let currentBalance = data.balanceOf;
                             let currentBalanceBN = new BigNumber(currentBalance);
                             let previousBalanceBN = new BigNumber(previousBalance);
-
+                           
                             if (previousBalance !== currentBalance) {
-
+                                
                                 return async.waterfall([(callback) => {
 
                                     return MobileTokenBalanceRepository.updateTokenAddressBalance(notificationToken, addressObject.id, currentBalance, (err) => {
@@ -309,7 +331,6 @@ class MobileContractBalanceNotifier {
                                     });
 
                                 }, (callback) => {
-
                                     // if (previousBalance < currentBalance) {
                                     if (previousBalanceBN.lt(currentBalanceBN)) {
 
@@ -374,7 +395,6 @@ class MobileContractBalanceNotifier {
                 if (err) {
                     logger.error(err);
                 }
-
                 return this.notifyTokens(diffBalances, () => {
                     setTimeout(() => {
                         this.checkBalances();

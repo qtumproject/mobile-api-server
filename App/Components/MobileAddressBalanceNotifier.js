@@ -93,23 +93,22 @@ class MobileAddressBalanceNotifier {
 
     /**
      *
-     * @param {Object} data
-     * @param {BigNumber} data.amount
-     * @param {Array.<String>} data.transactions
+     * @param {BigNumber} amount
+     * @param {Array.<String>} transactions
      * @param {String} language
      * @returns {*}
      */
-    getMessage(data, language) {
+    getMessage({ amount, transactions }, language) {
         let message = new gcm.Message();
 
-        message.addNotification('title', i18n.__({phrase: 'notification.title', locale: language}));
-        message.addNotification('body', i18n.__({phrase: 'notification.body', locale: language}, {amount: data.amount.toString(10)}));
+        message.addNotification('title', i18n.__({ phrase: 'notification.title', locale: language }, { name: 'QTUM' }));
+        message.addNotification('body', i18n.__({ phrase: 'notification.body', locale: language }, { name: 'QTUM', amount: amount.toString(10) }));
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
         message.addNotification('color', '#2e9ad0');
 
         message.addData('type', 'balance');
-        message.addData('transactions', data.transactions);
+        message.addData('transactions', transactions);
 
         return message;
 
@@ -162,7 +161,7 @@ class MobileAddressBalanceNotifier {
 
                         let message = this.getMessage(addressesHash[addressObject.address], languageKey);
 
-                        return this.notifier.send(message, { registrationTokens: notifyTokens}, (err, response) => {
+                        return this.notifier.send(message, { registrationTokens: notifyTokens }, (err, response) => {
 
                             if (err) {
                                 logger.error('notifier.send', err);
