@@ -35,6 +35,15 @@ class TransactionService {
 
     }
 
+    static getTransactionReceipt(txId, next) {
+        return InsightApiRepository.getTransactionReceipt(txId, (err, data) => {
+            if (err) {
+                return next(err, data);
+            }
+            return next(null, data);
+        });
+    }
+
 }
 
 module.exports = TransactionService;

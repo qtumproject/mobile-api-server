@@ -50,7 +50,7 @@ class SocketController {
     }
 
     initSocketEvents() {
-        this.events.tokenBalanceEvents = new TokenBalanceChangeEvents(this.socket, this.tokenContract);
+        this.events.tokenBalanceEvents = new TokenBalanceChangeEvents(this.socket, this.socketClient, this.tokenContract);
         this.events.qtumRoomEvents = new QtumRoomEvents(this.socket, this.socketClient);
         this.events.contractPurchaseEvents = new ContractPurchaseEvents(contractPurchaseWatcherInstance);
     }
