@@ -5,7 +5,7 @@ const MobileTokenBalanceRepository = require('../Repositories/MobileTokenBalance
 const MobileTokenBalance = require('../Models/MobileTokenBalance');
 const BigNumber = require('bignumber.js');
 const config = require('../../config/main.json');
-const BALANCE_CHECKER_TIMER_MS = 3000;
+const BALANCE_CHECKER_TIMER_MS = 60000;
 const i18n = require('i18n');
 
 class MobileContractBalanceNotifier {
