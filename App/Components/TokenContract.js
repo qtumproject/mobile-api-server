@@ -49,7 +49,7 @@ class TokenContract {
             });
 
         } catch (e) {
-            return next(null, { symbol: undefined });
+            return next(null, { symbol: '' });
         }
     }
 
@@ -69,7 +69,7 @@ class TokenContract {
             });
 
         } catch (e) {
-            return next(null, { name: undefined });
+            return next(null, { name: '' });
         }
     }
 

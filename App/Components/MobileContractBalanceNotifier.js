@@ -231,7 +231,16 @@ class MobileContractBalanceNotifier {
 
     }
 
+
+    /**
+    *
+    * @param {String} contractAddress
+    * @param {Function} next
+    * @returns {*}
+    */
     getContractInfo(contractAddress, next) {
+        const contractInfo = {};
+        
         return async.waterfall([
             (callback) => this.tokenContract.getName(contractAddress, (err, { name }) => {
                 if (err) {
@@ -239,17 +248,21 @@ class MobileContractBalanceNotifier {
                     return callback(err);
                 }
 
-                return callback(null, name);
+                contractInfo.name = name;
+
+                return callback();
             }),
-            (name, callback) => this.tokenContract.getSymbol(contractAddress, (err, { symbol }) => {
+            (callback) => this.tokenContract.getSymbol(contractAddress, (err, { symbol }) => {
                 if (err) {
                     logger.error('MobileTokenBalanceNotifier', err);
                     return callback(err);
                 }
 
-                return callback(null, { name, symbol });
+                contractInfo.symbol = symbol;
+
+                return callback();
             })
-        ], (err, contractInfo) => {
+        ], (err) => {
             if (err) {
                 return next(err);
             }
@@ -350,7 +363,7 @@ class MobileContractBalanceNotifier {
                                     });
 
                                 }, (callback) => {
-                                    // if (previousBalance < currentBalance) {
+
                                     if (previousBalanceBN.lt(currentBalanceBN)) {
 
                                         if (!diffBalances[notificationToken]) {
@@ -365,7 +378,6 @@ class MobileContractBalanceNotifier {
                                             };
                                         }
 
-                                        // diffBalances[notificationToken][contractAddress].amount += (currentBalance - previousBalance);
                                         diffBalances[notificationToken][contractAddress].amount = diffBalances[notificationToken][contractAddress].amount.plus(currentBalanceBN.minus(previousBalanceBN));
 
                                         if (typeof contractsDecimals[contractAddress] !== "undefined") {
