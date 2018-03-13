@@ -8,7 +8,7 @@ const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 const bs58 = require('bs58');
 const qtumcoreLib = require('qtumcore-lib');
-const BALANCE_CHECKER_TIMER_MS = 30000;
+
 const ERC20_ZERO_TOPIC_HASH = 'ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 
@@ -41,7 +41,7 @@ class TokenBalanceChangeEvents {
                     return async.waterfall([
                         (callback) => TransactionService.getTransaction(transaction.txid, (err, result) => {
                             if (err) {
-                                logger.error('get transaction err', err.message);
+                                logger.error('Get transaction error: ', err.message);
                                 return callback(err);
                             }
 
@@ -51,14 +51,12 @@ class TokenBalanceChangeEvents {
                         }),
                         (callback) => TransactionService.getTransactionReceipt(transaction.txid, (err, data) => {
                             if (err) {
-                                logger.error('get transaction receipt err', err.message);
+                                logger.error('Get transaction receipt error: ', err.message);
                                 return callback(err);
                             }
 
-                            console.log('[DATA]', data);
                             if (data && data[0]) {
                                 receipt = data[0];
-                                console.log('[RECEIPT]', JSON.stringify(receipt, null, 2));
                                 this.processTransactionReceiptLogs(receipt.log, formattedTransaction);
                             }
 
@@ -141,19 +139,15 @@ class TokenBalanceChangeEvents {
                         return callback();
                     }
 
-                    return this.tokenContract.getBalance(contractAddress, addressFrom, (err, balance) => {
-                        console.log(balance);
-                        if (err || !balance) {
-                            notifications.push({
-                                address: addressFrom,
-                                balances: '0',
-                            });
-                        } else {
-                            notifications.push({
-                                address: addressFrom,
-                                balances: balance.balanceOf,
-                            });
+                    return this.getTokenBalance(contractAddress, addressFrom, (err, balanceValue) => {
+                        if (err) {
+                            logger.error('Get balance error: ', err.message);
                         }
+
+                        notifications.push({
+                            address: addressFrom,
+                            balances: balanceValue,
+                        });
 
                         return callback(err);
                     });
@@ -164,19 +158,15 @@ class TokenBalanceChangeEvents {
                         return callback();
                     }
 
-                    return this.tokenContract.getBalance(contractAddress, addressTo, (err, balance) => {
-                        console.log(balance);
-                        if (err || !balance) {
-                            notifications.push({
-                                address: addressTo,
-                                balances: '0',
-                            });
-                        } else {
-                            notifications.push({
-                                address: addressTo,
-                                balances: balance.balanceOf,
-                            });
+                    return this.getTokenBalance(contractAddress, addressTo, (err, balanceValue) => {
+                        if (err) {
+                            logger.error('Get balance error: ', err.message);
                         }
+
+                        notifications.push({
+                            address: addressTo,
+                            balances: balanceValue,
+                        });
 
                         return callback(err);
                     });
@@ -192,36 +182,6 @@ class TokenBalanceChangeEvents {
             });
 
         });
-        // emitters.forEach((emitter) => {
-
-        //     let uniqueContractKey = this.getUniqueContractKey(emitter, contractAddress);
-        //     let addresses = this.subscriptions.emitterAddresses[uniqueContractKey];
-
-        //     let indexFrom = addresses.indexOf(addressFrom);
-        //     let indexTo = addresses.indexOf(addressTo);
-
-        //     if (indexFrom !== -1) {
-        //         notifications.push({
-        //             address: addressFrom,
-        //             balances: amount.toString(),
-        //         });
-        //     }
-        //     if (indexTo !== -1) {
-        //         notifications.push({
-        //             address: addressTo,
-        //             balances: amount.toString(),
-        //         });
-        //     }
-
-        //     console.log('[NOTIFICATIONS]', JSON.stringify(notifications, null, 2));
-
-        //     this.emitTokenBalanceChangeEvent(emitter, {
-        //         contract_address: contractAddress,
-        //         balances: notifications,
-        //     });
-        //     this.emitNewTokenTransactionEvent(emitter, transaction);
-
-        // });
     }
 
     /**
@@ -245,27 +205,31 @@ class TokenBalanceChangeEvents {
             amount = solidityCoderUint.unpackOutput(data);
         } catch (err) {
             amount = 0;
-            logger.error('Topic amount parse error:', err.message);
+            logger.error('Topic amount parse error: ', err.message);
         }
 
         try {
             let addressFromEth = solidityCoderAddress.unpackOutput(from);
             addressFrom = ContractsHelper.getBitAddressFromContractAddress(addressFromEth, pubkeyhash);
         } catch (err) {
-            logger.error('Topic address from parse error:', err.message);
+            logger.error('Topic address from parse error: ', err.message);
         }
 
         try {
             let addressToEth = solidityCoderAddress.unpackOutput(to);
             addressTo = ContractsHelper.getBitAddressFromContractAddress(addressToEth, pubkeyhash);
         } catch (err) {
-            logger.error('Topic address to parse error:', err.message);
+            logger.error('Topic address to parse error: ', err.message);
         }
 
         return { addressFrom, addressTo, amount };
 
     }
 
+    /**
+     *
+     * @returns {Number}
+     */
     getNetworkPubkeyhash() {
         if (config.NETWORK = 'testnet') {
             return qtumcoreLib.Networks.get('testnet').pubkeyhash;
@@ -512,27 +476,18 @@ class TokenBalanceChangeEvents {
 
         return async.eachSeries(addresses, (address, callback) => {
 
-            return this.tokenContract.getBalance(contractAddress, address, (err, data) => {
-
-                let balance;
-
-                if (err || !data) {
-                    balance = {
-                        address: address,
-                        balance: '0'
-                    };
-                } else {
-                    balance = {
-                        address: address,
-                        balance: data.balanceOf
-                    };
+            return this.getTokenBalance(contractAddress, address, (err, balanceValue) => {
+                if (err) {
+                    logger.error('Get token balance error: ', err.message);
                 }
 
-                balances.push(balance);
+                balances.push({
+                    address: address,
+                    balance: balanceValue,
+                });
 
                 return callback(err);
-
-            });
+            })
 
         }, (err) => {
 
@@ -546,7 +501,21 @@ class TokenBalanceChangeEvents {
         });
 
     }
-    
+
+
+    /**
+     *
+     * @param {String} contractAddress
+     * @param {String} address
+     * @param {Function} next
+     * @returns {*}
+     */
+    getTokenBalance(contractAddress, address, next) {
+        return this.tokenContract.getBalance(contractAddress, address, (err, balance) => {
+            return (err || !balance) ? next(err, '0') : next(err, balance.balanceOf);
+        });
+    }
+
     /**
      *
      * @param {Object} emitter - Socket emitter
