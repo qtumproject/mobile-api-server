@@ -141,7 +141,7 @@ class MobileAddressBalanceNotifier {
 
                 let languageHash = {};
 
-                addressObject.tokens.forEach((tokenObject) => {
+                addressObject.tokens.forEach((tokenObject) => { 
 
                     if (!languageHash[tokenObject.language]) {
                         languageHash[tokenObject.language] = [];

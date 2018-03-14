@@ -12,14 +12,14 @@ class ContractsHelper {
      */
     static isContractVOutHex(str) {
 
-       try {
-           let script = bitcore.Script.fromString(str),
-               fChunk = script.chunks.find((chunk) => {
-                   return (chunk.opcodenum && [OP_CREATE, OP_CALL].indexOf(chunk.opcodenum) !== -1);
-               });
-           return !!fChunk;
+        try {
+            let script = bitcore.Script.fromString(str),
+                fChunk = script.chunks.find((chunk) => {
+                    return (chunk.opcodenum && [OP_CREATE, OP_CALL].indexOf(chunk.opcodenum) !== -1);
+                });
+            return !!fChunk;
         } catch (e) {
-           return false;
+            return false;
         }
 
     }
@@ -31,15 +31,15 @@ class ContractsHelper {
      */
     static isContractCreateVOutHex(str) {
 
-       try {
-           let script = bitcore.Script.fromString(str),
-               fChunk = script.chunks.find((chunk) => {
-                   return (chunk.opcodenum && [OP_CREATE].indexOf(chunk.opcodenum) !== -1);
-               });
+        try {
+            let script = bitcore.Script.fromString(str),
+                fChunk = script.chunks.find((chunk) => {
+                    return (chunk.opcodenum && [OP_CREATE].indexOf(chunk.opcodenum) !== -1);
+                });
 
-           return !!fChunk;
+            return !!fChunk;
         } catch (e) {
-           return false;
+            return false;
         }
 
     }
@@ -51,15 +51,15 @@ class ContractsHelper {
      */
     static isContractCallVOutHex(str) {
 
-       try {
-           let script = bitcore.Script.fromString(str),
-               fChunk = script.chunks.find((chunk) => {
-                   return (chunk.opcodenum && [OP_CALL].indexOf(chunk.opcodenum) !== -1);
-               });
+        try {
+            let script = bitcore.Script.fromString(str),
+                fChunk = script.chunks.find((chunk) => {
+                    return (chunk.opcodenum && [OP_CALL].indexOf(chunk.opcodenum) !== -1);
+                });
 
-           return !!fChunk;
+            return !!fChunk;
         } catch (e) {
-           return false;
+            return false;
         }
 
     }
@@ -95,6 +95,27 @@ class ContractsHelper {
             rpm = crypto.createHash('rmd160').update(sha256).digest();
 
         return rpm.toString('hex');
+    }
+
+    /**
+    *
+    * @param {String} contractAddress
+    * @param {String} networkId - hex
+    */
+    static getBitAddressFromContractAddress(contractAddress, networkId) {
+        try {
+            if (/^0x/.test(contractAddress)) {
+                contractAddress = contractAddress.slice(contractAddress.length - 40, contractAddress.length);
+            }
+
+            var checksum = bitcore.crypto.Hash.sha256sha256(new bitcore.deps.Buffer(networkId + contractAddress, 'hex')),
+                hexBitAddress = networkId + contractAddress + checksum.toString('hex').slice(0, 8);
+
+            return bitcore.encoding.Base58.encode(new bitcore.deps.Buffer(hexBitAddress, 'hex'));
+        } catch (e) {
+
+            return null;
+        }
     }
 
 }
