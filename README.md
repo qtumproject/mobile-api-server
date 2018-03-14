@@ -640,6 +640,50 @@ Sample output:
     "block_height": 23701|-1,
     "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
     "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+    "tx_time": 1490705700, // tx_time === block_time if transaction is uncluded in block
+    "amount": 1.875, //qtum
+    "contract_has_been_deleted": true, //optional
+    "vout": [
+        {
+            "value": "1", //qtum
+            "address": "mr8Mezn8p7CmHvPBbfieSxfeNtHiG7AwfQ",
+            "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
+        },
+        {
+            "value": "0.874", //qtum
+            "address": "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3",
+            "scriptPubKey": "4 400d030000000000 2800000000000000 a9059cbb0000000000000000000000002650f3a876b1f3ffd9766c381660cf946ee5237a0000000000000000000000000000000000000000000000000000000000000001 4545fc7b7e2bb7604027835f5b88427e40150aff OP_CALL"
+        }
+    ],
+    "vin": [
+        {
+            value: "1.875", //qtum
+            address: "mvYtoXgd5NCWNfPmyH8AYDyzY6kqmZ5Jt3"
+        }
+    ]
+}
+```
+
+### Event ``new_token_transaction``
+
+
+Listen:
+
+```
+    socket.on('new_token_transaction', function(data) {
+         console.log(data) // Sample output
+    });
+```
+
+Sample output:
+
+```
+{
+    "block_time": 1490705700,
+    "block_height": 23701,
+    "block_hash": "ea22d5650f6edf352790372c27edba05c4b3870f181ad245a2f9b63cfef39589"|null,
+    "tx_hash": "79d78d6f54037045cd091c7ae1a3a84c07cd7a9c02190b26092e62b77feaea80",
+    "tx_time": 1490705700, // tx_time === block_time
     "amount": 1.875, //qtum
     "contract_has_been_deleted": true, //optional
     "vout": [
