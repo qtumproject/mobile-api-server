@@ -35,6 +35,13 @@ class TransactionService {
 
     }
 
+
+    /**
+     *
+     * @param {String} txId
+     * @param {Function} next
+     * @returns {*}
+     */
     static getTransactionReceipt(txId, next) {
         return InsightApiRepository.getTransactionReceipt(txId, (err, data) => {
             if (err) {

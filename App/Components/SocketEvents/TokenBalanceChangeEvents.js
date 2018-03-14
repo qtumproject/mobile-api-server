@@ -272,7 +272,7 @@ class TokenBalanceChangeEvents {
 
         }
 
-        return this.notifyTokenBalanceChange(contract_address, emitter);
+        this.notifyTokenBalanceChange(contract_address, emitter);
     }
 
     /**

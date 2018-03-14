@@ -97,6 +97,11 @@ class ContractsHelper {
         return rpm.toString('hex');
     }
 
+    /**
+    *
+    * @param {String} contractAddress
+    * @param {String} networkId - hex
+    */
     static getBitAddressFromContractAddress(contractAddress, networkId) {
         try {
             if (/^0x/.test(contractAddress)) {
