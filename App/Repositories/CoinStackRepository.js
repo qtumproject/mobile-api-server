@@ -6,12 +6,12 @@ class CoinStackRepository {
 
 	/**
  	*
- 	* @param {Array<string>} blockInfo.addresses
- 	* @param {Number} blockInfo.blockHeight
+ 	* @param {Number} blockHeight
+ 	* @param {Array<string>} addresses
  	* @param {Function} next
  	*/
 	static addBlockAddresses({ blockHeight, addresses }, next) {
-		
+
 		if (!addresses || !addresses.length) {
 			return next();
 		}

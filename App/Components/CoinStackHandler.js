@@ -6,6 +6,12 @@ const TransactionService = require('../Services/TransactionService');
 
 class CoinStackHandler {
 
+	/**
+ 	*
+ 	* @param {Number} height
+ 	* @param {Array<string>} addresses
+ 	* @param {Function} next
+ 	*/
 	static handleCoinStack(height, addresses, next) {
 		return async.waterfall([
 			(callback) => CoinStackRepository.addBlockAddresses({ blockHeight: height, addresses }, (err) => callback(err)),
@@ -21,6 +27,11 @@ class CoinStackHandler {
 		], (err, uniqAddresses) => next(err, uniqAddresses));
 	}
 
+	/**
+ 	*
+	* @param {Object} transaction
+	* @returns {Array.<String>}
+ 	*/
 	static processCoinStackTransaction(transaction) {
 		let coinStackAddresses = [];
 		let { vout } = transaction;
@@ -39,6 +50,12 @@ class CoinStackHandler {
 		return coinStackAddresses;
 	}
 
+
+	/**
+ 	*
+	* @param {Array.<Object>} coinStacks
+	* @returns {Array.<String>}
+ 	*/
 	static getAddressesFromRemovedStacks(coinStacks) {
 
 		if (coinStacks.length === 1) {
