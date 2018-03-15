@@ -72,11 +72,17 @@ class QtumRoomEvents {
 
                 });
 
-                CoinStackHandler.handleCoinStack(data.block.height, coinStackAddresses, () => { });
+                return CoinStackHandler.handleCoinStack(data.block.height, coinStackAddresses, (err, coinStackAddresses) => {
+                    const commonAddresses = Object.keys(addresses);
 
-                this.notifyBalanceChanged(Object.keys(addresses));
-                
+                    if (err || !coinStackAddresses || !coinStackAddresses.length) {
+                        return this.notifyBalanceChanged(commonAddresses);
+                    }
+                    
+                    const allAddresses = _.union(commonAddresses, coinStackAddresses);
 
+                    return this.notifyBalanceChanged(allAddresses);
+                });
 
             }
 

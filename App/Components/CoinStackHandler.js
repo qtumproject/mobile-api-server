@@ -1,4 +1,5 @@
 const async = require('async');
+const _ = require('lodash');
 
 const CoinStackRepository = require('../Repositories/CoinStackRepository');
 const TransactionService = require('../Services/TransactionService');
@@ -6,42 +7,23 @@ const TransactionService = require('../Services/TransactionService');
 class CoinStackHandler {
 
 	static handleCoinStack(height, addresses, next) {
-		async.waterfall([
-			(callback) => CoinStackRepository.addBlockAddresses({ height, addresses }, (err) => callback(err)),
-			(callback) => CoinStackRepository.fetchAndRemoveOldestDocuments(height, (err, response) => {
-				console.log(JSON.stringify(response, null, 2));
-				return callback();
-			})
-		], (err) => next(err));
-	}
-
-	static checkConfirmedCoins(height, next) {
-		return UnconfirmedBalanceRepository.fetchAndRemoveOldestDocuments(height, (err, response) => {
-			if (err) {
-				return next(err);
-			}
-
-			if (response && response.length && response.addresses) {
-				const { addresses } = response.addresses;
-				return next(null, addresses);
-			}
-
-			return next(err, []);
-		})
-	}
-
-	static handleUnconfirmedCoins(transactions, next) {
 		return async.waterfall([
-			(callback) =>
-				(callback) => this.checkConfirmedCoins(block.height, (err, addresses) => callback(err, addresses))
-		],
-			(err, addresses) => next(err, addresses)
-		);
+			(callback) => CoinStackRepository.addBlockAddresses({ blockHeight: height, addresses }, (err) => callback(err)),
+			(callback) => CoinStackRepository.fetchAndRemoveOldestDocuments(height, (err, coinStacks) => {
+				if (err || !coinStacks || !coinStacks.length) {
+					return callback(err, []);
+				}
+
+				const uniqAddresses = this.getAddressesFromRemovedStacks(coinStacks);
+
+				return callback(null, uniqAddresses);
+			})
+		], (err, uniqAddresses) => next(err, uniqAddresses));
 	}
 
 	static processCoinStackTransaction(transaction) {
-		const coinStackAddresses = [];
-		const { vout } = transaction;
+		let coinStackAddresses = [];
+		let { vout } = transaction;
 
 		if (!vout || !vout.length) {
 			return [];
@@ -50,11 +32,25 @@ class CoinStackHandler {
 		vout.forEach((item, index) => {
 			if (item && item.scriptPubKey && item.scriptPubKey.addresses && item.scriptPubKey.addresses.length) {
 				const address = item.scriptPubKey.addresses;
-				coinStackAddresses.push(...address);
+				coinStackAddresses = _.union(coinStackAddresses, address);
 			}
 		});
 
 		return coinStackAddresses;
+	}
+
+	static getAddressesFromRemovedStacks(coinStacks) {
+
+		if (coinStacks.length === 1) {
+			return coinStacks[0].addresses;
+		}
+
+		const uniqAddresses = coinStacks
+			.reduce(({ addresses: currAddresses }, { addresses: nextAddresses }) => {
+				return _.union(currAddresses, nextAddresses);
+			});
+
+		return uniqAddresses;
 	}
 
 }
