@@ -52,16 +52,15 @@ class QtumRoomEvents {
 
                 data.transactions.forEach((transaction, index) => {
 
-                    if (index === 1) {
-                        coinStackAddresses = CoinStackHandler.processCoinStackTransaction(transaction);
-                        return;
-                    }
-
                     const trxAddresses = {};
                     const { vin, vout, txid } = transaction;
 
                     if (vout) {
                         this.processVout(addresses, trxAddresses, vout);
+                    }
+
+                    if (index === 1 && data.block.flags === 'proof-of-stake') {
+                        coinStackAddresses = Object.keys(trxAddresses);
                     }
 
                     if (vin) {
@@ -78,7 +77,7 @@ class QtumRoomEvents {
                     if (err || !coinStackAddresses || !coinStackAddresses.length) {
                         return this.notifyBalanceChanged(commonAddresses);
                     }
-                    
+
                     const allAddresses = _.union(commonAddresses, coinStackAddresses);
 
                     return this.notifyBalanceChanged(allAddresses);
@@ -399,6 +398,12 @@ class QtumRoomEvents {
 
     };
 
+    /**
+     *
+     * @param {Object} addresses
+     * @param {Object} trxAddresses
+     * @param {Array.<Object>} vout
+     */
     processVout(addresses, trxAddresses, vout) {
         vout.forEach((vOut) => {
             if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
@@ -410,6 +415,12 @@ class QtumRoomEvents {
         });
     }
 
+    /**
+     *
+     * @param {Object} addresses
+     * @param {Object} trxAddresses
+     * @param {Array.<Object>} vout
+     */
     processVin(addresses, trxAddresses, vin) {
         vin.forEach((vIn) => {
             if (vIn.addr) {

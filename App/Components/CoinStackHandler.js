@@ -29,30 +29,6 @@ class CoinStackHandler {
 
 	/**
  	*
-	* @param {Object} transaction
-	* @returns {Array.<String>}
- 	*/
-	static processCoinStackTransaction(transaction) {
-		let coinStackAddresses = [];
-		let { vout } = transaction;
-
-		if (!vout || !vout.length) {
-			return [];
-		}
-
-		vout.forEach((item, index) => {
-			if (item && item.scriptPubKey && item.scriptPubKey.addresses && item.scriptPubKey.addresses.length) {
-				const address = item.scriptPubKey.addresses;
-				coinStackAddresses = _.union(coinStackAddresses, address);
-			}
-		});
-
-		return coinStackAddresses;
-	}
-
-
-	/**
- 	*
 	* @param {Array.<Object>} coinStacks
 	* @returns {Array.<String>}
  	*/
