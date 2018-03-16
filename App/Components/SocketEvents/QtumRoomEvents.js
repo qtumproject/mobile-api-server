@@ -1,9 +1,11 @@
 const _ = require('lodash');
 const logger = require('log4js').getLogger('QtumRoomEvents Socket Events');
-const InsightApiRepository = require("../../Repositories/InsightApiRepository");
-const TransactionService = require("../../Services/TransactionService");
 const async = require('async');
 const BigNumber = require('bignumber.js');
+
+const InsightApiRepository = require("../../Repositories/InsightApiRepository");
+const TransactionService = require("../../Services/TransactionService");
+const CoinStackHandler = require('../../Components/CoinStackHandler');
 const Address = require('../../Components/Address');
 const config = require('../../../config/main.json');
 
@@ -46,34 +48,40 @@ class QtumRoomEvents {
             if (data && data.transactions) {
 
                 let addresses = {};
+                let coinStackAddresses = [];
 
-                data.transactions.forEach((transaction) => {
+                data.transactions.forEach((transaction, index) => {
 
-                    let trxAddresses = {};
+                    const trxAddresses = {};
+                    const { vin, vout, txid } = transaction;
 
-                    if (transaction.vout) {
-                        transaction.vout.forEach((vOut) => {
-                            if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
-                                addresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
-                                trxAddresses[vOut.scriptPubKey.addresses[0]] = vOut.scriptPubKey.addresses[0];
-                            }
-                        });
+                    if (vout) {
+                        this.processVout(addresses, trxAddresses, vout);
                     }
 
-                    if (transaction.vin) {
-                        transaction.vin.forEach((vIn) => {
-                            if (vIn.addr) {
-                                addresses[vIn.addr] = vIn.addr;
-                                trxAddresses[vIn.addr] = vIn.addr;
-                            }
-                        });
+                    if (index === 1 && data.block.flags === 'proof-of-stake') {
+                        coinStackAddresses = Object.keys(trxAddresses);
                     }
 
-                    this.notifyNewTransaction(Object.keys(trxAddresses), transaction.txid, {withHeight: true});
+                    if (vin) {
+                        this.processVin(addresses, trxAddresses, vin);
+                    }
+
+                    this.notifyNewTransaction(Object.keys(trxAddresses), txid, { withHeight: true });
 
                 });
 
-                this.notifyBalanceChanged(Object.keys(addresses));
+                return CoinStackHandler.handleCoinStack(data.block.height, coinStackAddresses, (err, coinStackAddresses) => {
+                    const commonAddresses = Object.keys(addresses);
+
+                    if (err || !coinStackAddresses || !coinStackAddresses.length) {
+                        return this.notifyBalanceChanged(commonAddresses);
+                    }
+
+                    const allAddresses = _.union(commonAddresses, coinStackAddresses);
+
+                    return this.notifyBalanceChanged(allAddresses);
+                });
 
             }
 
@@ -107,7 +115,7 @@ class QtumRoomEvents {
 
                 let addressKeys = Object.keys(addresses);
 
-                this.notifyNewTransaction(addressKeys, data.txid, {withHeight: false});
+                this.notifyNewTransaction(addressKeys, data.txid, { withHeight: false });
                 this.notifyBalanceChanged(addressKeys);
 
             }
@@ -204,7 +212,7 @@ class QtumRoomEvents {
      * @param {Object} emitter - Socket emitter
      */
     notifyBalanceChangedEmitter(emitter) {
-        
+
         if (this.subscriptions.emitterAddress[emitter.id]) {
             return InsightApiRepository.getAddressesBalance(this.subscriptions.emitterAddress[emitter.id], (err, data) => {
 
@@ -267,7 +275,7 @@ class QtumRoomEvents {
 
         let addressAdded = false;
 
-        for(let i = 0; i < addresses.length; i++) {
+        for (let i = 0; i < addresses.length; i++) {
 
             let addressStr = addresses[i];
 
@@ -275,7 +283,7 @@ class QtumRoomEvents {
 
                 addressAdded = true;
 
-                if(this.subscriptions.address[addressStr]) {
+                if (this.subscriptions.address[addressStr]) {
 
                     let emitters = this.subscriptions.address[addressStr],
                         index = emitters.indexOf(emitter);
@@ -324,20 +332,20 @@ class QtumRoomEvents {
      */
     unsubscribeAddress(emitter, addresses) {
 
-        if(!addresses) {
+        if (!addresses) {
             return this.unsubscribeAddressAll(emitter);
         }
 
-        for(let i = 0; i < addresses.length; i++) {
+        for (let i = 0; i < addresses.length; i++) {
 
             let addressStr = addresses[i];
 
-            if(this.subscriptions.address[addressStr]) {
+            if (this.subscriptions.address[addressStr]) {
 
                 let emitters = this.subscriptions.address[addressStr],
                     index = emitters.indexOf(emitter);
 
-                if(index > -1) {
+                if (index > -1) {
                     emitters.splice(index, 1);
                     if (emitters.length === 0) {
                         delete this.subscriptions.address[addressStr];
@@ -347,7 +355,7 @@ class QtumRoomEvents {
                 let addrs = this.subscriptions.emitterAddress[emitter.id],
                     addrIndex = addrs.indexOf(addressStr);
 
-                if(addrIndex > -1) {
+                if (addrIndex > -1) {
                     addrs.splice(addrIndex, 1);
                     if (addrs.length === 0) {
                         delete this.subscriptions.emitterAddress[emitter.id];
@@ -368,12 +376,12 @@ class QtumRoomEvents {
      */
     unsubscribeAddressAll(emitter) {
 
-        for(let hashHex in this.subscriptions.address) {
+        for (let hashHex in this.subscriptions.address) {
 
             let emitters = this.subscriptions.address[hashHex],
                 index = emitters.indexOf(emitter);
 
-            if(index > -1) {
+            if (index > -1) {
                 emitters.splice(index, 1);
             }
 
@@ -390,6 +398,37 @@ class QtumRoomEvents {
 
     };
 
+    /**
+     *
+     * @param {Object} addresses
+     * @param {Object} trxAddresses
+     * @param {Array.<Object>} vout
+     */
+    processVout(addresses, trxAddresses, vout) {
+        vout.forEach((vOut) => {
+            if (vOut && vOut.scriptPubKey && vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length) {
+                const address = vOut.scriptPubKey.addresses[0];
+
+                addresses[address] = address;
+                trxAddresses[address] = address;
+            }
+        });
+    }
+
+    /**
+     *
+     * @param {Object} addresses
+     * @param {Object} trxAddresses
+     * @param {Array.<Object>} vout
+     */
+    processVin(addresses, trxAddresses, vin) {
+        vin.forEach((vIn) => {
+            if (vIn.addr) {
+                addresses[vIn.addr] = vIn.addr;
+                trxAddresses[vIn.addr] = vIn.addr;
+            }
+        });
+    }
 
 }
 
