@@ -154,17 +154,16 @@ class MobileContractBalanceNotifier {
     /**
      *
      * @param {String} contractAddress
-     * @param {String} name
      * @param {String} symbol
      * @param {Number} amount
      * @param {String} language
      * @returns {*}
      */
-    getMessage({ contractAddress, name, symbol, amount }, language) {
+    getMessage({ contractAddress, symbol, amount }, language) {
 
         let message = new gcm.Message();
 
-        message.addNotification('title', i18n.__({ phrase: 'notification.title', locale: language }, { name }));
+        message.addNotification('title', i18n.__({ phrase: 'notification.title', locale: language }, { name: 'QTUM' }));
         message.addNotification('body', i18n.__({ phrase: 'notification.body', locale: language }, { amount, symbol }));
         message.addNotification('sound', true);
         message.addNotification('icon', 'icon');
@@ -193,12 +192,13 @@ class MobileContractBalanceNotifier {
         }
 
         return async.waterfall([
-            (callback) => this.getContractInfo(contractAddress, (err, { name, symbol }) => {
+            (callback) => this.tokenContract.getSymbol(contractAddress, (err, { symbol }) => {
                 if (err) {
+                    logger.error('MobileTokenBalanceNotifier', err);
                     return callback(err);
                 }
 
-                const message = this.getMessage({ contractAddress, name, symbol, amount: amountBN.toString(10) }, language);
+                const message = this.getMessage({ contractAddress, symbol, amount: amountBN.toString(10) }, language);
 
                 return callback(null, message);
             }),
@@ -229,46 +229,6 @@ class MobileContractBalanceNotifier {
             return next();
         });
 
-    }
-
-
-    /**
-    *
-    * @param {String} contractAddress
-    * @param {Function} next
-    * @returns {*}
-    */
-    getContractInfo(contractAddress, next) {
-        const contractInfo = {};
-        
-        return async.waterfall([
-            (callback) => this.tokenContract.getName(contractAddress, (err, { name }) => {
-                if (err) {
-                    logger.error('MobileTokenBalanceNotifier', err);
-                    return callback(err);
-                }
-
-                contractInfo.name = name;
-
-                return callback();
-            }),
-            (callback) => this.tokenContract.getSymbol(contractAddress, (err, { symbol }) => {
-                if (err) {
-                    logger.error('MobileTokenBalanceNotifier', err);
-                    return callback(err);
-                }
-
-                contractInfo.symbol = symbol;
-
-                return callback();
-            })
-        ], (err) => {
-            if (err) {
-                return next(err);
-            }
-
-            return next(null, contractInfo);
-        });
     }
 
     /**
