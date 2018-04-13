@@ -84,13 +84,13 @@ class HistoryService {
                         if (ContractsHelper.isContractCreateVOutHex(vOut.scriptPubKey.hex)) {
                             addressCreateString = ContractsHelper.getContractAddress(item.txid, vOut.n);
                         }
-                    } catch (e) {}
+                    } catch (e) { }
 
                     try {
                         if (!addressCreateString && ContractsHelper.isContractCallVOutHex(vOut.scriptPubKey.hex)) {
                             addressCallString = ContractsHelper.getCallContractAddressFromVOutHex(vOut.scriptPubKey.hex);
                         }
-                    } catch (e) {}
+                    } catch (e) { }
 
                     if (vOut.scriptPubKey.addresses && vOut.scriptPubKey.addresses.length && typeof vOut.value !== 'undefined') {
 
@@ -120,6 +120,10 @@ class HistoryService {
             vout: vout,
             vin: vin
         };
+
+        if (item.receipt && item.receipt.length) {
+            result.receipt = item.receipt;
+        }
 
         if (!addressCreateString && !addressCallString) {
             return cb(null, result);

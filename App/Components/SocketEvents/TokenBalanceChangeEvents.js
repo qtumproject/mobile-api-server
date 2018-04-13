@@ -33,41 +33,26 @@ class TokenBalanceChangeEvents {
     subscribeToQtumBlock() {
         this.socketClient.on('qtum/block', (block) => {
             if (block && block.transactions) {
-                return async.eachSeries(block.transactions, (transaction, callback) => {
+                return async.eachSeries(block.transactions, (trx, callback) => {
 
                     let formattedTransaction = {};
                     let receipt = null;
 
-                    return async.waterfall([
-                        (callback) => TransactionService.getTransaction(transaction.txid, (err, result) => {
-                            if (err) {
-                                logger.error('Get transaction error: ', err.message);
-                                return callback(err);
-                            }
+                    return TransactionService.getTransaction(trx.txid, (err, transaction) => {
 
-                            formattedTransaction = result;
+                        if (err) {
+                            logger.error('Get transaction error: ', err.message);
+                            return callback(err);
+                        }
 
-                            return callback();
-                        }),
-                        (callback) => TransactionService.getTransactionReceipt(transaction.txid, (err, data) => {
-                            if (err) {
-                                logger.error('Get transaction receipt error: ', err.message);
-                                return callback(err);
-                            }
+                        if (_.isArray(transaction.receipt) && transaction.receipt.length) {
+                            this.processTransactionReceiptLogs(transaction);
+                        }
 
-                            if (data && data[0]) {
-                                receipt = data[0];
-                                this.processTransactionReceiptLogs(receipt.log, formattedTransaction);
-                            }
-
-                            return callback();
-
-                        })
-                    ], (err) => {
                         return callback();
                     });
 
-                });
+                }, (err) => { });
             }
 
         });
@@ -77,11 +62,12 @@ class TokenBalanceChangeEvents {
 
     /**
      *
-     * @param {Array.<Object>} logs
      * @param {<Object>} transaction
      * @returns {*}
      */
-    processTransactionReceiptLogs(logs, transaction) {
+    processTransactionReceiptLogs(transaction) {
+        const logs = transaction.receipt[0].log;
+
         logs.forEach((log) => {
             this.processTransactionReceiptLog(log, transaction);
         });

@@ -108,7 +108,7 @@ class InsightApiRepository {
             if (body && _.isString(body)) { //Fix "Not Found" api response
                 body = null;
             }
-
+            
             return cb(error, body);
         });
     }
