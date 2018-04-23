@@ -55,7 +55,8 @@ class Qrc20Controller {
                         amount: item.value,
                         tx_hash: item.tx_hash,
                         tx_time: item.tx_time,
-                        contract_address: item.contract_address
+                        contract_address: item.contract_address,
+                        receipt: item.receipt
                     };
                 });
 
