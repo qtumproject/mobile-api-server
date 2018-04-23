@@ -727,7 +727,9 @@ Response:
 
 `GET`
 
-/qrc20/{:qrc20ContractAddress}/transfers?limit=20&offset=0&addresses[]=QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd
+/qrc20/{:qrc20ContractAddress}/transfers?limit=20&offset=0&addresses[]=QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd&withReceipt=true
+
+If you dont want to get receipt, then do not add withReceipt field to query
 
 Response:
 ```
@@ -736,22 +738,72 @@ Response:
     "offset": 0,
     "count": 2,
     "items": [
-        {
-            "contract_address": "9d3d4cc1986d81f9109f2b091b7732e7d9bcf63b",
-            "from": "QcoAQPP93jDAYnfvUxabQvGNR8x6Hn6tKC",
-            "to": "QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd",
-            "amount": "1000000",
-            "tx_hash": "b6101753060d6e7dd40a23e84305dd6c9f25d3f1b8a9cd45edc69cddb8d7f75a",
-            "tx_time": 1511486352
+       {
+            "from": "qVa4Pp5fjrLNdEzHM882F5hZnWMMPJCu7W",
+            "to": "qVa4Pp5fjrLNdEzHM882F5hZnWMMPJCu7W",
+            "amount": "120000000000000000000000000000000000000000",
+            "tx_hash": "e95cc08e65b626f0d9b36d452a7580c14ec75be2c078f7c155a7233f823239ae",
+            "tx_time": 1518525456,
+            "contract_address": "84447378b80baf144377a393aabcd8a61007c0e8",
+            "receipt": [
+                {
+                    "blockHash": "36d582085290dc43be4253ebc69d7eda596cbfc3a492b4b4b8877beffbf49a00",
+                    "blockNumber": 86145,
+                    "transactionHash": "e95cc08e65b626f0d9b36d452a7580c14ec75be2c078f7c155a7233f823239ae",
+                    "transactionIndex": 2,
+                    "from": "83c2436854450b0895d4c1d965720ef5e6a125be",
+                    "to": "84447378b80baf144377a393aabcd8a61007c0e8",
+                    "cumulativeGasUsed": 36923,
+                    "gasUsed": 36923,
+                    "contractAddress": "84447378b80baf144377a393aabcd8a61007c0e8",
+                    "excepted": "None",
+                    "log": [
+                        {
+                            "address": "84447378b80baf144377a393aabcd8a61007c0e8",
+                            "topics": [
+                                "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                                "00000000000000000000000083c2436854450b0895d4c1d965720ef5e6a125be",
+                                "00000000000000000000000083c2436854450b0895d4c1d965720ef5e6a125be"
+                            ],
+                            "data": "00000000000000000000000000000160a5f7552857b8fc0cb7808c0000000000"
+                        }
+                    ]
+                }
+            ]
         },
         {
-            "contract_address": "9d3d4cc1986d81f9109f2b091b7732e7d9bcf63b",
-            "from": "QQoU895WJ1NfCzHp6dEN8HEi9b8iuRvzQy",
-            "to": "QMo91KVCAW9BMAeHRDYz5ib94N7pGTMmQd",
-            "amount": "1000000",
-            "tx_hash": "79a958c1c323ac249e6b56862bf7a836df23cc7532ea4c4551f5d11694d9533d",
-            "tx_time": 1511065856
-        }
+            "from": "qVa4Pp5fjrLNdEzHM882F5hZnWMMPJCu7W",
+            "to": "qSZSyHjzHhqRYmsFLC1pWGA5jnuPzjB9gb",
+            "amount": "2220000000000000000000000000000000000000000",
+            "tx_hash": "2ebf4ec2df9a0e8b617681afe703b7ffe2d076c45b2c726fe1a6b0ffd665f599",
+            "tx_time": 1516880768,
+            "contract_address": "84447378b80baf144377a393aabcd8a61007c0e8",
+            "receipt": [
+                {
+                    "blockHash": "818d571cab4f0b6f1f425767245719f219614ad5aa0a6da7d2eded68e3f9c72d",
+                    "blockNumber": 74751,
+                    "transactionHash": "2ebf4ec2df9a0e8b617681afe703b7ffe2d076c45b2c726fe1a6b0ffd665f599",
+                    "transactionIndex": 3,
+                    "from": "83c2436854450b0895d4c1d965720ef5e6a125be",
+                    "to": "84447378b80baf144377a393aabcd8a61007c0e8",
+                    "cumulativeGasUsed": 103206,
+                    "gasUsed": 51923,
+                    "contractAddress": "84447378b80baf144377a393aabcd8a61007c0e8",
+                    "excepted": "None",
+                    "log": [
+                        {
+                            "address": "84447378b80baf144377a393aabcd8a61007c0e8",
+                            "topics": [
+                                "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                                "00000000000000000000000083c2436854450b0895d4c1d965720ef5e6a125be",
+                                "00000000000000000000000062bc51052a584450e820844cc8b648842439d77b"
+                            ],
+                            "data": "0000000000000000000000000000197bfe5fa76a56de36eb42ca1e0000000000"
+                        }
+                    ]
+                }
+            ]
+        },
     ]
 }
 ```

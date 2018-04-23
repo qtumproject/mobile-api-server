@@ -26,21 +26,33 @@ class Qrc20Controller {
     fetchTransfers(cb, data) {
 
         let req = data.req,
-            contractAddress = req.params.contractAddress,
-            offset = req.query.offset,
-            limit = req.query.limit,
-            addresses = req.query.addresses;
+            contractAddress = req.params.contractAddress;
 
+        const queryObj = {
+            offset: req.query.offset,
+            limit: req.query.limit,
+            addresses: req.query.addresses
+        };
 
-        if (!_.isArray(addresses) || !_.isString(contractAddress) || !contractAddress.trim()) {
+        let withReceipt;
+
+        if (req.query.withReceipt) {
+            try {
+                withReceipt = JSON.parse(req.query.withReceipt);
+            } catch (err) {
+                withReceipt = true;
+            }
+        }
+
+        if (withReceipt) {
+            queryObj.withReceipt = true;
+        }
+
+        if (!_.isArray(queryObj.addresses) || !_.isString(contractAddress) || !contractAddress.trim()) {
             return cb("Bad Request", 400);
         }
 
-        return InsightApiRepository.fetchQrc20Transfers(contractAddress, {
-            offset: offset,
-            limit: limit,
-            addresses: addresses
-        }, (err, data) => {
+        return InsightApiRepository.fetchQrc20Transfers(contractAddress, queryObj, (err, data) => {
 
             if (err) {
                 return cb("Not Found", 404);
