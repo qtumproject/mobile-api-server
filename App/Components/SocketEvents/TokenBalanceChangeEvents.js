@@ -132,7 +132,7 @@ class TokenBalanceChangeEvents {
 
                         notifications.push({
                             address: addressFrom,
-                            balances: balanceValue,
+                            balance: balanceValue,
                         });
 
                         return callback(err);
@@ -151,7 +151,7 @@ class TokenBalanceChangeEvents {
 
                         notifications.push({
                             address: addressTo,
-                            balances: balanceValue,
+                            balance: balanceValue,
                         });
 
                         return callback(err);
