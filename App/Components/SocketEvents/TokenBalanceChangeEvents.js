@@ -165,8 +165,14 @@ class TokenBalanceChangeEvents {
                     });
                     this.emitNewTokenTransactionEvent(emitter, transaction);
                 }
+				
+				return callback(err);
             });
 
+        }, (err) => {
+			if (err) {
+				logger.error(`Notify token balance: ${err}`);
+			}
         });
     }
 
