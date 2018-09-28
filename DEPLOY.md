@@ -1,4 +1,4 @@
-##Install QTUM API
+## Install QTUM API
 
 1. install mongodb https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 2. install qtum-bitcore daemon https://github.com/qtumproject/qtum-bitcore.git
