@@ -3,7 +3,7 @@
 1. install mongodb https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 2. install qtum-bitcore daemon https://github.com/qtumproject/qtum-bitcore.git
 3. vim ~/.qtum/qtum.conf
-
+```
 server=1
 whitelist=127.0.0.1
 txindex=1
@@ -22,7 +22,7 @@ addrindex=1
 rpcworkqueue=300
 logevents=1
 maxconnections=500
-
+```
 ## INSTALL SERVER-RECEIVE
 
 4. git clone https://github.com/qtumproject/server-receive
